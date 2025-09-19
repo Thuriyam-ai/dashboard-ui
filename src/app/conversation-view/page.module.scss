@@ -50,10 +50,116 @@
 .leftColumn {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .rightColumn {
   display: flex;
   flex-direction: column;
+  gap: 1.5rem;
+}
+
+.tabNavigation {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  border: none;
+  background: transparent;
+  color: #4a5568;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 200ms ease-in-out;
+  border-bottom: 2px solid transparent;
+
+  &:hover {
+    color: #2d3748;
+    background: #f7fafc;
+  }
+
+  &.active {
+    color: #3182ce;
+    border-bottom-color: #3182ce;
+    background: white;
+  }
+}
+
+.tabIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.tabContent {
+  min-height: 400px;
+}
+
+.lcaPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 3rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 2px dashed #cbd5e0;
+}
+
+.lcaIcon {
+  width: 4rem;
+  height: 4rem;
+  color: #3182ce;
+  margin-bottom: 1rem;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.lcaTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 0.5rem;
+}
+
+.lcaDescription {
+  font-size: 1rem;
+  color: #4a5568;
+  text-align: center;
+  margin-bottom: 2rem;
+  max-width: 400px;
+}
+
+.lcaButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  background: #3182ce;
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 200ms ease-in-out;
+
+  &:hover {
+    background: #2c5aa0;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }

@@ -1,4 +1,4 @@
-import type { GlobalSettings } from './global-settings.type';
+import type { GlobalSettings } from "./global-settings.type";
 
 /**
  * QA environment settings.
@@ -8,10 +8,10 @@ import type { GlobalSettings } from './global-settings.type';
  */
 const qaSettings: GlobalSettings = {
   urlConfig: {
-    EVENT_URL: 'https://example-qa-url.com', // Example URL for qa
+    EVENT_URL: "https://example-qa-url.com", // Example URL for qa
   },
   apiKey: {
-    EVENT_API_KEY: 'example-qa-api-key', // Example API key for qa
+    EVENT_API_KEY: "example-qa-api-key", // Example API key for qa
   },
 };
 

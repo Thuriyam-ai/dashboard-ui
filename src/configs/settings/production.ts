@@ -1,4 +1,4 @@
-import type { GlobalSettings } from './global-settings.type';
+import type { GlobalSettings } from "./global-settings.type";
 
 /**
  * Production environment settings.
@@ -8,10 +8,10 @@ import type { GlobalSettings } from './global-settings.type';
  */
 const productionSettings: GlobalSettings = {
   urlConfig: {
-    EVENT_URL: 'https://example-prod-url.com', // Example URL for production
+    EVENT_URL: "https://example-prod-url.com", // Example URL for production
   },
   apiKey: {
-    EVENT_API_KEY: 'example-prod-api-key', // Example API key for production
+    EVENT_API_KEY: "example-prod-api-key", // Example API key for production
   },
 };
 

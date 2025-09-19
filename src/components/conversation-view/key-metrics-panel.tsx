@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import styles from './key-metrics-panel.module.scss';
-import type { ConversationMetrics, RatioStatus, QualityStatus } from './types';
+import { useState, useEffect } from "react";
+import styles from "./key-metrics-panel.module.scss";
+import type { ConversationMetrics, RatioStatus, QualityStatus } from "./types";
 
 interface KeyMetricsPanelProps {
   metrics?: ConversationMetrics;
@@ -72,15 +72,15 @@ export function KeyMetricsPanel({ metrics }: KeyMetricsPanelProps) {
   }, [data]);
 
   const getRatioColor = (ratio: number) => {
-    if (ratio >= 0.4 && ratio <= 0.6) return '#10b981'; // Good range
-    if (ratio >= 0.3 && ratio <= 0.7) return '#f59e0b'; // Acceptable range
-    return '#ef4444'; // Poor range
+    if (ratio >= 0.4 && ratio <= 0.6) return "#10b981"; // Good range
+    if (ratio >= 0.3 && ratio <= 0.7) return "#f59e0b"; // Acceptable range
+    return "#ef4444"; // Poor range
   };
 
   const getQualityColor = (score: number) => {
-    if (score >= 80) return '#10b981';
-    if (score >= 60) return '#f59e0b';
-    return '#ef4444';
+    if (score >= 80) return "#10b981";
+    if (score >= 60) return "#f59e0b";
+    return "#ef4444";
   };
 
   const formatDuration = (seconds: number) => {
@@ -93,15 +93,15 @@ export function KeyMetricsPanel({ metrics }: KeyMetricsPanelProps) {
   };
 
   const getRatioStatus = (ratio: number): RatioStatus => {
-    if (ratio >= 0.4 && ratio <= 0.6) return 'Optimal';
-    if (ratio >= 0.3 && ratio <= 0.7) return 'Acceptable';
-    return 'Needs Improvement';
+    if (ratio >= 0.4 && ratio <= 0.6) return "Optimal";
+    if (ratio >= 0.3 && ratio <= 0.7) return "Acceptable";
+    return "Needs Improvement";
   };
 
   const getQualityStatus = (score: number): QualityStatus => {
-    if (score >= 80) return 'Excellent';
-    if (score >= 60) return 'Good';
-    return 'Poor';
+    if (score >= 80) return "Excellent";
+    if (score >= 60) return "Good";
+    return "Poor";
   };
 
   return (
@@ -245,11 +245,11 @@ export function KeyMetricsPanel({ metrics }: KeyMetricsPanelProps) {
         <h3 className={styles.summaryTitle}>Conversation Summary</h3>
         <div className={styles.summaryContent}>
           <p>
-            This conversation shows a{' '}
+            This conversation shows a{" "}
             {getRatioStatus(animatedMetrics.talkToListenRatio).toLowerCase()}
             talk-to-listen ratio with {animatedMetrics.fillerWords} filler words
             and {animatedMetrics.interruptions} interruptions. The transcript
-            quality is{' '}
+            quality is{" "}
             {getQualityStatus(
               animatedMetrics.transcriptQualityScore,
             ).toLowerCase()}

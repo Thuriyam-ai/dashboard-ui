@@ -1,5 +1,5 @@
-import { ToastProviderWrapper } from '../contexts/toast/index';
-import { ModalProviderWrapper } from '../contexts/modal/index';
+import { ToastProviderWrapper } from "../contexts/toast/index";
+import { ModalProviderWrapper } from "../contexts/modal/index";
 
 /**
  * This is a central wrapper where all the context providers will be set

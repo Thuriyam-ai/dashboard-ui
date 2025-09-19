@@ -1,1 +1,1 @@
-export { ResponsiveModal } from './responsive-modal';
+export { ResponsiveModal } from "./responsive-modal";

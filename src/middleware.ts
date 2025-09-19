@@ -1,4 +1,4 @@
-import { applyMiddleware } from './middlewares/_base';
+import { applyMiddleware } from "./middlewares/_base";
 
 /**
  * NextJS middleware which allows you to run code before each request.

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import styles from './sidebar.module.scss';
+import React, { useState, useEffect } from "react";
+import styles from "./sidebar.module.scss";
 
 interface NavItem {
   id: string;
@@ -17,7 +17,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ activeItem: propActiveItem }: SidebarProps = {}) {
-  const [activeItem, setActiveItem] = useState(propActiveItem || 'dashboard');
+  const [activeItem, setActiveItem] = useState(propActiveItem || "dashboard");
 
   // Update local state when prop changes
   useEffect(() => {
@@ -26,61 +26,81 @@ export function Sidebar({ activeItem: propActiveItem }: SidebarProps = {}) {
     }
   }, [propActiveItem]);
 
+  const handleNavClick = (itemId: string) => {
+    // Navigation logic with correct URLs
+    switch (itemId) {
+      case "dashboard":
+        window.location.href = "/dashboard";
+        break;
+      case "analytics-overview":
+        window.location.href = "/analytics";
+        break;
+      case "team-dashboard":
+        window.location.href = "/analytics/team";
+        break;
+      case "conversation-view":
+        window.location.href = "/conversation-view";
+        break;
+      default:
+        console.log(`Navigating to: ${itemId}`);
+    }
+  };
+
   const navItems: NavItem[] = [
     {
-      id: 'dashboard',
-      label: 'Dashboard',
-      description: 'Overview & Analytics',
-      icon: 'grid',
+      id: "dashboard",
+      label: "Dashboard",
+      description: "Overview & Analytics",
+      icon: "grid",
       isActive: true,
     },
     {
-      id: 'agent-config',
-      label: 'Agent Configurations',
-      description: 'Deploy & Configure Agents',
-      icon: 'rocket',
+      id: "agent-config",
+      label: "Agent Configurations",
+      description: "Deploy & Configure Agents",
+      icon: "rocket",
     },
     {
-      id: 'access-mgmt',
-      label: 'Access Management',
-      description: 'Users & Permissions',
-      icon: 'key',
+      id: "access-mgmt",
+      label: "Access Management",
+      description: "Users & Permissions",
+      icon: "key",
     },
     {
-      id: 'platform-settings',
-      label: 'Platform Settings',
-      description: 'System Configuration',
-      icon: 'gear',
+      id: "platform-settings",
+      label: "Platform Settings",
+      description: "System Configuration",
+      icon: "gear",
     },
     {
-      id: 'observability',
-      label: 'Observability',
-      description: 'Monitoring & Analytics',
-      icon: 'chart',
+      id: "observability",
+      label: "Observability",
+      description: "Monitoring & Analytics",
+      icon: "chart",
     },
     {
-      id: 'developer-hub',
-      label: 'Developer Hub',
-      description: 'APIs & Documentation',
-      icon: 'users',
+      id: "developer-hub",
+      label: "Developer Hub",
+      description: "APIs & Documentation",
+      icon: "users",
     },
     {
-      id: 'analytics',
-      label: 'Analytics',
-      description: 'Performance & Intelligence',
-      icon: 'chart',
+      id: "analytics",
+      label: "Analytics",
+      description: "Performance & Intelligence",
+      icon: "chart",
       children: [
         {
-          id: 'analytics-overview',
-          label: 'Overview',
-          description: 'Conversation Analysis',
-          icon: 'chart',
+          id: "analytics-overview",
+          label: "Overview",
+          description: "Conversation Analysis",
+          icon: "chart",
         },
         {
-          id: 'team-dashboard',
-          label: 'Team Dashboard',
-          description: 'Team & Campaign Analytics',
-          icon: 'users',
+          id: "team-dashboard",
+          label: "Team Dashboard",
+          description: "Team & Campaign Analytics",
+          icon: "users",
         },
       ],
     },
@@ -132,8 +152,11 @@ export function Sidebar({ activeItem: propActiveItem }: SidebarProps = {}) {
           {navItems.map((item) => (
             <div key={item.id}>
               <button
-                className={`${styles.navItem} ${activeItem === item.id || (item.children && item.children.some((child) => activeItem === child.id)) ? styles.active : ''}`}
-                onClick={() => setActiveItem(item.id)}
+                className={`${styles.navItem} ${activeItem === item.id || (item.children && item.children.some((child) => activeItem === child.id)) ? styles.active : ""}`}
+                onClick={() => {
+                  setActiveItem(item.id);
+                  handleNavClick(item.id);
+                }}
               >
                 <div className={styles.navIcon}>
                   <svg fill="currentColor" viewBox="0 0 24 24">
@@ -163,8 +186,11 @@ export function Sidebar({ activeItem: propActiveItem }: SidebarProps = {}) {
                     {item.children.map((child) => (
                       <button
                         key={child.id}
-                        className={`${styles.nestedItem} ${activeItem === child.id ? styles.active : ''}`}
-                        onClick={() => setActiveItem(child.id)}
+                        className={`${styles.nestedItem} ${activeItem === child.id ? styles.active : ""}`}
+                        onClick={() => {
+                          setActiveItem(child.id);
+                          handleNavClick(child.id);
+                        }}
                       >
                         <div className={styles.nestedIcon}>
                           <svg fill="currentColor" viewBox="0 0 24 24">

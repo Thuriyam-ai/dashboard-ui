@@ -1,13 +1,13 @@
-'use client';
-import { createContext, ReactNode, useContext, useState } from 'react';
+"use client";
+import { createContext, ReactNode, useContext, useState } from "react";
 
-export type ToastType = 'alert' | 'success' | 'error' | 'info';
+export type ToastType = "alert" | "success" | "error" | "info";
 
 export const ToastPosition = {
-  BOTTOM_RIGHT: 'bottom-right',
-  BOTTOM_LEFT: 'bottom-left',
-  TOP_RIGHT: 'top-right',
-  TOP_LEFT: 'top-left',
+  BOTTOM_RIGHT: "bottom-right",
+  BOTTOM_LEFT: "bottom-left",
+  TOP_RIGHT: "top-right",
+  TOP_LEFT: "top-left",
 } as const;
 
 export interface Toast {
@@ -28,10 +28,10 @@ interface ToastContextType {
 const defaultContext: ToastContextType = {
   toasts: [],
   addToasts: () => {
-    console.warn('addToasts called outside of ToastProvider');
+    console.warn("addToasts called outside of ToastProvider");
   },
   removeToasts: () => {
-    console.warn('removeToasts called outside of ToastProvider');
+    console.warn("removeToasts called outside of ToastProvider");
   },
 };
 

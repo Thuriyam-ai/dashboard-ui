@@ -1,0 +1,216 @@
+.gaugeContainer {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.gaugeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.gaugeTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0;
+}
+
+.statusBadge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  &.healthy {
+    background: #c6f6d5;
+    color: #22543d;
+  }
+
+  &.imbalanced {
+    background: #fed7d7;
+    color: #742a2a;
+  }
+
+  &.moderate {
+    background: #fef5e7;
+    color: #744210;
+  }
+}
+
+.gaugeWrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 1.5rem;
+}
+
+.gaugeSvg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.agentProgress {
+  transition: stroke-dasharray 0.5s ease-in-out;
+}
+
+.customerProgress {
+  transition: stroke-dasharray 0.5s ease-in-out;
+}
+
+.gaugeCenter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.ratioDisplay {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.agentRatio,
+.customerRatio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.ratioLabel {
+  font-size: 0.75rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.ratioValue {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.agentRatio .ratioValue {
+  color: #3182ce;
+}
+
+.customerRatio .ratioValue {
+  color: #38a169;
+}
+
+.breakdown {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.breakdownItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.breakdownColor {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+
+  &.agent {
+    background: #3182ce;
+  }
+
+  &.customer {
+    background: #38a169;
+  }
+}
+
+.breakdownLabel {
+  font-size: 0.75rem;
+  color: #4a5568;
+  text-align: center;
+}
+
+.breakdownValue {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.balanceIndicator {
+  margin-top: 1rem;
+}
+
+.balanceBar {
+  position: relative;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.balanceFill {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 4px;
+  transition: all 0.3s ease-in-out;
+
+  &.healthy {
+    background: #38a169;
+  }
+
+  &.imbalanced {
+    background: #e53e3e;
+  }
+
+  &.moderate {
+    background: #d69e2e;
+  }
+}
+
+.balanceLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #718096;
+}
+
+.balanceLabel {
+  font-weight: 500;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .gaugeContainer {
+    padding: 1rem;
+  }
+
+  .gaugeHeader {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .breakdown {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .breakdownItem {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}

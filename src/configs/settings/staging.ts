@@ -1,4 +1,4 @@
-import type { GlobalSettings } from './global-settings.type';
+import type { GlobalSettings } from "./global-settings.type";
 
 /**
  * Staging environment settings.
@@ -8,10 +8,10 @@ import type { GlobalSettings } from './global-settings.type';
  */
 const stagingSettings: GlobalSettings = {
   urlConfig: {
-    EVENT_URL: 'https://example-staging-url.com', // Example URL for staging
+    EVENT_URL: "https://example-staging-url.com", // Example URL for staging
   },
   apiKey: {
-    EVENT_API_KEY: 'example-staging-api-key', // Example API key for staging
+    EVENT_API_KEY: "example-staging-api-key", // Example API key for staging
   },
 };
 

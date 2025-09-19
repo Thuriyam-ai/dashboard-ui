@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import styles from './page.module.scss';
-import { Sidebar } from '@/components/dashboard/sidebar';
-import { ConversationOverview } from '@/components/analytics/conversation-overview';
-import { ConversationDetailView } from '@/components/analytics/conversation-detail-view';
+import { useState } from "react";
+import styles from "./page.module.scss";
+import { Sidebar } from "@/components/dashboard/sidebar";
+import { ConversationOverview } from "@/components/analytics/conversation-overview";
+import { ConversationDetailView } from "@/components/analytics/conversation-detail-view";
 
 interface Conversation {
   id: string;
@@ -12,7 +12,7 @@ interface Conversation {
   customerName: string;
   duration: string;
   date: string;
-  status: 'completed' | 'in-progress' | 'failed';
+  status: "completed" | "in-progress" | "failed";
   qualityScore: number;
   fillerWords: number;
   interruptions: number;
@@ -30,60 +30,60 @@ export default function AnalyticsPage() {
   // Mock conversation data with Indian names
   const conversations: Conversation[] = [
     {
-      id: '1',
-      agentName: 'Priya Sharma',
-      customerName: 'Rajesh Kumar',
-      duration: '8:45',
-      date: '2024-01-15',
-      status: 'completed',
+      id: "1",
+      agentName: "Priya Sharma",
+      customerName: "Rajesh Kumar",
+      duration: "8:45",
+      date: "2024-01-15",
+      status: "completed",
       qualityScore: 87,
       fillerWords: 12,
       interruptions: 3,
       talkToListenRatio: 0.65,
     },
     {
-      id: '2',
-      agentName: 'Arjun Patel',
-      customerName: 'Sneha Singh',
-      duration: '12:30',
-      date: '2024-01-15',
-      status: 'completed',
+      id: "2",
+      agentName: "Arjun Patel",
+      customerName: "Sneha Singh",
+      duration: "12:30",
+      date: "2024-01-15",
+      status: "completed",
       qualityScore: 92,
       fillerWords: 8,
       interruptions: 1,
       talkToListenRatio: 0.58,
     },
     {
-      id: '3',
-      agentName: 'Kavya Reddy',
-      customerName: 'Vikram Joshi',
-      duration: '6:20',
-      date: '2024-01-14',
-      status: 'completed',
+      id: "3",
+      agentName: "Kavya Reddy",
+      customerName: "Vikram Joshi",
+      duration: "6:20",
+      date: "2024-01-14",
+      status: "completed",
       qualityScore: 78,
       fillerWords: 15,
       interruptions: 5,
       talkToListenRatio: 0.72,
     },
     {
-      id: '4',
-      agentName: 'Priya Sharma',
-      customerName: 'Anita Gupta',
-      duration: '15:10',
-      date: '2024-01-14',
-      status: 'completed',
+      id: "4",
+      agentName: "Priya Sharma",
+      customerName: "Anita Gupta",
+      duration: "15:10",
+      date: "2024-01-14",
+      status: "completed",
       qualityScore: 95,
       fillerWords: 5,
       interruptions: 0,
       talkToListenRatio: 0.52,
     },
     {
-      id: '5',
-      agentName: 'Arjun Patel',
-      customerName: 'Deepak Verma',
-      duration: '4:35',
-      date: '2024-01-13',
-      status: 'failed',
+      id: "5",
+      agentName: "Arjun Patel",
+      customerName: "Deepak Verma",
+      duration: "4:35",
+      date: "2024-01-13",
+      status: "failed",
       qualityScore: 45,
       fillerWords: 25,
       interruptions: 8,

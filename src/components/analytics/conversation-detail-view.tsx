@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import styles from './conversation-detail-view.module.scss';
+import styles from "./conversation-detail-view.module.scss";
 import {
   InteractiveTranscriptPlayer,
   SpeakerTimeline,
   KeyMetricsPanel,
-} from '@/components/conversation-view';
+} from "@/components/conversation-view";
 
 interface Conversation {
   id: string;
@@ -13,7 +13,7 @@ interface Conversation {
   customerName: string;
   duration: string;
   date: string;
-  status: 'completed' | 'in-progress' | 'failed';
+  status: "completed" | "in-progress" | "failed";
   qualityScore: number;
   fillerWords: number;
   interruptions: number;
@@ -31,12 +31,12 @@ export function ConversationDetailView({
 }: ConversationDetailViewProps) {
   // Generate mock transcript data based on the conversation
   const generateTranscriptData = () => {
-    const agentName = conversation.agentName.split(' ')[0];
-    const customerName = conversation.customerName.split(' ')[0];
+    const agentName = conversation.agentName.split(" ")[0];
+    const customerName = conversation.customerName.split(" ")[0];
 
     return [
       {
-        id: '1',
+        id: "1",
         speaker: agentName,
         text: `Hello ${customerName}, thank you for calling our support line. How can I help you today?`,
         startTime: 0,
@@ -45,16 +45,16 @@ export function ConversationDetailView({
         isInterruption: false,
       },
       {
-        id: '2',
+        id: "2",
         speaker: customerName,
         text: `Hi, um, I'm having trouble with my account login. It keeps saying my password is wrong.`,
         startTime: 4.5,
         endTime: 8.1,
-        fillerWords: ['um'],
+        fillerWords: ["um"],
         isInterruption: false,
       },
       {
-        id: '3',
+        id: "3",
         speaker: agentName,
         text: `I understand your frustration. Let me help you with that. Can you tell me your email address?`,
         startTime: 8.3,
@@ -63,7 +63,7 @@ export function ConversationDetailView({
         isInterruption: false,
       },
       {
-        id: '4',
+        id: "4",
         speaker: customerName,
         text: `Sure, it's ${customerName.toLowerCase()}@email.com`,
         startTime: 13.0,
@@ -72,7 +72,7 @@ export function ConversationDetailView({
         isInterruption: false,
       },
       {
-        id: '5',
+        id: "5",
         speaker: agentName,
         text: `Perfect. I can see your account here. The issue might be that your password has expired. Let me reset it for you.`,
         startTime: 15.5,
@@ -81,7 +81,7 @@ export function ConversationDetailView({
         isInterruption: false,
       },
       {
-        id: '6',
+        id: "6",
         speaker: customerName,
         text: `Oh, that would be great! Thank you so much.`,
         startTime: 21.0,
@@ -94,8 +94,8 @@ export function ConversationDetailView({
 
   // Generate mock speaker timeline data
   const generateSpeakerData = () => {
-    const agentName = conversation.agentName.split(' ')[0];
-    const customerName = conversation.customerName.split(' ')[0];
+    const agentName = conversation.agentName.split(" ")[0];
+    const customerName = conversation.customerName.split(" ")[0];
 
     return [
       { speaker: agentName, startTime: 0, endTime: 4.2, duration: 4.2 },
@@ -120,24 +120,24 @@ export function ConversationDetailView({
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-IN', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
+    return date.toLocaleDateString("en-IN", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
     });
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed':
-        return '#38a169';
-      case 'in-progress':
-        return '#3182ce';
-      case 'failed':
-        return '#e53e3e';
+      case "completed":
+        return "#38a169";
+      case "in-progress":
+        return "#3182ce";
+      case "failed":
+        return "#e53e3e";
       default:
-        return '#718096';
+        return "#718096";
     }
   };
 

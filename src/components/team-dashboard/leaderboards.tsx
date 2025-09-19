@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import styles from './leaderboards.module.scss';
+import styles from "./leaderboards.module.scss";
 
 interface Agent {
   id: string;
@@ -17,54 +17,54 @@ export function Leaderboards() {
   // Mock data with Indian agent names
   const agents: Agent[] = [
     {
-      id: '1',
-      name: 'Priya Sharma',
-      team: 'Customer Support',
+      id: "1",
+      name: "Priya Sharma",
+      team: "Customer Support",
       talkToListenRatio: 0.58,
       interruptions: 1,
       qualityScore: 95,
       totalConversations: 45,
-      avgDuration: '8:30',
+      avgDuration: "8:30",
     },
     {
-      id: '2',
-      name: 'Arjun Patel',
-      team: 'Sales',
+      id: "2",
+      name: "Arjun Patel",
+      team: "Sales",
       talkToListenRatio: 0.62,
       interruptions: 2,
       qualityScore: 92,
       totalConversations: 38,
-      avgDuration: '12:15',
+      avgDuration: "12:15",
     },
     {
-      id: '3',
-      name: 'Kavya Reddy',
-      team: 'Technical Support',
+      id: "3",
+      name: "Kavya Reddy",
+      team: "Technical Support",
       talkToListenRatio: 0.55,
       interruptions: 0,
       qualityScore: 98,
       totalConversations: 52,
-      avgDuration: '15:45',
+      avgDuration: "15:45",
     },
     {
-      id: '4',
-      name: 'Rajesh Kumar',
-      team: 'Customer Support',
+      id: "4",
+      name: "Rajesh Kumar",
+      team: "Customer Support",
       talkToListenRatio: 0.65,
       interruptions: 3,
       qualityScore: 87,
       totalConversations: 41,
-      avgDuration: '7:20',
+      avgDuration: "7:20",
     },
     {
-      id: '5',
-      name: 'Sneha Singh',
-      team: 'Sales',
+      id: "5",
+      name: "Sneha Singh",
+      team: "Sales",
       talkToListenRatio: 0.59,
       interruptions: 1,
       qualityScore: 94,
       totalConversations: 36,
-      avgDuration: '11:30',
+      avgDuration: "11:30",
     },
   ];
 
@@ -100,21 +100,21 @@ export function Leaderboards() {
   };
 
   const getQualityColor = (score: number) => {
-    if (score >= 90) return '#38a169';
-    if (score >= 80) return '#dd6b20';
-    return '#e53e3e';
+    if (score >= 90) return "#38a169";
+    if (score >= 80) return "#dd6b20";
+    return "#e53e3e";
   };
 
   const getTeamColor = (team: string) => {
     switch (team) {
-      case 'Customer Support':
-        return '#3182ce';
-      case 'Sales':
-        return '#38a169';
-      case 'Technical Support':
-        return '#805ad5';
+      case "Customer Support":
+        return "#3182ce";
+      case "Sales":
+        return "#38a169";
+      case "Technical Support":
+        return "#805ad5";
       default:
-        return '#718096';
+        return "#718096";
     }
   };
 

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import styles from './speaker-timeline.module.scss';
-import type { SpeakerSegment, SpeakerStats, SpeakerColors } from './types';
+import { useState, useRef, useEffect } from "react";
+import styles from "./speaker-timeline.module.scss";
+import type { SpeakerSegment, SpeakerStats, SpeakerColors } from "./types";
 
 interface SpeakerTimelineProps {
   conversationData?: SpeakerSegment[];
@@ -28,27 +28,27 @@ export function SpeakerTimeline({
 
   // Mock data for demonstration
   const MOCK_CONVERSATION_DATA: SpeakerSegment[] = [
-    { speaker: 'Agent', startTime: 0, endTime: 4.2, duration: 4.2 },
-    { speaker: 'Customer', startTime: 4.5, endTime: 8.1, duration: 3.6 },
-    { speaker: 'Agent', startTime: 8.3, endTime: 12.7, duration: 4.4 },
-    { speaker: 'Customer', startTime: 13.0, endTime: 15.2, duration: 2.2 },
-    { speaker: 'Agent', startTime: 15.5, endTime: 20.8, duration: 5.3 },
-    { speaker: 'Customer', startTime: 21.0, endTime: 23.5, duration: 2.5 },
+    { speaker: "Agent", startTime: 0, endTime: 4.2, duration: 4.2 },
+    { speaker: "Customer", startTime: 4.5, endTime: 8.1, duration: 3.6 },
+    { speaker: "Agent", startTime: 8.3, endTime: 12.7, duration: 4.4 },
+    { speaker: "Customer", startTime: 13.0, endTime: 15.2, duration: 2.2 },
+    { speaker: "Agent", startTime: 15.5, endTime: 20.8, duration: 5.3 },
+    { speaker: "Customer", startTime: 21.0, endTime: 23.5, duration: 2.5 },
   ];
 
   const data = conversationData || MOCK_CONVERSATION_DATA;
   const speakers = Array.from(new Set(data.map((segment) => segment.speaker)));
   const speakerColors: SpeakerColors = {
-    Agent: '#3b82f6',
-    Customer: '#10b981',
-    System: '#f59e0b',
-    Other: '#8b5cf6',
+    Agent: "#3b82f6",
+    Customer: "#10b981",
+    System: "#f59e0b",
+    Other: "#8b5cf6",
   };
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   const getSegmentWidth = (duration: number) => {
@@ -108,7 +108,7 @@ export function SpeakerTimeline({
                 backgroundColor:
                   speakerColors[
                     segment.speaker as keyof typeof speakerColors
-                  ] || '#6b7280',
+                  ] || "#6b7280",
               }}
               onMouseEnter={() => setHoveredSegment(segment)}
               onMouseLeave={() => setHoveredSegment(null)}
@@ -144,7 +144,7 @@ export function SpeakerTimeline({
                     backgroundColor:
                       speakerColors[
                         stat.speaker as keyof typeof speakerColors
-                      ] || '#6b7280',
+                      ] || "#6b7280",
                   }}
                 />
                 <span className={styles.speakerName}>{stat.speaker}</span>
@@ -170,7 +170,7 @@ export function SpeakerTimeline({
         <div className={styles.tooltip}>
           <div className={styles.tooltipSpeaker}>{hoveredSegment.speaker}</div>
           <div className={styles.tooltipTime}>
-            {formatTime(hoveredSegment.startTime)} -{' '}
+            {formatTime(hoveredSegment.startTime)} -{" "}
             {formatTime(hoveredSegment.endTime)}
           </div>
           <div className={styles.tooltipDuration}>

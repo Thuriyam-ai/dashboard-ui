@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 /**
  * Context object passed between middlewares
@@ -45,7 +45,7 @@ export function applyMiddleware<T extends Record<string, unknown>>(
         ({ matcher }) =>
           !matcher ||
           matcher.some((condition) =>
-            typeof condition === 'string'
+            typeof condition === "string"
               ? req.nextUrl.pathname.startsWith(condition)
               : condition.test(req.nextUrl.pathname),
           ),
@@ -54,7 +54,7 @@ export function applyMiddleware<T extends Record<string, unknown>>(
 
     let index = -1;
     return (async function runner(i: number): Promise<NextResponse> {
-      if (i <= index) throw new Error('next() called multiple times');
+      if (i <= index) throw new Error("next() called multiple times");
       index = i;
       if (i < applicableMiddlewares.length) {
         return await applicableMiddlewares[i](req, context, () =>

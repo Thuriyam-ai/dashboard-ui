@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { ModalProvider } from './modal-context';
-import { ResponsiveModal } from '@/components/modal';
+import { ModalProvider } from "./modal-context";
+import { ResponsiveModal } from "@/components/modal";
 
 /**
  * ModalProviderWrapper component

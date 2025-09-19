@@ -1,6 +1,6 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import styles from './page.module.scss';
+import Image from "next/image";
+import Link from "next/link";
+import styles from "./page.module.scss";
 
 /**
  * Example Home Page
@@ -13,7 +13,7 @@ export default function ExampleHomePage() {
     <div className={styles.page}>
       <main className={styles.main}>
         <Image
-          src={'/images/placeholder.svg'}
+          src={"/images/placeholder.svg"}
           alt="placeholder"
           width={300}
           height={100}

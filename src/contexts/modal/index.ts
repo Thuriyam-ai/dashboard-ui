@@ -1,2 +1,2 @@
-export { useModal } from './modal-context';
-export { ModalProviderWrapper } from './modal-wrapper';
+export { useModal } from "./modal-context";
+export { ModalProviderWrapper } from "./modal-wrapper";

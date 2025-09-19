@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import styles from './page.module.scss';
-import { Sidebar } from '@/components/dashboard/sidebar';
-import { MetricsCards } from '@/components/dashboard/metrics-cards';
-import { RecentDeployments } from '@/components/dashboard/recent-deployments';
-import { SystemHealth } from '@/components/dashboard/system-health';
+import styles from "./page.module.scss";
+import { Sidebar } from "@/components/dashboard/sidebar";
+import { MetricsCards } from "@/components/dashboard/metrics-cards";
+import { RecentDeployments } from "@/components/dashboard/recent-deployments";
+import { SystemHealth } from "@/components/dashboard/system-health";
 
 /**
  * Dashboard page component.

@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
 import {
   InteractiveTranscriptPlayer,
   SpeakerTimeline,
   KeyMetricsPanel,
-} from '@/components/conversation-view';
-import styles from './page.module.scss';
+} from "@/components/conversation-view";
+import styles from "./page.module.scss";
 
 /**
  * Demo page for the Single Conversation View components.

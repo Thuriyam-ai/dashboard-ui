@@ -1,18 +1,18 @@
-import React, { useEffect } from 'react';
-import { useModal } from '../../contexts/modal/modal-context';
-import styles from './responsive-modal.module.scss';
+import React, { useEffect } from "react";
+import { useModal } from "../../contexts/modal/modal-context";
+import styles from "./responsive-modal.module.scss";
 
 export const ResponsiveModal: React.FC = () => {
   const { isOpen, content, closeModal } = useModal();
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isOpen]);
 

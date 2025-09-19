@@ -1,9 +1,9 @@
-import developmentSettings from './development';
-import productionSettings from './production';
-import stagingSettings from './staging';
-import qaSettings from './qa';
-import betaSettings from './beta';
-import type { GlobalSettings } from './global-settings.type';
+import developmentSettings from "./development";
+import productionSettings from "./production";
+import stagingSettings from "./staging";
+import qaSettings from "./qa";
+import betaSettings from "./beta";
+import type { GlobalSettings } from "./global-settings.type";
 
 /**
  * Retrieves the global settings based on the current environment.
@@ -23,19 +23,19 @@ import type { GlobalSettings } from './global-settings.type';
  */
 const getGlobalSettings = (): GlobalSettings => {
   if (!process.env.NEXT_PUBLIC_ENV) {
-    throw new Error('NEXT_PUBLIC_ENV is not set');
+    throw new Error("NEXT_PUBLIC_ENV is not set");
   }
 
   switch (process.env.NEXT_PUBLIC_ENV) {
-    case 'development':
+    case "development":
       return developmentSettings;
-    case 'production':
+    case "production":
       return productionSettings;
-    case 'beta':
+    case "beta":
       return betaSettings;
-    case 'staging':
+    case "staging":
       return stagingSettings;
-    case 'qa':
+    case "qa":
       return qaSettings;
   }
 

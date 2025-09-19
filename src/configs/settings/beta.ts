@@ -1,4 +1,4 @@
-import type { GlobalSettings } from './global-settings.type';
+import type { GlobalSettings } from "./global-settings.type";
 
 /**
  * Beta environment settings.
@@ -8,10 +8,10 @@ import type { GlobalSettings } from './global-settings.type';
  */
 const betaSettings: GlobalSettings = {
   urlConfig: {
-    EVENT_URL: 'https://example-beta-url.com', // Example URL for beta
+    EVENT_URL: "https://example-beta-url.com", // Example URL for beta
   },
   apiKey: {
-    EVENT_API_KEY: 'example-beta-api-key', // Example API key for beta
+    EVENT_API_KEY: "example-beta-api-key", // Example API key for beta
   },
 };
 

@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { Middleware } from './_base';
+import { NextResponse } from "next/server";
+import { Middleware } from "./_base";
 
 /**
  * User data interface for type safety
@@ -15,7 +15,7 @@ interface UserData {
 type AuthPathPattern = string | RegExp;
 
 // Define URL patterns for different auth types
-const OPTIONAL_AUTH_PATHS: AuthPathPattern[] = ['/explore'];
+const OPTIONAL_AUTH_PATHS: AuthPathPattern[] = ["/explore"];
 
 /**
  * Authentication Middleware
@@ -36,18 +36,18 @@ export const authMiddleware: Middleware = async (
   const pathname = req.nextUrl.pathname;
 
   const isOptionalAuthPath = OPTIONAL_AUTH_PATHS.some((path) =>
-    typeof path === 'string' ? pathname.startsWith(path) : path.test(pathname),
+    typeof path === "string" ? pathname.startsWith(path) : path.test(pathname),
   );
 
   // Get the user token from cookies
-  const userTokenData = req.cookies.get('user_token_data');
+  const userTokenData = req.cookies.get("user_token_data");
 
   // If no token is present
   if (!userTokenData) {
     if (!isOptionalAuthPath) {
       // For strict auth paths, redirect to login
-      console.log('redirecting to login', req.url);
-      return NextResponse.redirect(new URL('/login', req.url));
+      console.log("redirecting to login", req.url);
+      return NextResponse.redirect(new URL("/login", req.url));
     }
 
     return response;
@@ -69,16 +69,16 @@ export const authMiddleware: Middleware = async (
     });
 
     // Embed user data in the response headers for UI components to access
-    newResponse.headers.set('x-user-data', JSON.stringify(userData));
+    newResponse.headers.set("x-user-data", JSON.stringify(userData));
 
     return newResponse;
   } catch (error) {
     // Log the error for debugging purposes
-    console.error('Auth middleware error:', error);
+    console.error("Auth middleware error:", error);
 
     // If token is invalid or malformed
     if (!isOptionalAuthPath) {
-      return NextResponse.redirect(new URL('/login', req.url));
+      return NextResponse.redirect(new URL("/login", req.url));
     }
     return response;
   }

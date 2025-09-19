@@ -1,0 +1,276 @@
+.container {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0;
+}
+
+.clarityScore {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f8fafc;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+}
+
+.clarityLabel {
+  font-size: 0.875rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.clarityValue {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #38a169;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.speakerSection {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.speakerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.speakerTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0;
+}
+
+.toneIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toneIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+.toneLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.wpmAnalysis {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.wpmDisplay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px;
+}
+
+.wpmValue {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a202c;
+  line-height: 1;
+}
+
+.wpmUnit {
+  font-size: 0.75rem;
+  color: #4a5568;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.wpmRange {
+  flex: 1;
+}
+
+.rangeBar {
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+.rangeTrack {
+  position: relative;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.optimalRange {
+  position: absolute;
+  left: 40%;
+  right: 20%;
+  height: 100%;
+  background: #38a169;
+  opacity: 0.3;
+}
+
+.wpmIndicator {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  &.optimal {
+    background: #38a169;
+  }
+
+  &.normal {
+    background: #3182ce;
+  }
+
+  &.slow {
+    background: #d69e2e;
+  }
+
+  &.fast {
+    background: #e53e3e;
+  }
+}
+
+.rangeLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #718096;
+  font-weight: 500;
+}
+
+.wpmStatus {
+  text-align: center;
+}
+
+.statusBadge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  &.optimal {
+    background: #c6f6d5;
+    color: #22543d;
+  }
+
+  &.normal {
+    background: #bee3f8;
+    color: #1a365d;
+  }
+
+  &.slow {
+    background: #fef5e7;
+    color: #744210;
+  }
+
+  &.fast {
+    background: #fed7d7;
+    color: #742a2a;
+  }
+}
+
+.additionalMetrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.metricItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 6px;
+}
+
+.metricLabel {
+  font-size: 0.875rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.metricValue {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .speakerHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .wpmAnalysis {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .wpmDisplay {
+    align-self: center;
+  }
+
+  .additionalMetrics {
+    grid-template-columns: 1fr;
+  }
+}

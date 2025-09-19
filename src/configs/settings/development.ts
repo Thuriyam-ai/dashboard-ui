@@ -1,4 +1,4 @@
-import type { GlobalSettings } from './global-settings.type';
+import type { GlobalSettings } from "./global-settings.type";
 
 /**
  * Development environment settings.
@@ -9,10 +9,10 @@ import type { GlobalSettings } from './global-settings.type';
 const developmentSettings: GlobalSettings = {
   // Add your development-specific settings here
   urlConfig: {
-    EVENT_URL: 'https://example-dev-url.com', // Example URL for development'
+    EVENT_URL: "https://example-dev-url.com", // Example URL for development'
   },
   apiKey: {
-    EVENT_API_KEY: 'example-dev-api-key', // Example API key for development
+    EVENT_API_KEY: "example-dev-api-key", // Example API key for development
   },
 };
 

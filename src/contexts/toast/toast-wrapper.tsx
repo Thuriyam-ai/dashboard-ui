@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { ToastProvider } from './toast-context';
-import { ToastContainer } from '@/components/toast';
+import { ToastProvider } from "./toast-context";
+import { ToastContainer } from "@/components/toast";
 
 /**
  * ToastProviderWrapper component

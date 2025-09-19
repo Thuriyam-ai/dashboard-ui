@@ -1,54 +1,54 @@
-'use client';
+"use client";
 
-import styles from './system-health.module.scss';
+import styles from "./system-health.module.scss";
 
 interface HealthMetric {
   id: string;
   label: string;
   value: string;
   progress: number;
-  status: 'good' | 'warning' | 'critical';
+  status: "good" | "warning" | "critical";
   statusText: string;
 }
 
 export function SystemHealth() {
   const healthMetrics: HealthMetric[] = [
     {
-      id: 'api-response-time',
-      label: 'API Response Time',
-      value: 'Average: 120ms',
+      id: "api-response-time",
+      label: "API Response Time",
+      value: "Average: 120ms",
       progress: 85,
-      status: 'good',
-      statusText: 'Good',
+      status: "good",
+      statusText: "Good",
     },
     {
-      id: 'bot-availability',
-      label: 'Bot Availability',
-      value: 'Last 24 hours',
+      id: "bot-availability",
+      label: "Bot Availability",
+      value: "Last 24 hours",
       progress: 99.8,
-      status: 'good',
-      statusText: '99.8%',
+      status: "good",
+      statusText: "99.8%",
     },
     {
-      id: 'error-rate',
-      label: 'Error Rate',
-      value: 'Within acceptable range',
+      id: "error-rate",
+      label: "Error Rate",
+      value: "Within acceptable range",
       progress: 2,
-      status: 'warning',
-      statusText: '0.2%',
+      status: "warning",
+      statusText: "0.2%",
     },
   ];
 
   const getProgressColor = (status: string) => {
     switch (status) {
-      case 'good':
-        return '#38a169';
-      case 'warning':
-        return '#dd6b20';
-      case 'critical':
-        return '#e53e3e';
+      case "good":
+        return "#38a169";
+      case "warning":
+        return "#dd6b20";
+      case "critical":
+        return "#e53e3e";
       default:
-        return '#718096';
+        return "#718096";
     }
   };
 

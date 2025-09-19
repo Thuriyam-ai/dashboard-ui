@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import styles from './metrics-cards.module.scss';
+import styles from "./metrics-cards.module.scss";
 
 interface MetricCard {
   id: string;
   title: string;
   value: string;
   trend: string;
-  trendColor: 'green' | 'blue' | 'orange' | 'red';
+  trendColor: "green" | "blue" | "orange" | "red";
   icon: string;
   iconColor: string;
 }
@@ -15,40 +15,40 @@ interface MetricCard {
 export function MetricsCards() {
   const metrics: MetricCard[] = [
     {
-      id: 'active-bots',
-      title: 'Active Bots',
-      value: '12',
-      trend: '+2 this week',
-      trendColor: 'green',
-      icon: 'robot',
-      iconColor: '#3182ce',
+      id: "active-bots",
+      title: "Active Bots",
+      value: "12",
+      trend: "+2 this week",
+      trendColor: "green",
+      icon: "robot",
+      iconColor: "#3182ce",
     },
     {
-      id: 'deployments-today',
-      title: 'Deployments Today',
-      value: '8',
-      trend: '+25% from yesterday',
-      trendColor: 'green',
-      icon: 'rocket',
-      iconColor: '#38a169',
+      id: "deployments-today",
+      title: "Deployments Today",
+      value: "8",
+      trend: "+25% from yesterday",
+      trendColor: "green",
+      icon: "rocket",
+      iconColor: "#38a169",
     },
     {
-      id: 'active-users',
-      title: 'Active Users',
-      value: '1,234',
-      trend: '+12% this month',
-      trendColor: 'green',
-      icon: 'users',
-      iconColor: '#805ad5',
+      id: "active-users",
+      title: "Active Users",
+      value: "1,234",
+      trend: "+12% this month",
+      trendColor: "green",
+      icon: "users",
+      iconColor: "#805ad5",
     },
     {
-      id: 'issues',
-      title: 'Issues',
-      value: '3',
-      trend: '2 resolved today',
-      trendColor: 'blue',
-      icon: 'warning',
-      iconColor: '#dd6b20',
+      id: "issues",
+      title: "Issues",
+      value: "3",
+      trend: "2 resolved today",
+      trendColor: "blue",
+      icon: "warning",
+      iconColor: "#dd6b20",
     },
   ];
 

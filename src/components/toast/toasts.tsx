@@ -1,6 +1,6 @@
-import { ToastPosition, useToast, type Toast } from '@/contexts/toast';
-import Image from 'next/image';
-import styles from './toast.module.scss';
+import { ToastPosition, useToast, type Toast } from "@/contexts/toast";
+import Image from "next/image";
+import styles from "./toast.module.scss";
 
 interface ToastContainerProps {
   position?: (typeof ToastPosition)[keyof typeof ToastPosition];
@@ -42,19 +42,19 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({
  */
 const Toast = ({ toast, onDelete }: ToastProps) => (
   <div
-    className={`${styles[toast.type]} ${styles['toast-container']}`}
+    className={`${styles[toast.type]} ${styles["toast-container"]}`}
     onClick={() => {
       onDelete(toast);
     }}
   >
     {toast.icon && (
-      <div className={styles['toast-icon']}>
+      <div className={styles["toast-icon"]}>
         <Image src={toast.icon} alt={toast.type} width={24} height={24} />
       </div>
     )}
-    <div className={styles['toast-info']}>
-      <h3 className={styles['toast-title']}>{toast.title}</h3>
-      <p className={styles['toast-description']}>{toast.message}</p>
+    <div className={styles["toast-info"]}>
+      <h3 className={styles["toast-title"]}>{toast.title}</h3>
+      <p className={styles["toast-description"]}>{toast.message}</p>
     </div>
   </div>
 );

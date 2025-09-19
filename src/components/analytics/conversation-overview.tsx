@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import styles from './conversation-overview.module.scss';
+import styles from "./conversation-overview.module.scss";
 
 interface Conversation {
   id: string;
@@ -8,7 +8,7 @@ interface Conversation {
   customerName: string;
   duration: string;
   date: string;
-  status: 'completed' | 'in-progress' | 'failed';
+  status: "completed" | "in-progress" | "failed";
   qualityScore: number;
   fillerWords: number;
   interruptions: number;
@@ -26,32 +26,32 @@ export function ConversationOverview({
 }: ConversationOverviewProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed':
-        return '#38a169';
-      case 'in-progress':
-        return '#3182ce';
-      case 'failed':
-        return '#e53e3e';
+      case "completed":
+        return "#38a169";
+      case "in-progress":
+        return "#3182ce";
+      case "failed":
+        return "#e53e3e";
       default:
-        return '#718096';
+        return "#718096";
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'completed':
+      case "completed":
         return (
           <svg fill="currentColor" viewBox="0 0 24 24">
             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
           </svg>
         );
-      case 'in-progress':
+      case "in-progress":
         return (
           <svg fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
           </svg>
         );
-      case 'failed':
+      case "failed":
         return (
           <svg fill="currentColor" viewBox="0 0 24 24">
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
@@ -63,17 +63,17 @@ export function ConversationOverview({
   };
 
   const getQualityColor = (score: number) => {
-    if (score >= 80) return '#38a169';
-    if (score >= 60) return '#dd6b20';
-    return '#e53e3e';
+    if (score >= 80) return "#38a169";
+    if (score >= 60) return "#dd6b20";
+    return "#e53e3e";
   };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-IN', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
+    return date.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
     });
   };
 
@@ -101,7 +101,7 @@ export function ConversationOverview({
           </div>
           <div className={styles.summaryContent}>
             <div className={styles.summaryValue}>
-              {conversations.filter((c) => c.status === 'completed').length}
+              {conversations.filter((c) => c.status === "completed").length}
             </div>
             <div className={styles.summaryLabel}>Completed</div>
           </div>

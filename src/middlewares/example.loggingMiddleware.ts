@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { Middleware } from './_base';
+import { NextResponse } from "next/server";
+import { Middleware } from "./_base";
 
 /**
  * Example Logging Middleware

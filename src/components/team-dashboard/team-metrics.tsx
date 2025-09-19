@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import styles from './team-metrics.module.scss';
+import styles from "./team-metrics.module.scss";
 
 interface TeamMetric {
   id: string;
   title: string;
   value: string;
   change: string;
-  changeType: 'positive' | 'negative' | 'neutral';
+  changeType: "positive" | "negative" | "neutral";
   icon: string;
   iconColor: string;
 }
@@ -15,58 +15,58 @@ interface TeamMetric {
 export function TeamMetrics() {
   const metrics: TeamMetric[] = [
     {
-      id: 'total-agents',
-      title: 'Active Agents',
-      value: '12',
-      change: '+2 this month',
-      changeType: 'positive',
-      icon: 'users',
-      iconColor: '#3182ce',
+      id: "total-agents",
+      title: "Active Agents",
+      value: "12",
+      change: "+2 this month",
+      changeType: "positive",
+      icon: "users",
+      iconColor: "#3182ce",
     },
     {
-      id: 'avg-quality',
-      title: 'Average Quality Score',
-      value: '91.2',
-      change: '+3.5% from last month',
-      changeType: 'positive',
-      icon: 'star',
-      iconColor: '#38a169',
+      id: "avg-quality",
+      title: "Average Quality Score",
+      value: "91.2",
+      change: "+3.5% from last month",
+      changeType: "positive",
+      icon: "star",
+      iconColor: "#38a169",
     },
     {
-      id: 'total-conversations',
-      title: 'Total Conversations',
-      value: '1,247',
-      change: '+15% this week',
-      changeType: 'positive',
-      icon: 'chat',
-      iconColor: '#805ad5',
+      id: "total-conversations",
+      title: "Total Conversations",
+      value: "1,247",
+      change: "+15% this week",
+      changeType: "positive",
+      icon: "chat",
+      iconColor: "#805ad5",
     },
     {
-      id: 'avg-duration',
-      title: 'Average Duration',
-      value: '9:45',
-      change: '-2 min from last week',
-      changeType: 'positive',
-      icon: 'clock',
-      iconColor: '#dd6b20',
+      id: "avg-duration",
+      title: "Average Duration",
+      value: "9:45",
+      change: "-2 min from last week",
+      changeType: "positive",
+      icon: "clock",
+      iconColor: "#dd6b20",
     },
     {
-      id: 'interruption-rate',
-      title: 'Interruption Rate',
-      value: '1.8',
-      change: '+0.3 from last month',
-      changeType: 'negative',
-      icon: 'warning',
-      iconColor: '#e53e3e',
+      id: "interruption-rate",
+      title: "Interruption Rate",
+      value: "1.8",
+      change: "+0.3 from last month",
+      changeType: "negative",
+      icon: "warning",
+      iconColor: "#e53e3e",
     },
     {
-      id: 'customer-satisfaction',
-      title: 'Customer Satisfaction',
-      value: '4.7/5',
-      change: '+0.2 from last month',
-      changeType: 'positive',
-      icon: 'heart',
-      iconColor: '#38a169',
+      id: "customer-satisfaction",
+      title: "Customer Satisfaction",
+      value: "4.7/5",
+      change: "+0.2 from last month",
+      changeType: "positive",
+      icon: "heart",
+      iconColor: "#38a169",
     },
   ];
 
@@ -94,24 +94,24 @@ export function TeamMetrics() {
 
   const getChangeColor = (changeType: string) => {
     switch (changeType) {
-      case 'positive':
-        return '#38a169';
-      case 'negative':
-        return '#e53e3e';
+      case "positive":
+        return "#38a169";
+      case "negative":
+        return "#e53e3e";
       default:
-        return '#718096';
+        return "#718096";
     }
   };
 
   const getChangeIcon = (changeType: string) => {
     switch (changeType) {
-      case 'positive':
+      case "positive":
         return (
           <svg fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" />
           </svg>
         );
-      case 'negative':
+      case "negative":
         return (
           <svg fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 18l2.29-2.29-4.88-4.88-4 4L2 7.41 3.41 6l6 6 4-4 6.3 6.29L22 12v6z" />

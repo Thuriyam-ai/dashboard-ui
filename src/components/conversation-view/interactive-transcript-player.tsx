@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import styles from './interactive-transcript-player.module.scss';
-import type { TranscriptSegment } from './types';
+import { useState, useRef, useEffect } from "react";
+import styles from "./interactive-transcript-player.module.scss";
+import type { TranscriptSegment } from "./types";
 
 interface InteractiveTranscriptPlayerProps {
   transcriptData?: TranscriptSegment[];
@@ -30,35 +30,35 @@ export function InteractiveTranscriptPlayer({
   // Mock data for demonstration
   const MOCK_TRANSCRIPT_DATA: TranscriptSegment[] = [
     {
-      id: '1',
-      speaker: 'Agent',
-      text: 'Hello, thank you for calling our support line. How can I help you today?',
+      id: "1",
+      speaker: "Agent",
+      text: "Hello, thank you for calling our support line. How can I help you today?",
       startTime: 0,
       endTime: 4.2,
       fillerWords: [],
       isInterruption: false,
     },
     {
-      id: '2',
-      speaker: 'Customer',
+      id: "2",
+      speaker: "Customer",
       text: "Hi, um, I'm having trouble with my account login. It keeps saying my password is wrong.",
       startTime: 4.5,
       endTime: 8.1,
-      fillerWords: ['um'],
+      fillerWords: ["um"],
       isInterruption: false,
     },
     {
-      id: '3',
-      speaker: 'Agent',
-      text: 'I understand your frustration. Let me help you with that. Can you tell me your email address?',
+      id: "3",
+      speaker: "Agent",
+      text: "I understand your frustration. Let me help you with that. Can you tell me your email address?",
       startTime: 8.3,
       endTime: 12.7,
       fillerWords: [],
       isInterruption: false,
     },
     {
-      id: '4',
-      speaker: 'Customer',
+      id: "4",
+      speaker: "Customer",
       text: "Sure, it's john.doe@email.com",
       startTime: 13.0,
       endTime: 15.2,
@@ -66,18 +66,18 @@ export function InteractiveTranscriptPlayer({
       isInterruption: false,
     },
     {
-      id: '5',
-      speaker: 'Agent',
-      text: 'Perfect. I can see your account here. The issue might be that your password has expired. Let me reset it for you.',
+      id: "5",
+      speaker: "Agent",
+      text: "Perfect. I can see your account here. The issue might be that your password has expired. Let me reset it for you.",
       startTime: 15.5,
       endTime: 20.8,
       fillerWords: [],
       isInterruption: false,
     },
     {
-      id: '6',
-      speaker: 'Customer',
-      text: 'Oh, that would be great! Thank you so much.',
+      id: "6",
+      speaker: "Customer",
+      text: "Oh, that would be great! Thank you so much.",
       startTime: 21.0,
       endTime: 23.5,
       fillerWords: [],
@@ -103,14 +103,14 @@ export function InteractiveTranscriptPlayer({
       setCurrentSegmentId(currentSegment?.id || null);
     };
 
-    audio.addEventListener('timeupdate', updateTime);
-    audio.addEventListener('play', () => setIsPlaying(true));
-    audio.addEventListener('pause', () => setIsPlaying(false));
+    audio.addEventListener("timeupdate", updateTime);
+    audio.addEventListener("play", () => setIsPlaying(true));
+    audio.addEventListener("pause", () => setIsPlaying(false));
 
     return () => {
-      audio.removeEventListener('timeupdate', updateTime);
-      audio.removeEventListener('play', () => setIsPlaying(true));
-      audio.removeEventListener('pause', () => setIsPlaying(false));
+      audio.removeEventListener("timeupdate", updateTime);
+      audio.removeEventListener("play", () => setIsPlaying(true));
+      audio.removeEventListener("pause", () => setIsPlaying(false));
     };
   }, [data, audioUrl]);
 
@@ -122,7 +122,7 @@ export function InteractiveTranscriptPlayer({
       audio.pause();
     } else {
       audio.play().catch((error) => {
-        console.warn('Audio playback failed:', error);
+        console.warn("Audio playback failed:", error);
       });
     }
   };
@@ -133,7 +133,7 @@ export function InteractiveTranscriptPlayer({
 
     audio.currentTime = segment.startTime;
     audio.play().catch((error) => {
-      console.warn('Audio playback failed:', error);
+      console.warn("Audio playback failed:", error);
     });
   };
 
@@ -142,7 +142,7 @@ export function InteractiveTranscriptPlayer({
 
     let highlightedText = text;
     fillerWords.forEach((filler) => {
-      const regex = new RegExp(`\\b${filler}\\b`, 'gi');
+      const regex = new RegExp(`\\b${filler}\\b`, "gi");
       highlightedText = highlightedText.replace(
         regex,
         `<span class="${styles.fillerWord}">${filler}</span>`,
@@ -154,7 +154,7 @@ export function InteractiveTranscriptPlayer({
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   return (
@@ -167,7 +167,7 @@ export function InteractiveTranscriptPlayer({
               <button
                 onClick={handlePlayPause}
                 className={styles.playButton}
-                aria-label={isPlaying ? 'Pause' : 'Play'}
+                aria-label={isPlaying ? "Pause" : "Play"}
               >
                 {isPlaying ? (
                   <svg
@@ -188,7 +188,7 @@ export function InteractiveTranscriptPlayer({
                 )}
               </button>
               <div className={styles.timeDisplay}>
-                {formatTime(currentTime)} /{' '}
+                {formatTime(currentTime)} /{" "}
                 {formatTime(data[data.length - 1]?.endTime || 0)}
               </div>
             </>
@@ -214,8 +214,8 @@ export function InteractiveTranscriptPlayer({
           <div
             key={segment.id}
             className={`${styles.transcriptSegment} ${
-              currentSegmentId === segment.id ? styles.activeSegment : ''
-            } ${segment.isInterruption ? styles.interruption : ''}`}
+              currentSegmentId === segment.id ? styles.activeSegment : ""
+            } ${segment.isInterruption ? styles.interruption : ""}`}
             onClick={() => handleSegmentClick(segment)}
           >
             <div className={styles.segmentHeader}>

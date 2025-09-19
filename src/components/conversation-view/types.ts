@@ -35,7 +35,7 @@ export interface SpeakerStats {
   segmentCount: number;
 }
 
-export type SpeakerColor = 'Agent' | 'Customer' | 'System' | 'Other';
+export type SpeakerColor = "Agent" | "Customer" | "System" | "Other";
 
 export interface SpeakerColors {
   Agent: string;
@@ -44,5 +44,5 @@ export interface SpeakerColors {
   Other: string;
 }
 
-export type RatioStatus = 'Optimal' | 'Acceptable' | 'Needs Improvement';
-export type QualityStatus = 'Excellent' | 'Good' | 'Poor';
+export type RatioStatus = "Optimal" | "Acceptable" | "Needs Improvement";
+export type QualityStatus = "Excellent" | "Good" | "Poor";

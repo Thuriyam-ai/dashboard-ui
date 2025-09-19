@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import styles from './trend-analysis.module.scss';
+import styles from "./trend-analysis.module.scss";
 
 interface TrendData {
   date: string;
@@ -14,105 +14,105 @@ export function TrendAnalysis() {
   // Mock trend data for the last 30 days
   const trendData: TrendData[] = [
     {
-      date: '2024-01-01',
+      date: "2024-01-01",
       talkRatio: 0.62,
       interruptions: 2.1,
       qualityScore: 89,
       totalConversations: 45,
     },
     {
-      date: '2024-01-02',
+      date: "2024-01-02",
       talkRatio: 0.58,
       interruptions: 1.8,
       qualityScore: 92,
       totalConversations: 52,
     },
     {
-      date: '2024-01-03',
+      date: "2024-01-03",
       talkRatio: 0.65,
       interruptions: 2.3,
       qualityScore: 87,
       totalConversations: 38,
     },
     {
-      date: '2024-01-04',
+      date: "2024-01-04",
       talkRatio: 0.59,
       interruptions: 1.5,
       qualityScore: 94,
       totalConversations: 48,
     },
     {
-      date: '2024-01-05',
+      date: "2024-01-05",
       talkRatio: 0.61,
       interruptions: 2.0,
       qualityScore: 90,
       totalConversations: 41,
     },
     {
-      date: '2024-01-06',
+      date: "2024-01-06",
       talkRatio: 0.57,
       interruptions: 1.7,
       qualityScore: 93,
       totalConversations: 55,
     },
     {
-      date: '2024-01-07',
+      date: "2024-01-07",
       talkRatio: 0.63,
       interruptions: 2.2,
       qualityScore: 88,
       totalConversations: 43,
     },
     {
-      date: '2024-01-08',
+      date: "2024-01-08",
       talkRatio: 0.6,
       interruptions: 1.9,
       qualityScore: 91,
       totalConversations: 49,
     },
     {
-      date: '2024-01-09',
+      date: "2024-01-09",
       talkRatio: 0.58,
       interruptions: 1.6,
       qualityScore: 95,
       totalConversations: 47,
     },
     {
-      date: '2024-01-10',
+      date: "2024-01-10",
       talkRatio: 0.64,
       interruptions: 2.4,
       qualityScore: 86,
       totalConversations: 39,
     },
     {
-      date: '2024-01-11',
+      date: "2024-01-11",
       talkRatio: 0.59,
       interruptions: 1.8,
       qualityScore: 92,
       totalConversations: 51,
     },
     {
-      date: '2024-01-12',
+      date: "2024-01-12",
       talkRatio: 0.61,
       interruptions: 2.1,
       qualityScore: 89,
       totalConversations: 44,
     },
     {
-      date: '2024-01-13',
+      date: "2024-01-13",
       talkRatio: 0.57,
       interruptions: 1.5,
       qualityScore: 94,
       totalConversations: 53,
     },
     {
-      date: '2024-01-14',
+      date: "2024-01-14",
       talkRatio: 0.62,
       interruptions: 2.0,
       qualityScore: 90,
       totalConversations: 42,
     },
     {
-      date: '2024-01-15',
+      date: "2024-01-15",
       talkRatio: 0.58,
       interruptions: 1.7,
       qualityScore: 93,
@@ -122,24 +122,24 @@ export function TrendAnalysis() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+    return date.toLocaleDateString("en-IN", { month: "short", day: "numeric" });
   };
 
   const getTrendDirection = (current: number, previous: number) => {
-    if (current > previous) return 'up';
-    if (current < previous) return 'down';
-    return 'stable';
+    if (current > previous) return "up";
+    if (current < previous) return "down";
+    return "stable";
   };
 
   const getTrendIcon = (direction: string) => {
     switch (direction) {
-      case 'up':
+      case "up":
         return (
           <svg fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" />
           </svg>
         );
-      case 'down':
+      case "down":
         return (
           <svg fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 18l2.29-2.29-4.88-4.88-4 4L2 7.41 3.41 6l6 6 4-4 6.3 6.29L22 12v6z" />
@@ -156,12 +156,12 @@ export function TrendAnalysis() {
 
   const getTrendColor = (direction: string) => {
     switch (direction) {
-      case 'up':
-        return '#38a169';
-      case 'down':
-        return '#e53e3e';
+      case "up":
+        return "#38a169";
+      case "down":
+        return "#e53e3e";
       default:
-        return '#718096';
+        return "#718096";
     }
   };
 
@@ -212,11 +212,11 @@ export function TrendAnalysis() {
               style={{ color: getTrendColor(talkRatioTrend) }}
             >
               {getTrendIcon(talkRatioTrend)}
-              {talkRatioTrend === 'up'
-                ? 'Increasing'
-                : talkRatioTrend === 'down'
-                  ? 'Decreasing'
-                  : 'Stable'}
+              {talkRatioTrend === "up"
+                ? "Increasing"
+                : talkRatioTrend === "down"
+                  ? "Decreasing"
+                  : "Stable"}
             </div>
           </div>
         </div>
@@ -296,7 +296,7 @@ export function TrendAnalysis() {
                   style={{
                     height: `${data.talkRatio * 100}%`,
                     backgroundColor:
-                      data.talkRatio <= 0.6 ? '#38a169' : '#dd6b20',
+                      data.talkRatio <= 0.6 ? "#38a169" : "#dd6b20",
                   }}
                 />
                 <div className={styles.barLabel}>{formatDate(data.date)}</div>

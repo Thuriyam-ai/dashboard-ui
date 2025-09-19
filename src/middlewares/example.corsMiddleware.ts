@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
-import { Middleware } from './_base';
+import { NextResponse } from "next/server";
+import { Middleware } from "./_base";
 
 const corsOptions = {
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
 /**
@@ -21,17 +21,17 @@ export const corsMiddleware: Middleware = async (
 ): Promise<NextResponse> => {
   const response = await next();
 
-  const allowedOrigins = ['https://example.com', 'https://another-origin.com'];
-  const origin = req.headers.get('origin') ?? '';
+  const allowedOrigins = ["https://example.com", "https://another-origin.com"];
+  const origin = req.headers.get("origin") ?? "";
 
-  const isPreflight = req.method === 'OPTIONS';
+  const isPreflight = req.method === "OPTIONS";
 
   const isAllowedOrigin = allowedOrigins.includes(origin);
 
   if (origin && isAllowedOrigin) {
     const headers = {
-      'Access-Control-Allow-Origin': origin,
-      'Access-Control-Allow-Credentials': 'true',
+      "Access-Control-Allow-Origin": origin,
+      "Access-Control-Allow-Credentials": "true",
       ...corsOptions,
     };
 
@@ -43,7 +43,7 @@ export const corsMiddleware: Middleware = async (
   // Handle preflight (OPTIONS) request
   if (isPreflight) {
     const preflightHeaders = {
-      ...(isAllowedOrigin && { 'Access-Control-Allow-Origin': origin }),
+      ...(isAllowedOrigin && { "Access-Control-Allow-Origin": origin }),
       ...corsOptions,
     };
     return NextResponse.json({}, { headers: preflightHeaders });

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import styles from './team-filters.module.scss';
+import { useState } from "react";
+import styles from "./team-filters.module.scss";
 
 interface FilterState {
   team: string;
@@ -11,31 +11,31 @@ interface FilterState {
 
 export function TeamFilters() {
   const [filters, setFilters] = useState<FilterState>({
-    team: 'all',
-    campaign: 'all',
-    dateRange: 'last-30-days',
+    team: "all",
+    campaign: "all",
+    dateRange: "last-30-days",
   });
 
   const teams = [
-    { value: 'all', label: 'All Teams' },
-    { value: 'customer-support', label: 'Customer Support' },
-    { value: 'sales', label: 'Sales Team' },
-    { value: 'technical-support', label: 'Technical Support' },
+    { value: "all", label: "All Teams" },
+    { value: "customer-support", label: "Customer Support" },
+    { value: "sales", label: "Sales Team" },
+    { value: "technical-support", label: "Technical Support" },
   ];
 
   const campaigns = [
-    { value: 'all', label: 'All Campaigns' },
-    { value: 'holiday-sale', label: 'Holiday Sale Campaign' },
-    { value: 'product-launch', label: 'Product Launch' },
-    { value: 'customer-retention', label: 'Customer Retention' },
-    { value: 'upselling', label: 'Upselling Campaign' },
+    { value: "all", label: "All Campaigns" },
+    { value: "holiday-sale", label: "Holiday Sale Campaign" },
+    { value: "product-launch", label: "Product Launch" },
+    { value: "customer-retention", label: "Customer Retention" },
+    { value: "upselling", label: "Upselling Campaign" },
   ];
 
   const dateRanges = [
-    { value: 'last-7-days', label: 'Last 7 Days' },
-    { value: 'last-30-days', label: 'Last 30 Days' },
-    { value: 'last-90-days', label: 'Last 90 Days' },
-    { value: 'custom', label: 'Custom Range' },
+    { value: "last-7-days", label: "Last 7 Days" },
+    { value: "last-30-days", label: "Last 30 Days" },
+    { value: "last-90-days", label: "Last 90 Days" },
+    { value: "custom", label: "Custom Range" },
   ];
 
   const handleFilterChange = (filterType: keyof FilterState, value: string) => {
@@ -47,9 +47,9 @@ export function TeamFilters() {
 
   const handleResetFilters = () => {
     setFilters({
-      team: 'all',
-      campaign: 'all',
-      dateRange: 'last-30-days',
+      team: "all",
+      campaign: "all",
+      dateRange: "last-30-days",
     });
   };
 
@@ -71,7 +71,7 @@ export function TeamFilters() {
           <label className={styles.filterLabel}>Team</label>
           <select
             value={filters.team}
-            onChange={(e) => handleFilterChange('team', e.target.value)}
+            onChange={(e) => handleFilterChange("team", e.target.value)}
             className={styles.filterSelect}
           >
             {teams.map((team) => (
@@ -87,7 +87,7 @@ export function TeamFilters() {
           <label className={styles.filterLabel}>Campaign</label>
           <select
             value={filters.campaign}
-            onChange={(e) => handleFilterChange('campaign', e.target.value)}
+            onChange={(e) => handleFilterChange("campaign", e.target.value)}
             className={styles.filterSelect}
           >
             {campaigns.map((campaign) => (
@@ -103,7 +103,7 @@ export function TeamFilters() {
           <label className={styles.filterLabel}>Date Range</label>
           <select
             value={filters.dateRange}
-            onChange={(e) => handleFilterChange('dateRange', e.target.value)}
+            onChange={(e) => handleFilterChange("dateRange", e.target.value)}
             className={styles.filterSelect}
           >
             {dateRanges.map((range) => (
@@ -115,7 +115,7 @@ export function TeamFilters() {
         </div>
 
         {/* Custom Date Range (shown when custom is selected) */}
-        {filters.dateRange === 'custom' && (
+        {filters.dateRange === "custom" && (
           <div className={styles.customDateRange}>
             <div className={styles.dateInputGroup}>
               <label className={styles.dateLabel}>From</label>
@@ -141,35 +141,35 @@ export function TeamFilters() {
       <div className={styles.activeFilters}>
         <span className={styles.activeFiltersLabel}>Active Filters:</span>
         <div className={styles.filterTags}>
-          {filters.team !== 'all' && (
+          {filters.team !== "all" && (
             <span className={styles.filterTag}>
               Team: {teams.find((t) => t.value === filters.team)?.label}
               <button
-                onClick={() => handleFilterChange('team', 'all')}
+                onClick={() => handleFilterChange("team", "all")}
                 className={styles.removeFilter}
               >
                 ×
               </button>
             </span>
           )}
-          {filters.campaign !== 'all' && (
+          {filters.campaign !== "all" && (
             <span className={styles.filterTag}>
-              Campaign:{' '}
+              Campaign:{" "}
               {campaigns.find((c) => c.value === filters.campaign)?.label}
               <button
-                onClick={() => handleFilterChange('campaign', 'all')}
+                onClick={() => handleFilterChange("campaign", "all")}
                 className={styles.removeFilter}
               >
                 ×
               </button>
             </span>
           )}
-          {filters.dateRange !== 'last-30-days' && (
+          {filters.dateRange !== "last-30-days" && (
             <span className={styles.filterTag}>
-              Date:{' '}
+              Date:{" "}
               {dateRanges.find((d) => d.value === filters.dateRange)?.label}
               <button
-                onClick={() => handleFilterChange('dateRange', 'last-30-days')}
+                onClick={() => handleFilterChange("dateRange", "last-30-days")}
                 className={styles.removeFilter}
               >
                 ×
