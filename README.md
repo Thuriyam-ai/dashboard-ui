@@ -1,3 +1,3 @@
 # front-end
 
-This is a dummy project created for me to understand
+This is the project created to design the front end screens for the Analytics piece of the Bolt Dashboard
