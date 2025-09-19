@@ -1,0 +1,204 @@
+.container {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  padding: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.duration {
+  font-size: 0.875rem;
+  color: #6b7280;
+  background-color: #f3f4f6;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+}
+
+.timelineContainer {
+  margin-bottom: 2rem;
+}
+
+.timelineHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.timeLabel {
+  font-family: "Courier New", monospace;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.timeline {
+  position: relative;
+  height: 3rem;
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.segment {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 200ms ease-in-out;
+  opacity: 0.8;
+
+  &:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.timeMarkers {
+  position: relative;
+  height: 1rem;
+  margin-top: 0.5rem;
+}
+
+.timeMarker {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 1px;
+  background-color: #d1d5db;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -2px;
+    width: 4px;
+    height: 4px;
+    background-color: #6b7280;
+    border-radius: 50%;
+  }
+}
+
+.markerTime {
+  position: absolute;
+  top: -1.5rem;
+  left: -1rem;
+  font-family: "Courier New", monospace;
+  font-size: 0.625rem;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.legend {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1.5rem;
+}
+
+.legendTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 1rem;
+}
+
+.speakerStats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.speakerStat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.speakerInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.speakerColor {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.25rem;
+}
+
+.speakerName {
+  font-weight: 600;
+  color: #374151;
+}
+
+.speakerMetrics {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.speakerTime {
+  font-family: "Courier New", monospace;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.speakerPercentage {
+  color: #6b7280;
+}
+
+.segmentCount {
+  color: #6b7280;
+  background-color: #e5e7eb;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.tooltip {
+  position: fixed;
+  background-color: #1f2937;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  pointer-events: none;
+  z-index: 1000;
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.tooltipSpeaker {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.tooltipTime {
+  color: #d1d5db;
+  margin-bottom: 0.25rem;
+}
+
+.tooltipDuration {
+  color: #9ca3af;
+}

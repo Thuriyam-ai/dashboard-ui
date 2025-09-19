@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    parameters {
+        booleanParam(
+            name: 'deploy',
+            defaultValue: true,
+            description: 'Continue with release?'
+        )
+    }
+
+    stages {
+        stage('Initialise') {
+            steps {
+                echo 'Preparing to release frontend-boilerplate...'
+            }
+        }
+
+        stage('Execute Release Archive') {
+            when {
+                expression { params.deploy == true }
+            }
+            steps {
+                sh '''
+                    # Make the script executable
+                    chmod +x cicd/release-archive.sh
+
+                    # Run the release archive script
+                    ./cicd/release-archive.sh
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs() // Clean up workspace after build
+        }
+        success {
+            echo "Release archive created and uploaded successfully!"
+            jiraSendDeploymentInfo(
+                environmentId: 'production',
+                environmentName: 'production',
+                environmentType: 'production',
+                site: 'workindia-tech.atlassian.net'
+            )
+        }
+        failure {
+            echo "Release archive process failed!"
+        }
+    }
+}

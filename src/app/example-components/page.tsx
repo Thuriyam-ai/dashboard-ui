@@ -1,0 +1,225 @@
+'use client';
+
+import { useModal } from '@/contexts/modal';
+import styles from './page.module.scss';
+import { type Toast, useToast } from '@/contexts/toast';
+
+/**
+ * Main content component for the example components page.
+ * Displays the page header and modal example component.
+ * @returns The main content layout for the example components page
+ */
+function ExampleContent() {
+  return (
+    <div className={styles.container}>
+      <div className={styles.content}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Example Components</h1>
+          <p className={styles.subtitle}>
+            A collection of reusable UI components built with modern web
+            technologies and best practices.
+          </p>
+        </div>
+        <ExampleModalComponent />
+        <br />
+        <ExampleToastComponent />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Example content component that demonstrates the modal functionality.
+ * Contains a button that opens a modal with feature descriptions.
+ * @returns A component with a button to trigger the modal demonstration
+ */
+function ExampleModalComponent() {
+  const { openModal } = useModal();
+
+  /**
+   * Features list for the modal example
+   */
+  const MODAL_FEATURES = [
+    'Responsive design that adapts to screen size',
+    'Smooth animations and transitions',
+    'Backdrop click to close',
+    'Accessible close button',
+    'Body scroll lock when open',
+    'Keyboard navigation support',
+  ];
+
+  /**
+   * Handles opening the modal with example content.
+   * Creates a modal with a title, description and feature list.
+   */
+  const handleOpenModal = () => {
+    openModal(
+      <div className={styles.modalContent}>
+        <div className={styles.modalHeader}>
+          <h2 className={styles.modalTitle}>Example Modal</h2>
+        </div>
+        <p className={styles.modalDescription}>
+          This is an example modal that will appear as a bottom sheet on mobile
+          devices and as a centered modal on desktop screens. The component
+          adapts seamlessly to different screen sizes while maintaining a
+          consistent user experience.
+        </p>
+        <div className={styles.featuresList}>
+          <h3 className={styles.featuresTitle}>Features:</h3>
+          {MODAL_FEATURES.map((feature, index) => (
+            <div key={index} className={styles.featureItem}>
+              <svg
+                className={styles.checkIcon}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              <span>{feature}</span>
+            </div>
+          ))}
+        </div>
+      </div>,
+    );
+  };
+
+  return (
+    <div className={styles.card}>
+      <div className={styles.section}>
+        <div className={styles.iconWrapper}>
+          <svg
+            className={styles.icon}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
+            />
+          </svg>
+        </div>
+        <div>
+          <h2 className={styles.sectionTitle}>Modal Example</h2>
+          <p className={styles.sectionSubtitle}>
+            A responsive modal component that adapts to screen size
+          </p>
+        </div>
+      </div>
+
+      <div className={styles.demoSection}>
+        <p className={styles.demoText}>
+          Click the button below to open a responsive modal that adapts to
+          screen size. The modal will appear as a bottom sheet on mobile devices
+          and as a centered modal on desktop screens.
+        </p>
+        <button onClick={handleOpenModal} className={styles.button}>
+          <svg
+            className={styles.buttonIcon}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
+            />
+          </svg>
+          Open Modal
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Example toast component that demonstrates the toast functionality.
+ * Contains a button that shows a toast notification.
+ * @returns A component with a button to trigger the toast demonstration
+ */
+function ExampleToastComponent() {
+  const { addToasts } = useToast();
+
+  const demoToast: Toast = {
+    title: 'Success',
+    message: 'A demo toast generated by wi-next starter kit',
+    type: 'success',
+  };
+
+  const handleOpenToast = () => {
+    addToasts(demoToast);
+  };
+
+  return (
+    <div className={styles.card}>
+      <div className={styles.section}>
+        <div className={styles.iconWrapper}>
+          <svg
+            className={styles.icon}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
+            />
+          </svg>
+        </div>
+        <div>
+          <h2 className={styles.sectionTitle}>Toast Example</h2>
+          <p className={styles.sectionSubtitle}>
+            A toast notification component that appears at the top of the
+            screen.
+          </p>
+        </div>
+      </div>
+
+      <div className={styles.demoSection}>
+        <p className={styles.demoText}>
+          Click the button below to show a toast notification. The toast will
+          appear at the top of the screen and automatically disappear after a
+          few seconds.
+        </p>
+        <button onClick={handleOpenToast} className={styles.button}>
+          <svg
+            className={styles.buttonIcon}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
+            />
+          </svg>
+          Show Toast
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Example components page that demonstrates various UI components.
+ * This page currently showcases a responsive modal implementation.
+ * Wraps the content in a ModalProvider to enable modal functionality.
+ * @returns The example components page with modal demonstration
+ */
+export default function ExampleComponentsPage() {
+  return <ExampleContent />;
+}
