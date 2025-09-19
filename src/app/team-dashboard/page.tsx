@@ -9,6 +9,9 @@ import { TrendAnalysis } from "@/components/team-dashboard/trend-analysis";
 import { TeamMetrics } from "@/components/team-dashboard/team-metrics";
 import { LCAPanel } from "@/components/lca";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
+import { DistributionPlots } from "@/components/team-dashboard/distribution-plots";
+import { CoachingLeaderboards } from "@/components/team-dashboard/coaching-leaderboards";
+import { RadarChart } from "@/components/team-dashboard/radar-chart";
 
 /**
  * Team dashboard page component displaying team metrics and performance data.
@@ -125,23 +128,29 @@ export default function TeamDashboardPage() {
 
           {activeTab === "lca" && (
             <div className={styles.tabContent}>
-              <div className={styles.lcaPlaceholder}>
-                <div className={styles.lcaIcon}>
-                  <svg fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                  </svg>
+              {/* FR-DV-4.5: Distribution Plots */}
+              <DistributionPlots />
+
+              {/* FR-DV-4.6: Coaching Leaderboards */}
+              <CoachingLeaderboards />
+
+              {/* FR-DV-4.7: Radar Chart for Comparison */}
+              <RadarChart />
+
+              {/* Additional LCA Panel Access */}
+              <div className={styles.lcaPanelAccess}>
+                <div className={styles.lcaPanelContent}>
+                  <h3 className={styles.lcaPanelTitle}>Advanced LCA Analysis</h3>
+                  <p className={styles.lcaPanelDescription}>
+                    Access detailed linguistic analysis, conversation flow patterns, and sentiment analysis
+                  </p>
+                  <button
+                    className={styles.lcaPanelButton}
+                    onClick={() => setShowLCAPanel(true)}
+                  >
+                    Open Advanced LCA Panel
+                  </button>
                 </div>
-                <h3 className={styles.lcaTitle}>Team LCA Analysis</h3>
-                <p className={styles.lcaDescription}>
-                  Click the button below to open the detailed Team-level
-                  Linguistic & Conversation Flow Analysis panel
-                </p>
-                <button
-                  className={styles.lcaButton}
-                  onClick={() => setShowLCAPanel(true)}
-                >
-                  Open Team LCA Panel
-                </button>
               </div>
             </div>
           )}

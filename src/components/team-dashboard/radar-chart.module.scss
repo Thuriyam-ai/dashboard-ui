@@ -1,0 +1,275 @@
+.radarChart {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: #4a5568;
+  margin-bottom: 1.5rem;
+}
+
+.agentSelector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.selectorLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.selector {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  background: white;
+  color: #2d3748;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color 200ms ease-in-out;
+
+  &:focus {
+    outline: none;
+    border-color: #3182ce;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+  }
+}
+
+.chartContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.radarSvg {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.teamArea {
+  opacity: 0.6;
+}
+
+.agentArea {
+  opacity: 0.8;
+}
+
+.metricLabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.legend {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #4a5568;
+}
+
+.legendColor {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 2px;
+
+  &.agentColor {
+    background: #e53e3e;
+  }
+
+  &.teamColor {
+    background: #3182ce;
+  }
+}
+
+.metricsTable {
+  margin-bottom: 1.5rem;
+
+  h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 1rem;
+  }
+}
+
+.tableContainer {
+  background: #f8fafc;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.tableHeader {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  background: #e2e8f0;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #2d3748;
+}
+
+.tableRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.875rem;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: #f1f5f9;
+  }
+}
+
+.metricColumn {
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.agentColumn {
+  color: #e53e3e;
+  font-weight: 500;
+}
+
+.teamColumn {
+  color: #3182ce;
+  font-weight: 500;
+}
+
+.differenceColumn {
+  font-weight: 600;
+
+  &.positive {
+    color: #38a169;
+  }
+
+  &.negative {
+    color: #e53e3e;
+  }
+}
+
+.performanceSummary {
+  h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 1rem;
+  }
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.summaryCard {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+
+  h5 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.75rem;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    font-size: 0.875rem;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+    padding-left: 1rem;
+    position: relative;
+
+    &::before {
+      content: '•';
+      color: #3182ce;
+      font-weight: bold;
+      position: absolute;
+      left: 0;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .radarChart {
+    padding: 1rem;
+  }
+
+  .agentSelector {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .selector {
+    width: 100%;
+  }
+
+  .chartContainer {
+    gap: 0.75rem;
+  }
+
+  .radarSvg {
+    width: 100%;
+    height: auto;
+  }
+
+  .legend {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .tableHeader,
+  .tableRow {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .teamColumn,
+  .differenceColumn {
+    display: none;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+}

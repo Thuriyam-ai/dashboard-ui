@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import styles from "./lca-panel.module.scss";
+import { DistributionPlots } from "@/components/team-dashboard/distribution-plots";
+import { CoachingLeaderboards } from "@/components/team-dashboard/coaching-leaderboards";
+import { RadarChart } from "@/components/team-dashboard/radar-chart";
 
 interface LCAMetrics {
   linguisticComplexity: number;
@@ -232,6 +235,30 @@ export function LCAPanel({ conversationId, onClose }: LCAPanelProps) {
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+
+              {/* FR-DV-4.5: Distribution Plots */}
+              <div className={styles.section}>
+                <h3>Team Distribution Analysis</h3>
+                <div className={styles.componentContainer}>
+                  <DistributionPlots />
+                </div>
+              </div>
+
+              {/* FR-DV-4.6: Coaching Leaderboards */}
+              <div className={styles.section}>
+                <h3>Coaching Opportunities</h3>
+                <div className={styles.componentContainer}>
+                  <CoachingLeaderboards />
+                </div>
+              </div>
+
+              {/* FR-DV-4.7: Radar Chart for Comparison */}
+              <div className={styles.section}>
+                <h3>Performance Comparison</h3>
+                <div className={styles.componentContainer}>
+                  <RadarChart />
                 </div>
               </div>
             </div>

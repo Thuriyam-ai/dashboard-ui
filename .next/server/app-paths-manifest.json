@@ -1,13 +1,7 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/conversation-view/page": "app/conversation-view/page.js",
-  "/analytics/page": "app/analytics/page.js",
-  "/conversation-view-demo/page": "app/conversation-view-demo/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
+  "/analytics/conversation-view/page": "app/analytics/conversation-view/page.js",
   "/analytics/team/page": "app/analytics/team/page.js",
-  "/example-home/page": "app/example-home/page.js",
-  "/team-dashboard/page": "app/team-dashboard/page.js",
-  "/example-components/page": "app/example-components/page.js",
-  "/page": "app/page.js"
+  "/dashboard/page": "app/dashboard/page.js",
+  "/analytics/page": "app/analytics/page.js"
 }

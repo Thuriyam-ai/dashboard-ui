@@ -93,9 +93,12 @@ export default function AnalyticsPage() {
   ];
 
   const handleConversationSelect = (conversation: Conversation) => {
-    setSelectedConversation(conversation);
+    // Navigate to the conversation view page
+    window.location.href = `/analytics/conversation-view?id=${conversation.id}`;
   };
 
+
+  
   const handleBackToOverview = () => {
     setSelectedConversation(null);
   };

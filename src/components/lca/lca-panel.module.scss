@@ -368,3 +368,40 @@
     text-align: left;
   }
 }
+
+.componentContainer {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  margin-top: 1rem;
+
+  // Override component styles to fit within modal
+  :global(.distributionPlots),
+  :global(.coachingLeaderboards),
+  :global(.radarChart) {
+    margin-bottom: 0;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  // Ensure components fit within modal width
+  :global(.plotsGrid) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  :global(.leaderboardContent) {
+    max-height: 300px;
+  }
+
+  :global(.chartContainer) {
+    padding: 1rem;
+  }
+
+  :global(.radarSvg) {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+  }
+}
