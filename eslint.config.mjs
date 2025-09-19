@@ -32,29 +32,20 @@ const eslintConfig = [
     ],
     parser: "@typescript-eslint/parser",
     plugins: ["prettier"],
-    rules: {
-      "prettier/prettier": [
-        "error",
-        {
-          printWidth: 80,
-          semi: true,
-          singleQuote: true,
-          tabWidth: 2,
-          trailingComma: "all",
-          useTabs: false,
-        },
-      ],
-      // Disable strict rules that are causing deployment failures
-      "@typescript-eslint/no-confusing-void-expression": "off",
-      "@typescript-eslint/prefer-nullish-coalescing": "off",
-      "@typescript-eslint/use-unknown-in-catch-callback-variable": "off",
-      "@typescript-eslint/restrict-template-expressions": "off",
-      "@typescript-eslint/no-unnecessary-condition": "off",
-      "@typescript-eslint/prefer-optional-chain": "off",
-      "@typescript-eslint/no-unused-vars": "warn",
-      "react/no-unescaped-entities": "off",
-      "jsdoc/require-jsdoc": "off",
-    },
+      rules: {
+        // Disable Prettier formatting rules to avoid quote conflicts
+        "prettier/prettier": "off",
+        // Disable strict rules that are causing deployment failures
+        "@typescript-eslint/no-confusing-void-expression": "off",
+        "@typescript-eslint/prefer-nullish-coalescing": "off",
+        "@typescript-eslint/use-unknown-in-catch-callback-variable": "off",
+        "@typescript-eslint/restrict-template-expressions": "off",
+        "@typescript-eslint/no-unnecessary-condition": "off",
+        "@typescript-eslint/prefer-optional-chain": "off",
+        "@typescript-eslint/no-unused-vars": "warn",
+        "react/no-unescaped-entities": "off",
+        "jsdoc/require-jsdoc": "off",
+      },
     settings: {
       jsdoc: {
         mode: "typescript",

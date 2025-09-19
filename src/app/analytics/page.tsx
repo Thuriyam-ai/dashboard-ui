@@ -5,6 +5,7 @@ import styles from "./page.module.scss";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import { ConversationOverview } from "@/components/analytics/conversation-overview";
 import { ConversationDetailView } from "@/components/analytics/conversation-detail-view";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 
 interface Conversation {
   id: string;
@@ -134,6 +135,9 @@ export default function AnalyticsPage() {
 
         {/* Analytics Content */}
         <div className={styles.analyticsContent}>
+          {/* Breadcrumbs */}
+          <Breadcrumbs />
+          
           {!selectedConversation ? (
             <>
               {/* Header */}

@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/dashboard/sidebar";
 import { MetricsCards } from "@/components/dashboard/metrics-cards";
 import { RecentDeployments } from "@/components/dashboard/recent-deployments";
 import { SystemHealth } from "@/components/dashboard/system-health";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 
 /**
  * Dashboard page component.
@@ -47,6 +48,9 @@ export default function DashboardPage() {
 
         {/* Dashboard Content */}
         <div className={styles.dashboardContent}>
+          {/* Breadcrumbs */}
+          <Breadcrumbs />
+          
           {/* Header */}
           <div className={styles.header}>
             <h1 className={styles.title}>Dashboard Overview</h1>

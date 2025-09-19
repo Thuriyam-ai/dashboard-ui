@@ -8,6 +8,7 @@ import { Leaderboards } from "@/components/team-dashboard/leaderboards";
 import { TrendAnalysis } from "@/components/team-dashboard/trend-analysis";
 import { TeamMetrics } from "@/components/team-dashboard/team-metrics";
 import { LCAPanel } from "@/components/lca";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 
 /**
  * Team Analytics page component displaying team metrics and performance data.
@@ -53,6 +54,9 @@ export default function TeamAnalyticsPage() {
 
         {/* Team Analytics Content */}
         <div className={styles.dashboardContent}>
+          {/* Breadcrumbs */}
+          <Breadcrumbs />
+          
           {/* Header */}
           <div className={styles.header}>
             <h1 className={styles.title}>Team Analytics</h1>

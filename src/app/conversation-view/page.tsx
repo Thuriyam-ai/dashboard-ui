@@ -12,6 +12,7 @@ import {
   SpeechDynamicsPanel,
 } from "@/components/conversation-view";
 import { LCAPanel } from "@/components/lca";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 
 /**
  * Single Conversation View page component.
@@ -38,14 +39,17 @@ export default function ConversationViewPage() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.content}>
-        {/* Page Header */}
-        <div className={styles.header}>
-          <h1 className={styles.title}>Single Conversation View</h1>
-          <p className={styles.subtitle}>
-            Comprehensive analysis and visualization of conversation data
-          </p>
-        </div>
+        <div className={styles.content}>
+          {/* Breadcrumbs */}
+          <Breadcrumbs />
+          
+          {/* Page Header */}
+          <div className={styles.header}>
+            <h1 className={styles.title}>Single Conversation View</h1>
+            <p className={styles.subtitle}>
+              Comprehensive analysis and visualization of conversation data
+            </p>
+          </div>
 
         {/* Tab Navigation */}
         <div className={styles.tabNavigation}>

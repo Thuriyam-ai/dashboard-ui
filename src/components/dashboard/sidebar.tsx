@@ -41,6 +41,21 @@ export function Sidebar({ activeItem: propActiveItem }: SidebarProps = {}) {
       case "conversation-view":
         window.location.href = "/conversation-view";
         break;
+      case "agent-config":
+        window.location.href = "/agent-config";
+        break;
+      case "access-mgmt":
+        window.location.href = "/access-management";
+        break;
+      case "platform-settings":
+        window.location.href = "/platform-settings";
+        break;
+      case "observability":
+        window.location.href = "/observability";
+        break;
+      case "developer-hub":
+        window.location.href = "/developer-hub";
+        break;
       default:
         console.log(`Navigating to: ${itemId}`);
     }

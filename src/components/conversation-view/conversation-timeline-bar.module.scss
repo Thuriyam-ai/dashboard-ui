@@ -1,4 +1,4 @@
-.timelineContainer {
+.timelineBar {
   background: white;
   border-radius: 12px;
   padding: 1.5rem;
@@ -6,48 +6,7 @@
   margin-bottom: 1.5rem;
 }
 
-.timelineHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.timelineTitle {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1a202c;
-  margin: 0;
-}
-
-.timelineLegend {
-  display: flex;
-  gap: 1rem;
-}
-
-.legendItem {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: #4a5568;
-}
-
-.legendColor {
-  width: 1rem;
-  height: 1rem;
-  border-radius: 2px;
-
-  &.agent {
-    background: #3182ce;
-  }
-
-  &.customer {
-    background: #38a169;
-  }
-}
-
-.timelineBar {
+.timelineTrack {
   position: relative;
   height: 3rem;
   background: #f7fafc;
@@ -56,13 +15,7 @@
   margin-bottom: 1rem;
 }
 
-.timelineTrack {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.timelineSegment {
+.segment {
   position: absolute;
   height: 100%;
   cursor: pointer;
@@ -92,7 +45,7 @@
     }
   }
 
-  &.longMonologue {
+  &.monologue {
     opacity: 1;
     border: 2px solid #e53e3e;
     box-shadow: 0 0 8px rgba(229, 62, 62, 0.3);
@@ -107,66 +60,72 @@
   }
 }
 
-.monologueIndicator {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #e53e3e;
-  opacity: 0.8;
-
-  svg {
-    width: 1rem;
-    height: 1rem;
-  }
-}
-
 .timeMarkers {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
+  position: relative;
   height: 1.5rem;
   display: flex;
   justify-content: space-between;
+  margin-bottom: 1rem;
 }
 
-.timeMarker {
-  position: absolute;
-  top: 0.5rem;
-  transform: translateX(-50%);
-}
-
-.timeLabel {
+.marker {
   font-size: 0.75rem;
   color: #718096;
   font-weight: 500;
 }
 
-.timelineStats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e2e8f0;
-}
-
-.statItem {
+.legend {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 1rem;
+  justify-content: center;
 }
 
-.statLabel {
+.agent {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 0.875rem;
   color: #4a5568;
-  font-weight: 500;
+
+  &::before {
+    content: '';
+    width: 1rem;
+    height: 1rem;
+    border-radius: 2px;
+    background: #3182ce;
+  }
 }
 
-.statValue {
+.customer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 0.875rem;
-  color: #1a202c;
-  font-weight: 600;
+  color: #4a5568;
+
+  &::before {
+    content: '';
+    width: 1rem;
+    height: 1rem;
+    border-radius: 2px;
+    background: #38a169;
+  }
+}
+
+.monologueLegend {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #4a5568;
+
+  &::before {
+    content: '';
+    width: 1rem;
+    height: 1rem;
+    border-radius: 2px;
+    background: #e53e3e;
+  }
 }
 
 // Responsive design
