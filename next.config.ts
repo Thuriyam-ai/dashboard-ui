@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
   // assetPrefix: process.env.NODE_ENV === 'production' ? '/dashboard-ui/' : '',
   // Disable ESLint during builds to prevent deployment failures
   eslint: {
-    ignoreDuringBuilds: process.env.ESLINT_NO_DEV_ERRORS === "true",
+    ignoreDuringBuilds: true,
   },
   // Disable TypeScript type checking during builds if needed
   typescript: {

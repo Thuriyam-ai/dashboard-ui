@@ -1,7 +1,0 @@
-{
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/analytics/conversation-view/page": "app/analytics/conversation-view/page.js",
-  "/analytics/team/page": "app/analytics/team/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/analytics/page": "app/analytics/page.js"
-}
