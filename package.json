@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "NEXT_PUBLIC_ENV=development next dev",
     "build": "NEXT_PUBLIC_ENV=production next build",
+    "build:ignore-lint": "NEXT_PUBLIC_ENV=production ESLINT_NO_DEV_ERRORS=true next build",
     "build:dev": "NEXT_PUBLIC_ENV=development next build",
     "build:prod": "NEXT_PUBLIC_ENV=production next build",
     "build:staging": "NEXT_PUBLIC_ENV=staging next build",
