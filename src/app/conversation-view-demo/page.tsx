@@ -23,10 +23,10 @@ export default function ConversationViewDemoPage() {
             Interactive demonstration of conversation analysis features
           </p>
           <div className={styles.navigation}>
-            <a href="/conversation-view" className={styles.navLink}>
+            <a href={`${process.env.NODE_ENV === 'production' ? '/dashboard-ui' : ''}/conversation-view`} className={styles.navLink}>
               View Full Page
             </a>
-            <a href="/example-components" className={styles.navLink}>
+            <a href={`${process.env.NODE_ENV === 'production' ? '/dashboard-ui' : ''}/example-components`} className={styles.navLink}>
               Back to Examples
             </a>
           </div>

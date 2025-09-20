@@ -6,15 +6,15 @@ import type { NextConfig } from "next";
  */
 
 const nextConfig: NextConfig = {
-  // Remove static export for Vercel deployment
-  // output: 'export',
+  // Enable static export for GitHub Pages
+  output: 'export',
   trailingSlash: true,
   images: {
-    unoptimized: false, // Enable image optimization for Vercel
+    unoptimized: true, // Required for static export
   },
-  // Remove basePath and assetPrefix for Vercel
-  // basePath: process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '',
-  // assetPrefix: process.env.NODE_ENV === 'production' ? '/dashboard-ui/' : '',
+  // Configure basePath for GitHub Pages (replace 'vercel-deployment' with your repo name)
+  basePath: process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '',
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/dashboard-ui/' : '',
   // Disable ESLint during builds to prevent deployment failures
   eslint: {
     ignoreDuringBuilds: true,

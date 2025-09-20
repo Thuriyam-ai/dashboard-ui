@@ -27,34 +27,36 @@ export function Sidebar({ activeItem: propActiveItem }: SidebarProps = {}) {
   }, [propActiveItem]);
 
   const handleNavClick = (itemId: string) => {
-    // Navigation logic with correct URLs
+    // Navigation logic with correct URLs including basePath for GitHub Pages
+    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
+    
     switch (itemId) {
       case "dashboard":
-        window.location.href = "/dashboard";
+        window.location.href = `${basePath}/dashboard`;
         break;
       case "analytics-overview":
-        window.location.href = "/analytics";
+        window.location.href = `${basePath}/analytics`;
         break;
       case "team-dashboard":
-        window.location.href = "/analytics/team";
+        window.location.href = `${basePath}/analytics/team`;
         break;
       case "conversation-view":
-        window.location.href = "/conversation-view";
+        window.location.href = `${basePath}/conversation-view`;
         break;
       case "agent-config":
-        window.location.href = "/agent-config";
+        window.location.href = `${basePath}/agent-config`;
         break;
       case "access-mgmt":
-        window.location.href = "/access-management";
+        window.location.href = `${basePath}/access-management`;
         break;
       case "platform-settings":
-        window.location.href = "/platform-settings";
+        window.location.href = `${basePath}/platform-settings`;
         break;
       case "observability":
-        window.location.href = "/observability";
+        window.location.href = `${basePath}/observability`;
         break;
       case "developer-hub":
-        window.location.href = "/developer-hub";
+        window.location.href = `${basePath}/developer-hub`;
         break;
       default:
         console.log(`Navigating to: ${itemId}`);

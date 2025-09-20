@@ -15,10 +15,16 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "prepare": "husky || true",
-    "build:gh-pages": "NODE_ENV=production next build",
+    "build:gh-pages": "NODE_ENV=production NEXT_PUBLIC_ENV=production next build",
     "deploy:gh-pages": "npm run build:gh-pages && touch out/.nojekyll && git add out/ && git commit -m 'Deploy to GitHub Pages' && git subtree push --prefix out origin gh-pages"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.2",
+    "@mui/material": "^7.3.2",
+    "@mui/x-charts": "^8.11.3",
+    "@mui/x-data-grid": "^8.11.3",
     "next": "15.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
