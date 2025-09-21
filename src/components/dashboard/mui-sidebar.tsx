@@ -201,7 +201,7 @@ export function MuiSidebar({ activeItem: propActiveItem }: MuiSidebarProps = {})
           MANAGEMENT
         </Typography>
         
-        <List disablePadding>
+        <List sx={{ px: 2 }}>
           {navItems.map((item) => (
             <React.Fragment key={item.id}>
               <ListItem disablePadding>
@@ -268,7 +268,7 @@ export function MuiSidebar({ activeItem: propActiveItem }: MuiSidebarProps = {})
               {/* Render nested items */}
               {item.children && (
                 <Collapse in={analyticsOpen} timeout="auto" unmountOnExit>
-                  <List component="div" disablePadding sx={{ pl: 2 }}>
+                  <List component="div" disablePadding sx={{ pl: 4, pr: 2 }}>
                     {item.children.map((child) => (
                       <ListItem key={child.id} disablePadding>
                         <ListItemButton
