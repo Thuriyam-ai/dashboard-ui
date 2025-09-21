@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import styles from "./page.module.scss";
+import { MuiSidebar } from "@/components/dashboard/mui-sidebar";
 import {
   InteractiveTranscriptPlayer,
   SpeakerTimeline,
@@ -39,6 +40,7 @@ export default function ConversationViewPage() {
 
   return (
     <div className={styles.container}>
+      <MuiSidebar activeItem="conversation-view" />
         <div className={styles.content}>
           {/* Breadcrumbs */}
           <Breadcrumbs />

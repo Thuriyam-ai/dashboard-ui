@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import styles from "./page.module.scss";
-import { Sidebar } from "@/components/dashboard/sidebar";
+import { MuiSidebar } from "@/components/dashboard/mui-sidebar";
 import { TeamFilters } from "@/components/team-dashboard/team-filters";
 import { Leaderboards } from "@/components/team-dashboard/leaderboards";
 import { TrendAnalysis } from "@/components/team-dashboard/trend-analysis";
@@ -23,7 +23,7 @@ export default function TeamDashboardPage() {
   const [showLCAPanel, setShowLCAPanel] = useState(false);
   return (
     <div className={styles.container}>
-      <Sidebar activeItem="team-dashboard" />
+      <MuiSidebar activeItem="team-dashboard" />
       <div className={styles.mainContent}>
         {/* Top Bar */}
         <div className={styles.topBar}>

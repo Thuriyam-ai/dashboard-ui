@@ -1,11 +1,25 @@
 "use client";
 
-import styles from "./page.module.scss";
 import { MuiSidebar } from "@/components/dashboard/mui-sidebar";
 import { MetricsCards } from "@/components/dashboard/metrics-cards";
 import { RecentDeployments } from "@/components/dashboard/recent-deployments";
 import { SystemHealth } from "@/components/dashboard/system-health";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
+import { 
+  Box, 
+  Container, 
+  Typography, 
+  AppBar, 
+  Toolbar, 
+  IconButton, 
+  Button, 
+  Avatar 
+} from "@mui/material";
+import {
+  BookmarkBorder,
+  MoreVert,
+  Logout,
+} from "@mui/icons-material";
 
 /**
  * Dashboard page component.
@@ -14,61 +28,89 @@ import { Breadcrumbs } from "@/components/ui/breadcrumbs";
  */
 export default function DashboardPage() {
   return (
-    <div className={styles.container}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
       <MuiSidebar activeItem="dashboard" />
-      <div className={styles.mainContent}>
+      
+      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         {/* Top Bar */}
-        <div className={styles.topBar}>
-          <div className={styles.urlBar}>
-            <span className={styles.url}>dashboard-admin.localhost:3000</span>
-          </div>
-          <div className={styles.topBarActions}>
-            <button className={styles.bookmarkButton} aria-label="Bookmark">
-              <svg fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
-              </svg>
-            </button>
-            <button className={styles.userButton} aria-label="User Profile">
-              <span className={styles.userInitial}>W</span>
-              <span className={styles.userText}>Work</span>
-            </button>
-            <button className={styles.menuButton} aria-label="Menu">
-              <svg fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-              </svg>
-            </button>
-            <button className={styles.logoutButton}>
-              <svg fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
-              </svg>
-              Logout
-            </button>
-          </div>
-        </div>
+        <AppBar 
+          position="static" 
+          elevation={1}
+          sx={{ 
+            backgroundColor: 'background.paper',
+            color: 'text.primary',
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+          }}
+        >
+          <Toolbar>
+            <Box sx={{ flexGrow: 1 }}>
+              <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
+                dashboard-admin.localhost:3000
+              </Typography>
+            </Box>
+            
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <IconButton size="small" sx={{ color: 'text.secondary' }}>
+                <BookmarkBorder />
+              </IconButton>
+              
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 2 }}>
+                <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '0.875rem' }}>
+                  W
+                </Avatar>
+                <Typography variant="body2" fontWeight={500}>
+                  Work
+                </Typography>
+              </Box>
+              
+              <IconButton size="small" sx={{ color: 'text.secondary' }}>
+                <MoreVert />
+              </IconButton>
+              
+              <Button
+                variant="contained"
+                color="error"
+                size="small"
+                startIcon={<Logout />}
+                sx={{ ml: 1 }}
+              >
+                Logout
+              </Button>
+            </Box>
+          </Toolbar>
+        </AppBar>
 
         {/* Dashboard Content */}
-        <div className={styles.dashboardContent}>
+        <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3 }}>
           {/* Breadcrumbs */}
           <Breadcrumbs />
           
           {/* Header */}
-          <div className={styles.header}>
-            <h1 className={styles.title}>Dashboard Overview</h1>
-            <p className={styles.subtitle}>
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="h3" component="h1" fontWeight={700} gutterBottom>
+              Dashboard Overview
+            </Typography>
+            <Typography variant="h6" color="text.secondary">
               Monitor your bot deployments and system health
-            </p>
-          </div>
+            </Typography>
+          </Box>
 
           {/* Key Metrics Cards */}
           <MetricsCards />
 
           {/* Bottom Section */}
-          <div className={styles.bottomSection}>
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' }, 
+            gap: 3, 
+            mt: 3 
+          }}>
             <RecentDeployments />
             <SystemHealth />
-          </div>
-        </div>
-      </div>
-    </div>
+          </Box>
+        </Container>
+      </Box>
+    </Box>
   );
 }
