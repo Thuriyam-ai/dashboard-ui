@@ -159,7 +159,7 @@ export default function CallQualityAnalyticsPage() {
           {/* Quality Metrics Cards */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
             {qualityMetrics.map((metric, index) => (
-              <Grid xs={12} md={6} lg={3} key={index}>
+              <Grid key={index}>
                 <Card>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
@@ -199,7 +199,7 @@ export default function CallQualityAnalyticsPage() {
 
           {/* Additional Analytics Content */}
           <Grid container spacing={3}>
-            <Grid xs={12} md={6}>
+            <Grid>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
@@ -212,7 +212,7 @@ export default function CallQualityAnalyticsPage() {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid xs={12} md={6}>
+            <Grid>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
