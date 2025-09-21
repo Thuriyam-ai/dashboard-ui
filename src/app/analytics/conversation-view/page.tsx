@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import styles from "./page.module.scss";
-import { Sidebar } from "@/components/dashboard/sidebar";
+import { MuiSidebar } from "@/components/dashboard/mui-sidebar";
 import {
   InteractiveTranscriptPlayer,
   SpeakerTimeline,
@@ -40,7 +40,7 @@ export default function AnalyticsConversationViewPage() {
 
   return (
     <div className={styles.container}>
-      <Sidebar activeItem="analytics-overview" />
+      <MuiSidebar activeItem="analytics-overview" />
       <div className={styles.mainContent}>
         {/* Top Bar */}
         <div className={styles.topBar}>
