@@ -6,7 +6,7 @@ import { MuiSidebar } from "@/components/dashboard/mui-sidebar";
 import { ConversationOverview } from "@/components/analytics/conversation-overview";
 import { ConversationDetailView } from "@/components/analytics/conversation-detail-view";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
-import MuiAnalyticsPage from "./mui-page";
+// import MuiAnalyticsPage from "./mui-page";
 
 interface Conversation {
   id: string;
@@ -26,6 +26,10 @@ interface Conversation {
  * @returns The AnalyticsPage component
  */
 export default function AnalyticsPage() {
-  // Use MUI version for now - can switch back to original if needed
-  return <MuiAnalyticsPage />;
+  return (
+    <div style={{ padding: '20px' }}>
+      <h1>Analytics Page</h1>
+      <p>Analytics functionality coming soon...</p>
+    </div>
+  );
 }
