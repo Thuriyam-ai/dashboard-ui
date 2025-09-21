@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { MuiSidebar } from "@/components/dashboard/mui-sidebar";
+import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
 import { MetricsCards } from "@/components/dashboard/metrics-cards";
 import { RecentDeployments } from "@/components/dashboard/recent-deployments";
 import { SystemHealth } from "@/components/dashboard/system-health";
@@ -13,12 +15,18 @@ import {
   Toolbar, 
   IconButton, 
   Button, 
-  Avatar 
+  Avatar,
+  Menu,
+  MenuItem,
+  Chip,
 } from "@mui/material";
 import {
   BookmarkBorder,
   MoreVert,
   Logout,
+  KeyboardArrowDown,
+  SupervisorAccount,
+  Dashboard,
 } from "@mui/icons-material";
 
 /**
@@ -27,9 +35,41 @@ import {
  * @returns The Dashboard page layout
  */
 export default function DashboardPage() {
+  const [currentView, setCurrentView] = useState("generic");
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleViewChange = (newView: string) => {
+    setCurrentView(newView);
+    setAnchorEl(null);
+  };
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const getViewTypeLabel = () => {
+    return currentView === "generic" ? "Generic view" : "Team Lead view";
+  };
+
+  const getViewTypeColor = () => {
+    return currentView === "generic" ? "primary" : "secondary";
+  };
+
+  const getViewTypeIcon = () => {
+    return currentView === "generic" ? <Dashboard /> : <SupervisorAccount />;
+  };
+
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
-      <MuiSidebar activeItem="dashboard" />
+      {currentView === "generic" ? (
+        <MuiSidebar activeItem="dashboard" />
+      ) : (
+        <TeamLeaderSidebar activeItem="overview" />
+      )}
       
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         {/* Top Bar */}
@@ -50,7 +90,51 @@ export default function DashboardPage() {
               </Typography>
             </Box>
             
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              {/* View Type Dropdown */}
+              <Chip
+                icon={getViewTypeIcon()}
+                label={getViewTypeLabel()}
+                color={getViewTypeColor()}
+                onClick={handleMenuClick}
+                deleteIcon={<KeyboardArrowDown />}
+                onDelete={handleMenuClick}
+                variant="outlined"
+                sx={{ 
+                  fontWeight: 600,
+                  '& .MuiChip-deleteIcon': {
+                    color: 'inherit',
+                  },
+                }}
+              />
+
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+                PaperProps={{
+                  sx: {
+                    mt: 1,
+                    minWidth: 200,
+                  },
+                }}
+              >
+                <MenuItem 
+                  onClick={() => handleViewChange("generic")}
+                  selected={currentView === "generic"}
+                >
+                  <Dashboard sx={{ mr: 1 }} />
+                  Generic view
+                </MenuItem>
+                <MenuItem 
+                  onClick={() => handleViewChange("team-lead")}
+                  selected={currentView === "team-lead"}
+                >
+                  <SupervisorAccount sx={{ mr: 1 }} />
+                  Team Lead view
+                </MenuItem>
+              </Menu>
+              
               <IconButton size="small" sx={{ color: 'text.secondary' }}>
                 <BookmarkBorder />
               </IconButton>
@@ -89,26 +173,68 @@ export default function DashboardPage() {
           {/* Header */}
           <Box sx={{ mb: 4 }}>
             <Typography variant="h3" component="h1" fontWeight={700} gutterBottom>
-              Dashboard Overview
+              {currentView === "generic" ? "Dashboard Overview" : "Team Leader Dashboard"}
             </Typography>
             <Typography variant="h6" color="text.secondary">
-              Monitor your bot deployments and system health
+              {currentView === "generic" 
+                ? "Monitor your bot deployments and system health"
+                : "Comprehensive team performance and analytics overview"
+              }
             </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                Current View:
+              </Typography>
+              <Chip 
+                icon={getViewTypeIcon()}
+                label={getViewTypeLabel()} 
+                color={getViewTypeColor()} 
+                size="small" 
+                variant="filled"
+              />
+            </Box>
           </Box>
 
-          {/* Key Metrics Cards */}
-          <MetricsCards />
+          {currentView === "generic" ? (
+            <>
+              {/* Key Metrics Cards */}
+              <MetricsCards />
 
-          {/* Bottom Section */}
-          <Box sx={{ 
-            display: 'grid', 
-            gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' }, 
-            gap: 3, 
-            mt: 3 
-          }}>
-            <RecentDeployments />
-            <SystemHealth />
-          </Box>
+              {/* Bottom Section */}
+              <Box sx={{ 
+                display: 'grid', 
+                gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' }, 
+                gap: 3, 
+                mt: 3 
+              }}>
+                <RecentDeployments />
+                <SystemHealth />
+              </Box>
+            </>
+          ) : (
+            <>
+              {/* Team Leader Dashboard Content */}
+              <Box>
+                <Typography variant="h5" gutterBottom>
+                  Team Leader View Content
+                </Typography>
+                <Typography variant="body1" color="text.secondary" paragraph>
+                  This is the specialized Team Leader view with enhanced analytics, team management tools,
+                  and advanced reporting capabilities designed specifically for team leaders.
+                </Typography>
+                <Typography variant="body2" color="text.secondary" paragraph>
+                  Navigate using the sidebar to access:
+                </Typography>
+                <Box component="ul" sx={{ pl: 2 }}>
+                  <li>Call Quality Analytics</li>
+                  <li>Conversations View</li>
+                  <li>Support Call Analysis</li>
+                  <li>Customer Success Analysis</li>
+                  <li>Configuration Management (Goals, Campaigns, Alerts)</li>
+                </Box>
+              </Box>
+            </>
+          )}
         </Container>
       </Box>
     </Box>

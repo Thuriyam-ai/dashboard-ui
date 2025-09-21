@@ -6,8 +6,8 @@ import type { NextConfig } from "next";
  */
 
 const nextConfig: NextConfig = {
-  // Enable static export for GitHub Pages
-  output: 'export',
+  // Enable static export for GitHub Pages (disabled for development)
+  ...(process.env.NODE_ENV === 'production' && { output: 'export' }),
   trailingSlash: true,
   images: {
     unoptimized: true, // Required for static export
