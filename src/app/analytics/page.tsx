@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import styles from "./page.module.scss";
-import { Sidebar } from "@/components/dashboard/sidebar";
+import { MuiSidebar } from "@/components/dashboard/mui-sidebar";
 import { ConversationOverview } from "@/components/analytics/conversation-overview";
 import { ConversationDetailView } from "@/components/analytics/conversation-detail-view";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
