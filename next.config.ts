@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   // Enable static export for GitHub Pages (disabled for development)
   ...(process.env.NODE_ENV === 'production' && { output: 'export' }),
   trailingSlash: true,
+  distDir: 'out',
   images: {
     unoptimized: true, // Required for static export
   },
