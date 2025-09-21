@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./page.module.scss";
-import { Sidebar } from "@/components/dashboard/sidebar";
+import { MuiSidebar } from "@/components/dashboard/mui-sidebar";
 import { MetricsCards } from "@/components/dashboard/metrics-cards";
 import { RecentDeployments } from "@/components/dashboard/recent-deployments";
 import { SystemHealth } from "@/components/dashboard/system-health";
@@ -15,7 +15,7 @@ import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 export default function DashboardPage() {
   return (
     <div className={styles.container}>
-      <Sidebar />
+      <MuiSidebar activeItem="dashboard" />
       <div className={styles.mainContent}>
         {/* Top Bar */}
         <div className={styles.topBar}>
