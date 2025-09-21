@@ -17,7 +17,6 @@ import {
   IconButton,
   Card,
   CardContent,
-  Grid,
   LinearProgress,
   Chip,
 } from "@mui/material";
@@ -104,89 +103,93 @@ export function MuiLCAPanel({ conversationId, onClose }: LCAPanelProps) {
         Linguistic Complexity Analysis
       </Typography>
       
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Vocabulary Richness
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h4" color="primary" sx={{ mr: 2 }}>
-                  {linguisticAnalysis.vocabularyRichness}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+          <Box sx={{ flex: '1 1 300px', minWidth: '300px' }}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Vocabulary Richness
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  / 10.0
-                </Typography>
-              </Box>
-              <LinearProgress
-                variant="determinate"
-                value={(linguisticAnalysis.vocabularyRichness / 10) * 100}
-                sx={{ height: 8, borderRadius: 4 }}
-              />
-            </CardContent>
-          </Card>
-        </Grid>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h4" color="primary" sx={{ mr: 2 }}>
+                    {linguisticAnalysis.vocabularyRichness}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    / 10.0
+                  </Typography>
+                </Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={(linguisticAnalysis.vocabularyRichness / 10) * 100}
+                  sx={{ height: 8, borderRadius: 4 }}
+                />
+              </CardContent>
+            </Card>
+          </Box>
 
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Sentence Complexity
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h4" color="primary" sx={{ mr: 2 }}>
-                  {linguisticAnalysis.sentenceComplexity}
+          <Box sx={{ flex: '1 1 300px', minWidth: '300px' }}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Sentence Complexity
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  / 10.0
-                </Typography>
-              </Box>
-              <LinearProgress
-                variant="determinate"
-                value={(linguisticAnalysis.sentenceComplexity / 10) * 100}
-                sx={{ height: 8, borderRadius: 4 }}
-              />
-            </CardContent>
-          </Card>
-        </Grid>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h4" color="primary" sx={{ mr: 2 }}>
+                    {linguisticAnalysis.sentenceComplexity}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    / 10.0
+                  </Typography>
+                </Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={(linguisticAnalysis.sentenceComplexity / 10) * 100}
+                  sx={{ height: 8, borderRadius: 4 }}
+                />
+              </CardContent>
+            </Card>
+          </Box>
+        </Box>
 
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Grammatical Accuracy
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h4" color="success.main" sx={{ mr: 2 }}>
-                  {linguisticAnalysis.grammaticalAccuracy}%
+        <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+          <Box sx={{ flex: '1 1 300px', minWidth: '300px' }}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Grammatical Accuracy
                 </Typography>
-              </Box>
-              <LinearProgress
-                variant="determinate"
-                value={linguisticAnalysis.grammaticalAccuracy}
-                color="success"
-                sx={{ height: 8, borderRadius: 4 }}
-              />
-            </CardContent>
-          </Card>
-        </Grid>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h4" color="success.main" sx={{ mr: 2 }}>
+                    {linguisticAnalysis.grammaticalAccuracy}%
+                  </Typography>
+                </Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={linguisticAnalysis.grammaticalAccuracy}
+                  color="success"
+                  sx={{ height: 8, borderRadius: 4 }}
+                />
+              </CardContent>
+            </Card>
+          </Box>
 
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Word Frequency Distribution
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                <Chip label={`Common: ${linguisticAnalysis.wordFrequency.common}%`} color="primary" />
-                <Chip label={`Uncommon: ${linguisticAnalysis.wordFrequency.uncommon}%`} color="secondary" />
-                <Chip label={`Rare: ${linguisticAnalysis.wordFrequency.rare}%`} color="default" />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+          <Box sx={{ flex: '1 1 300px', minWidth: '300px' }}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Word Frequency Distribution
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  <Chip label={`Common: ${linguisticAnalysis.wordFrequency.common}%`} color="primary" />
+                  <Chip label={`Uncommon: ${linguisticAnalysis.wordFrequency.uncommon}%`} color="secondary" />
+                  <Chip label={`Rare: ${linguisticAnalysis.wordFrequency.rare}%`} color="default" />
+                </Box>
+              </CardContent>
+            </Card>
+          </Box>
+        </Box>
+      </Box>
     </Box>
   );
 
@@ -196,89 +199,93 @@ export function MuiLCAPanel({ conversationId, onClose }: LCAPanelProps) {
         Conversation Flow Analysis
       </Typography>
       
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Turn Taking
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h4" color="primary" sx={{ mr: 2 }}>
-                  {flowAnalysis.turnTaking}%
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+          <Box sx={{ flex: '1 1 300px', minWidth: '300px' }}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Turn Taking
                 </Typography>
-              </Box>
-              <LinearProgress
-                variant="determinate"
-                value={flowAnalysis.turnTaking}
-                sx={{ height: 8, borderRadius: 4 }}
-              />
-            </CardContent>
-          </Card>
-        </Grid>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h4" color="primary" sx={{ mr: 2 }}>
+                    {flowAnalysis.turnTaking}%
+                  </Typography>
+                </Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={flowAnalysis.turnTaking}
+                  sx={{ height: 8, borderRadius: 4 }}
+                />
+              </CardContent>
+            </Card>
+          </Box>
 
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Topic Maintenance
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h4" color="success.main" sx={{ mr: 2 }}>
-                  {flowAnalysis.topicMaintenance}%
+          <Box sx={{ flex: '1 1 300px', minWidth: '300px' }}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Topic Maintenance
                 </Typography>
-              </Box>
-              <LinearProgress
-                variant="determinate"
-                value={flowAnalysis.topicMaintenance}
-                color="success"
-                sx={{ height: 8, borderRadius: 4 }}
-              />
-            </CardContent>
-          </Card>
-        </Grid>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h4" color="success.main" sx={{ mr: 2 }}>
+                    {flowAnalysis.topicMaintenance}%
+                  </Typography>
+                </Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={flowAnalysis.topicMaintenance}
+                  color="success"
+                  sx={{ height: 8, borderRadius: 4 }}
+                />
+              </CardContent>
+            </Card>
+          </Box>
+        </Box>
 
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Response Relevance
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h4" color="primary" sx={{ mr: 2 }}>
-                  {flowAnalysis.responseRelevance}%
+        <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+          <Box sx={{ flex: '1 1 300px', minWidth: '300px' }}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Response Relevance
                 </Typography>
-              </Box>
-              <LinearProgress
-                variant="determinate"
-                value={flowAnalysis.responseRelevance}
-                sx={{ height: 8, borderRadius: 4 }}
-              />
-            </CardContent>
-          </Card>
-        </Grid>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h4" color="primary" sx={{ mr: 2 }}>
+                    {flowAnalysis.responseRelevance}%
+                  </Typography>
+                </Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={flowAnalysis.responseRelevance}
+                  sx={{ height: 8, borderRadius: 4 }}
+                />
+              </CardContent>
+            </Card>
+          </Box>
 
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Conversation Depth
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h4" color="warning.main" sx={{ mr: 2 }}>
-                  {flowAnalysis.conversationDepth}%
+          <Box sx={{ flex: '1 1 300px', minWidth: '300px' }}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Conversation Depth
                 </Typography>
-              </Box>
-              <LinearProgress
-                variant="determinate"
-                value={flowAnalysis.conversationDepth}
-                color="warning"
-                sx={{ height: 8, borderRadius: 4 }}
-              />
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h4" color="warning.main" sx={{ mr: 2 }}>
+                    {flowAnalysis.conversationDepth}%
+                  </Typography>
+                </Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={flowAnalysis.conversationDepth}
+                  color="warning"
+                  sx={{ height: 8, borderRadius: 4 }}
+                />
+              </CardContent>
+            </Card>
+          </Box>
+        </Box>
+      </Box>
     </Box>
   );
 
@@ -288,55 +295,57 @@ export function MuiLCAPanel({ conversationId, onClose }: LCAPanelProps) {
         Sentiment Analysis
       </Typography>
       
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Overall Sentiment
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h4" color="success.main" sx={{ mr: 2 }}>
-                  {Math.round(sentimentAnalysis.overallSentiment * 100)}%
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+          <Box sx={{ flex: '1 1 300px', minWidth: '300px' }}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Overall Sentiment
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Positive
-                </Typography>
-              </Box>
-              <LinearProgress
-                variant="determinate"
-                value={sentimentAnalysis.overallSentiment * 100}
-                color="success"
-                sx={{ height: 8, borderRadius: 4 }}
-              />
-            </CardContent>
-          </Card>
-        </Grid>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h4" color="success.main" sx={{ mr: 2 }}>
+                    {Math.round(sentimentAnalysis.overallSentiment * 100)}%
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Positive
+                  </Typography>
+                </Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={sentimentAnalysis.overallSentiment * 100}
+                  color="success"
+                  sx={{ height: 8, borderRadius: 4 }}
+                />
+              </CardContent>
+            </Card>
+          </Box>
 
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Emotional Range
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h4" color="primary" sx={{ mr: 2 }}>
-                  {Math.round(sentimentAnalysis.emotionalRange * 100)}%
+          <Box sx={{ flex: '1 1 300px', minWidth: '300px' }}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Emotional Range
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Diverse
-                </Typography>
-              </Box>
-              <LinearProgress
-                variant="determinate"
-                value={sentimentAnalysis.emotionalRange * 100}
-                sx={{ height: 8, borderRadius: 4 }}
-              />
-            </CardContent>
-          </Card>
-        </Grid>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h4" color="primary" sx={{ mr: 2 }}>
+                    {Math.round(sentimentAnalysis.emotionalRange * 100)}%
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Diverse
+                  </Typography>
+                </Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={sentimentAnalysis.emotionalRange * 100}
+                  sx={{ height: 8, borderRadius: 4 }}
+                />
+              </CardContent>
+            </Card>
+          </Box>
+        </Box>
 
-        <Grid item xs={12}>
+        <Box>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -370,8 +379,8 @@ export function MuiLCAPanel({ conversationId, onClose }: LCAPanelProps) {
               </Box>
             </CardContent>
           </Card>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Box>
   );
 
