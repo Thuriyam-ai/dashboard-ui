@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import styles from "./page.module.scss";
 import { MuiSidebar } from "@/components/dashboard/mui-sidebar";
 import { TeamFilters } from "@/components/team-dashboard/team-filters";
 import { Leaderboards } from "@/components/team-dashboard/leaderboards";
@@ -9,6 +8,27 @@ import { TrendAnalysis } from "@/components/team-dashboard/trend-analysis";
 import { TeamMetrics } from "@/components/team-dashboard/team-metrics";
 import { LCAPanel } from "@/components/lca";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
+import {
+  Box,
+  Container,
+  Typography,
+  AppBar,
+  Toolbar,
+  IconButton,
+  Button,
+  Avatar,
+  Tabs,
+  Tab,
+  Card,
+  CardContent,
+} from "@mui/material";
+import {
+  BookmarkBorder,
+  MoreVert,
+  Logout,
+  Group,
+  Star,
+} from "@mui/icons-material";
 
 /**
  * Team Analytics page component displaying team metrics and performance data.
@@ -19,88 +39,116 @@ export default function TeamAnalyticsPage() {
   const [activeTab, setActiveTab] = useState<"team" | "lca">("team");
   const [showLCAPanel, setShowLCAPanel] = useState(false);
 
-  return (
-    <div className={styles.container}>
-      <MuiSidebar activeItem="team-dashboard" />
-      <div className={styles.mainContent}>
-        {/* Top Bar */}
-        <div className={styles.topBar}>
-          <div className={styles.urlBar}>
-            <span className={styles.url}>analytics-team.localhost:3000</span>
-          </div>
-          <div className={styles.topBarActions}>
-            <button className={styles.bookmarkButton} aria-label="Bookmark">
-              <svg fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
-              </svg>
-            </button>
-            <button className={styles.userButton} aria-label="User Profile">
-              <span className={styles.userInitial}>W</span>
-              <span className={styles.userText}>Work</span>
-            </button>
-            <button className={styles.menuButton} aria-label="Menu">
-              <svg fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-              </svg>
-            </button>
-            <button className={styles.logoutButton}>
-              <svg fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
-              </svg>
-              Logout
-            </button>
-          </div>
-        </div>
+  const handleTabChange = (event: React.SyntheticEvent, newValue: "team" | "lca") => {
+    setActiveTab(newValue);
+    if (newValue === "lca") {
+      setShowLCAPanel(true);
+    }
+  };
 
-        {/* Team Analytics Content */}
-        <div className={styles.dashboardContent}>
+  return (
+    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
+      <MuiSidebar activeItem="team-dashboard" />
+
+      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        {/* Top Bar */}
+        <AppBar
+          position="static"
+          elevation={1}
+          sx={{
+            backgroundColor: 'background.paper',
+            color: 'text.primary',
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+          }}
+        >
+          <Toolbar>
+            <Box sx={{ flexGrow: 1 }}>
+              <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
+                analytics-team.localhost:3000
+              </Typography>
+            </Box>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <IconButton size="small" sx={{ color: 'text.secondary' }}>
+                <BookmarkBorder />
+              </IconButton>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 2 }}>
+                <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '0.875rem' }}>
+                  W
+                </Avatar>
+                <Typography variant="body2" fontWeight={500}>
+                  Work
+                </Typography>
+              </Box>
+
+              <IconButton size="small" sx={{ color: 'text.secondary' }}>
+                <MoreVert />
+              </IconButton>
+
+              <Button
+                variant="contained"
+                color="error"
+                size="small"
+                startIcon={<Logout />}
+                sx={{ ml: 1 }}
+              >
+                Logout
+              </Button>
+            </Box>
+          </Toolbar>
+        </AppBar>
+
+        {/* Main Content */}
+        <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3 }}>
           {/* Breadcrumbs */}
           <Breadcrumbs />
           
           {/* Header */}
-          <div className={styles.header}>
-            <h1 className={styles.title}>Team Analytics</h1>
-            <p className={styles.subtitle}>
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="h3" component="h1" fontWeight={700} gutterBottom>
+              Team Analytics
+            </Typography>
+            <Typography variant="h6" color="text.secondary">
               Team & Campaign Analytics with Leaderboards and Trend Analysis
-            </p>
-          </div>
+            </Typography>
+          </Box>
 
           {/* Tab Navigation */}
-          <div className={styles.tabNavigation}>
-            <button
-              className={`${styles.tab} ${activeTab === "team" ? styles.active : ""}`}
-              onClick={() => setActiveTab("team")}
-            >
-              <svg
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                className={styles.tabIcon}
-              >
-                <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H17c-.8 0-1.54.37-2.01.99L14 10.5l-1-1.5c-.47-.62-1.21-.99-2.01-.99H9.46c-.8 0-1.54.37-2.01.99L5 10.5l-1-1.5C3.53 8.37 2.79 8 2 8H.5L3 15.5V22h2v-6h2v6h2v-6h2v6h2v-6h2v6h2z" />
-              </svg>
-              Team Analytics
-            </button>
-            <button
-              className={`${styles.tab} ${activeTab === "lca" ? styles.active : ""}`}
-              onClick={() => {
-                setActiveTab("lca");
-                setShowLCAPanel(true);
+          <Box sx={{ mb: 3 }}>
+            <Tabs
+              value={activeTab}
+              onChange={handleTabChange}
+              sx={{
+                borderBottom: 1,
+                borderColor: 'divider',
+                '& .MuiTab-root': {
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  minHeight: 48,
+                },
               }}
             >
-              <svg
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                className={styles.tabIcon}
-              >
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-              </svg>
-              Team LCA Analysis
-            </button>
-          </div>
+              <Tab
+                icon={<Group />}
+                iconPosition="start"
+                label="Team Analytics"
+                value="team"
+                sx={{ mr: 2 }}
+              />
+              <Tab
+                icon={<Star />}
+                iconPosition="start"
+                label="Team LCA Analysis"
+                value="lca"
+              />
+            </Tabs>
+          </Box>
 
           {/* Tab Content */}
           {activeTab === "team" && (
-            <div className={styles.tabContent}>
+            <Box>
               {/* Filters */}
               <TeamFilters />
 
@@ -108,44 +156,61 @@ export default function TeamAnalyticsPage() {
               <TeamMetrics />
 
               {/* Main Content Grid */}
-              <div className={styles.mainGrid}>
+              <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' },
+                gap: 3,
+                mt: 3
+              }}>
                 {/* Left Column - Leaderboards */}
-                <div className={styles.leftColumn}>
+                <Box>
                   <Leaderboards />
-                </div>
+                </Box>
 
                 {/* Right Column - Trend Analysis */}
-                <div className={styles.rightColumn}>
+                <Box>
                   <TrendAnalysis />
-                </div>
-              </div>
-            </div>
+                </Box>
+              </Box>
+            </Box>
           )}
 
           {activeTab === "lca" && (
-            <div className={styles.tabContent}>
-              <div className={styles.lcaPlaceholder}>
-                <div className={styles.lcaIcon}>
-                  <svg fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                  </svg>
-                </div>
-                <h3 className={styles.lcaTitle}>Team LCA Analysis</h3>
-                <p className={styles.lcaDescription}>
+            <Card sx={{ mt: 3 }}>
+              <CardContent sx={{ textAlign: 'center', py: 6 }}>
+                <Box sx={{ mb: 3 }}>
+                  <Avatar
+                    sx={{
+                      width: 64,
+                      height: 64,
+                      bgcolor: 'primary.main',
+                      mx: 'auto',
+                      mb: 2,
+                    }}
+                  >
+                    <Star sx={{ fontSize: 32 }} />
+                  </Avatar>
+                </Box>
+                <Typography variant="h5" component="h3" fontWeight={600} gutterBottom>
+                  Team LCA Analysis
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: 400, mx: 'auto' }}>
                   Click the button below to open the detailed Team-level
                   Linguistic & Conversation Flow Analysis panel
-                </p>
-                <button
-                  className={styles.lcaButton}
+                </Typography>
+                <Button
+                  variant="contained"
+                  size="large"
+                  startIcon={<Star />}
                   onClick={() => setShowLCAPanel(true)}
                 >
                   Open Team LCA Panel
-                </button>
-              </div>
-            </div>
+                </Button>
+              </CardContent>
+            </Card>
           )}
-        </div>
-      </div>
+        </Container>
+      </Box>
 
       {/* LCA Panel Modal */}
       {showLCAPanel && (
@@ -154,6 +219,6 @@ export default function TeamAnalyticsPage() {
           onClose={() => setShowLCAPanel(false)}
         />
       )}
-    </div>
+    </Box>
   );
 }

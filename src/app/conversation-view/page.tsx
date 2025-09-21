@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import styles from "./page.module.scss";
 import { MuiSidebar } from "@/components/dashboard/mui-sidebar";
 import {
   InteractiveTranscriptPlayer,
@@ -14,6 +13,27 @@ import {
 } from "@/components/conversation-view";
 import { LCAPanel } from "@/components/lca";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
+import {
+  Box,
+  Container,
+  Typography,
+  AppBar,
+  Toolbar,
+  IconButton,
+  Button,
+  Avatar,
+  Tabs,
+  Tab,
+  Card,
+  CardContent,
+} from "@mui/material";
+import {
+  BookmarkBorder,
+  MoreVert,
+  Logout,
+  Chat,
+  Star,
+} from "@mui/icons-material";
 
 /**
  * Single Conversation View page component.
@@ -28,9 +48,11 @@ export default function ConversationViewPage() {
   );
   const [showLCAPanel, setShowLCAPanel] = useState(false);
 
-  const handleLCATabClick = () => {
-    setActiveTab("lca");
-    setShowLCAPanel(true);
+  const handleTabChange = (event: React.SyntheticEvent, newValue: "conversation" | "lca") => {
+    setActiveTab(newValue);
+    if (newValue === "lca") {
+      setShowLCAPanel(true);
+    }
   };
 
   const handleCloseLCAPanel = () => {
@@ -39,120 +61,196 @@ export default function ConversationViewPage() {
   };
 
   return (
-    <div className={styles.container}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
       <MuiSidebar activeItem="conversation-view" />
-        <div className={styles.content}>
+
+      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        {/* Top Bar */}
+        <AppBar
+          position="static"
+          elevation={1}
+          sx={{
+            backgroundColor: 'background.paper',
+            color: 'text.primary',
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+          }}
+        >
+          <Toolbar>
+            <Box sx={{ flexGrow: 1 }}>
+              <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
+                conversation-view.localhost:3000
+              </Typography>
+            </Box>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <IconButton size="small" sx={{ color: 'text.secondary' }}>
+                <BookmarkBorder />
+              </IconButton>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 2 }}>
+                <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '0.875rem' }}>
+                  W
+                </Avatar>
+                <Typography variant="body2" fontWeight={500}>
+                  Work
+                </Typography>
+              </Box>
+
+              <IconButton size="small" sx={{ color: 'text.secondary' }}>
+                <MoreVert />
+              </IconButton>
+
+              <Button
+                variant="contained"
+                color="error"
+                size="small"
+                startIcon={<Logout />}
+                sx={{ ml: 1 }}
+              >
+                Logout
+              </Button>
+            </Box>
+          </Toolbar>
+        </AppBar>
+
+        {/* Main Content */}
+        <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3 }}>
           {/* Breadcrumbs */}
           <Breadcrumbs />
           
-          {/* Page Header */}
-          <div className={styles.header}>
-            <h1 className={styles.title}>Single Conversation View</h1>
-            <p className={styles.subtitle}>
+          {/* Header */}
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="h3" component="h1" fontWeight={700} gutterBottom>
+              Single Conversation View
+            </Typography>
+            <Typography variant="h6" color="text.secondary">
               Comprehensive analysis and visualization of conversation data
-            </p>
-          </div>
+            </Typography>
+          </Box>
 
-        {/* Tab Navigation */}
-        <div className={styles.tabNavigation}>
-          <button
-            className={`${styles.tab} ${activeTab === "conversation" ? styles.active : ""}`}
-            onClick={() => setActiveTab("conversation")}
-          >
-            <svg
-              fill="currentColor"
-              viewBox="0 0 24 24"
-              className={styles.tabIcon}
-            >
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-            </svg>
-            Conversation Analysis
-          </button>
-          <button
-            className={`${styles.tab} ${activeTab === "lca" ? styles.active : ""}`}
-            onClick={handleLCATabClick}
-          >
-            <svg
-              fill="currentColor"
-              viewBox="0 0 24 24"
-              className={styles.tabIcon}
-            >
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-            </svg>
-            LCA Analysis
-          </button>
-        </div>
-
-        {/* Tab Content */}
-        {activeTab === "conversation" && (
-          <div className={styles.tabContent}>
-            {/* FR-DV-4.1: Conversation Timeline Bar */}
-            <ConversationTimelineBar
-              totalDuration={320}
-              segments={[]}
-              onSegmentClick={(segment) => {
-                console.log("Timeline segment clicked:", segment);
+          {/* Tab Navigation */}
+          <Box sx={{ mb: 3 }}>
+            <Tabs
+              value={activeTab}
+              onChange={handleTabChange}
+              sx={{
+                borderBottom: 1,
+                borderColor: 'divider',
+                '& .MuiTab-root': {
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  minHeight: 48,
+                },
               }}
-            />
+            >
+              <Tab
+                icon={<Chat />}
+                iconPosition="start"
+                label="Conversation Analysis"
+                value="conversation"
+                sx={{ mr: 2 }}
+              />
+              <Tab
+                icon={<Star />}
+                iconPosition="start"
+                label="LCA Analysis"
+                value="lca"
+              />
+            </Tabs>
+          </Box>
 
-            {/* Main Content Grid */}
-            <div className={styles.mainGrid}>
-              {/* Left Column - Transcript and Analysis */}
-              <div className={styles.leftColumn}>
-                <InteractiveTranscriptPlayer />
-                <SpeakerTimeline />
+          {/* Tab Content */}
+          {activeTab === "conversation" && (
+            <Box>
+              {/* FR-DV-4.1: Conversation Timeline Bar */}
+              <ConversationTimelineBar
+                totalDuration={320}
+                segments={[]}
+                onSegmentClick={(segment) => {
+                  console.log("Timeline segment clicked:", segment);
+                }}
+              />
 
-                {/* FR-DV-4.3: Event Callouts */}
-                <EventCallouts
-                  events={[]}
-                  onEventClick={(event) => {
-                    console.log("Event clicked:", event);
-                  }}
-                />
-              </div>
+              {/* Main Content Grid */}
+              <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' },
+                gap: 3,
+                mt: 3
+              }}>
+                {/* Left Column - Transcript and Analysis */}
+                <Box>
+                  <InteractiveTranscriptPlayer />
+                  <SpeakerTimeline />
 
-              {/* Right Column - Metrics and Analysis */}
-              <div className={styles.rightColumn}>
-                <KeyMetricsPanel />
+                  {/* FR-DV-4.3: Event Callouts */}
+                  <EventCallouts
+                    events={[]}
+                    onEventClick={(event) => {
+                      console.log("Event clicked:", event);
+                    }}
+                  />
+                </Box>
 
-                {/* FR-DV-4.2: Talk Ratio Gauge */}
-                <TalkRatioGauge agentPercentage={65} customerPercentage={35} />
+                {/* Right Column - Metrics and Analysis */}
+                <Box>
+                  <KeyMetricsPanel />
 
-                {/* FR-DV-4.4: Speech Dynamics Panel */}
-                <SpeechDynamicsPanel />
-              </div>
-            </div>
-          </div>
-        )}
+                  {/* FR-DV-4.2: Talk Ratio Gauge */}
+                  <TalkRatioGauge agentPercentage={65} customerPercentage={35} />
 
-        {activeTab === "lca" && (
-          <div className={styles.tabContent}>
-            <div className={styles.lcaPlaceholder}>
-              <div className={styles.lcaIcon}>
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                </svg>
-              </div>
-              <h3 className={styles.lcaTitle}>LCA Analysis</h3>
-              <p className={styles.lcaDescription}>
-                Click the button below to open the detailed Linguistic &
-                Conversation Flow Analysis panel
-              </p>
-              <button
-                className={styles.lcaButton}
-                onClick={() => setShowLCAPanel(true)}
-              >
-                Open LCA Panel
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+                  {/* FR-DV-4.4: Speech Dynamics Panel */}
+                  <SpeechDynamicsPanel />
+                </Box>
+              </Box>
+            </Box>
+          )}
+
+          {activeTab === "lca" && (
+            <Card sx={{ mt: 3 }}>
+              <CardContent sx={{ textAlign: 'center', py: 6 }}>
+                <Box sx={{ mb: 3 }}>
+                  <Avatar
+                    sx={{
+                      width: 64,
+                      height: 64,
+                      bgcolor: 'primary.main',
+                      mx: 'auto',
+                      mb: 2,
+                    }}
+                  >
+                    <Star sx={{ fontSize: 32 }} />
+                  </Avatar>
+                </Box>
+                <Typography variant="h5" component="h3" fontWeight={600} gutterBottom>
+                  LCA Analysis
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: 400, mx: 'auto' }}>
+                  Click the button below to open the detailed Linguistic &
+                  Conversation Flow Analysis panel
+                </Typography>
+                <Button
+                  variant="contained"
+                  size="large"
+                  startIcon={<Star />}
+                  onClick={() => setShowLCAPanel(true)}
+                >
+                  Open LCA Panel
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </Container>
+      </Box>
 
       {/* LCA Panel Modal */}
       {showLCAPanel && (
-        <LCAPanel conversationId="CONV-001" onClose={handleCloseLCAPanel} />
+        <LCAPanel
+          conversationId="CONV-001"
+          onClose={handleCloseLCAPanel}
+        />
       )}
-    </div>
+    </Box>
   );
 }
