@@ -1,173 +1,64 @@
 "use client";
 
+import React from "react";
 import {
   Card,
   CardContent,
   Typography,
-  Box,
-  Grid,
-  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Chip,
-  LinearProgress,
+  Paper,
+  Grid,
+  Box,
 } from "@mui/material";
-import {
-  TrendingUp,
-  TrendingDown,
-  Person,
-} from "@mui/icons-material";
 
-interface TeamPerformanceChartProps {
-  className?: string;
-}
-
-export function TeamPerformanceChart({ className }: TeamPerformanceChartProps) {
-  const teamMembers = [
-    {
-      name: "Priya Sharma",
-      role: "Senior Agent",
-      performance: 95,
-      callsToday: 23,
-      satisfaction: 4.8,
-      status: "excellent",
-    },
-    {
-      name: "Arjun Patel",
-      role: "Team Lead",
-      performance: 92,
-      callsToday: 18,
-      satisfaction: 4.6,
-      status: "excellent",
-    },
-    {
-      name: "Kavya Reddy",
-      role: "Agent",
-      performance: 87,
-      callsToday: 21,
-      satisfaction: 4.4,
-      status: "good",
-    },
-    {
-      name: "Vikram Joshi",
-      role: "Junior Agent",
-      performance: 78,
-      callsToday: 15,
-      satisfaction: 4.2,
-      status: "good",
-    },
-    {
-      name: "Anita Gupta",
-      role: "Agent",
-      performance: 85,
-      callsToday: 19,
-      satisfaction: 4.5,
-      status: "good",
-    },
+export function TeamPerformanceChart() {
+  const agentPerformance = [
+    { name: "Sarah Johnson", calls: 45, quality: 94, satisfaction: 4.8 },
+    { name: "Mike Chen", calls: 38, quality: 91, satisfaction: 4.6 },
+    { name: "Emily Davis", calls: 42, quality: 89, satisfaction: 4.7 },
+    { name: "David Wilson", calls: 35, quality: 87, satisfaction: 4.5 },
+    { name: "Lisa Brown", calls: 41, quality: 92, satisfaction: 4.9 },
   ];
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "excellent":
-        return "success";
-      case "good":
-        return "info";
-      case "needs-improvement":
-        return "warning";
-      default:
-        return "default";
-    }
-  };
-
-  const getPerformanceColor = (performance: number) => {
-    if (performance >= 90) return "success.main";
-    if (performance >= 80) return "info.main";
-    if (performance >= 70) return "warning.main";
-    return "error.main";
-  };
+  const quickStats = [
+    { label: "Total Calls Today", value: "201" },
+    { label: "Avg Call Duration", value: "12:34" },
+    { label: "First Call Resolution", value: "78%" },
+    { label: "Customer Satisfaction", value: "4.7/5" },
+  ];
 
   return (
     <Grid container spacing={3}>
-      {/* Team Performance Overview */}
       <Grid xs={12} md={8}>
         <Card>
           <CardContent>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-              <TrendingUp color="primary" />
-              <Typography variant="h6" fontWeight={600}>
-                Team Performance Overview
-              </Typography>
-            </Box>
-            
+            <Typography variant="h6" gutterBottom>
+              Agent Performance Overview
+            </Typography>
             <TableContainer component={Paper} variant="outlined">
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Team Member</TableCell>
-                    <TableCell>Role</TableCell>
-                    <TableCell>Performance</TableCell>
-                    <TableCell>Calls Today</TableCell>
-                    <TableCell>Satisfaction</TableCell>
-                    <TableCell>Status</TableCell>
+                    <TableCell>Agent Name</TableCell>
+                    <TableCell align="right">Calls</TableCell>
+                    <TableCell align="right">Quality Score</TableCell>
+                    <TableCell align="right">Satisfaction</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {teamMembers.map((member, index) => (
+                  {agentPerformance.map((agent, index) => (
                     <TableRow key={index}>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Person fontSize="small" color="action" />
-                          <Typography variant="subtitle2" fontWeight={600}>
-                            {member.name}
-                          </Typography>
-                        </Box>
+                      <TableCell component="th" scope="row">
+                        {agent.name}
                       </TableCell>
-                      <TableCell>
-                        <Typography variant="body2" color="text.secondary">
-                          {member.role}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Box sx={{ width: 60, height: 8, bgcolor: 'grey.200', borderRadius: 1, overflow: 'hidden' }}>
-                            <LinearProgress
-                              variant="determinate"
-                              value={member.performance}
-                              sx={{
-                                height: '100%',
-                                '& .MuiLinearProgress-bar': {
-                                  backgroundColor: getPerformanceColor(member.performance),
-                                },
-                              }}
-                            />
-                          </Box>
-                          <Typography variant="body2" fontWeight={500}>
-                            {member.performance}%
-                          </Typography>
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2" fontWeight={500}>
-                          {member.callsToday}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2" fontWeight={500}>
-                          {member.satisfaction}/5
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={member.status.replace('-', ' ').toUpperCase()}
-                          color={getStatusColor(member.status) as any}
-                          size="small"
-                          variant="outlined"
-                        />
-                      </TableCell>
+                      <TableCell align="right">{agent.calls}</TableCell>
+                      <TableCell align="right">{agent.quality}%</TableCell>
+                      <TableCell align="right">{agent.satisfaction}/5</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -176,82 +67,23 @@ export function TeamPerformanceChart({ className }: TeamPerformanceChartProps) {
           </CardContent>
         </Card>
       </Grid>
-
-      {/* Quick Stats */}
+      
       <Grid xs={12} md={4}>
-        <Card sx={{ mb: 3 }}>
-          <CardContent>
-            <Typography variant="h6" fontWeight={600} gutterBottom>
-              Team Quick Stats
-            </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <Box>
-                <Typography variant="body2" color="text.secondary">
-                  Average Performance
-                </Typography>
-                <Typography variant="h5" fontWeight={700} color="success.main">
-                  87%
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="body2" color="text.secondary">
-                  Total Calls Today
-                </Typography>
-                <Typography variant="h5" fontWeight={700} color="info.main">
-                  96
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="body2" color="text.secondary">
-                  Avg Satisfaction
-                </Typography>
-                <Typography variant="h5" fontWeight={700} color="warning.main">
-                  4.5/5
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="body2" color="text.secondary">
-                  Active Agents
-                </Typography>
-                <Typography variant="h5" fontWeight={700} color="primary.main">
-                  12
-                </Typography>
-              </Box>
-            </Box>
-          </CardContent>
-        </Card>
-
         <Card>
           <CardContent>
-            <Typography variant="h6" fontWeight={600} gutterBottom>
-              Performance Trends
+            <Typography variant="h6" gutterBottom>
+              Quick Stats
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <TrendingUp color="success" fontSize="small" />
-                <Typography variant="body2">
-                  Team performance up 5% this week
+            {quickStats.map((stat, index) => (
+              <Box key={index} sx={{ mb: 2, p: 2, bgcolor: "#f5f5f5", borderRadius: 1 }}>
+                <Typography variant="body2" color="text.secondary">
+                  {stat.label}
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                  {stat.value}
                 </Typography>
               </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <TrendingUp color="success" fontSize="small" />
-                <Typography variant="body2">
-                  Customer satisfaction improved
-                </Typography>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <TrendingDown color="warning" fontSize="small" />
-                <Typography variant="body2">
-                  Call volume increased 12%
-                </Typography>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <TrendingUp color="success" fontSize="small" />
-                <Typography variant="body2">
-                  Resolution rate at 94%
-                </Typography>
-              </Box>
-            </Box>
+            ))}
           </CardContent>
         </Card>
       </Grid>

@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import { inter } from "./fonts";
 import "./globals.css";
+import { ContextWrapper } from "@/app/context-wrapper";
+import { ThemeProvider } from "@/theme/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "WorkIndia Next Starter Kit",
@@ -13,8 +16,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        {children}
+      <body className={inter.className}>
+        <ThemeProvider>
+          <ContextWrapper>
+            {children}
+          </ContextWrapper>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,13 +1,12 @@
 "use client";
 
+import React from "react";
 import {
   Card,
   CardContent,
   Typography,
-  Box,
-  Chip,
   Grid,
-  LinearProgress,
+  Box,
 } from "@mui/material";
 import {
   People,
@@ -16,98 +15,60 @@ import {
   CheckCircle,
 } from "@mui/icons-material";
 
-interface TeamMetricsCardsProps {
-  className?: string;
-}
-
-export function TeamMetricsCards({ className }: TeamMetricsCardsProps) {
-  const teamMetrics = [
+export function TeamMetricsCards() {
+  const metrics = [
     {
       title: "Team Size",
       value: "12",
-      subtitle: "Active Agents",
-      icon: <People />,
-      color: "primary",
-      trend: "+2 this month",
-      trendColor: "success",
+      icon: <People sx={{ fontSize: 40, color: "#1976d2" }} />,
+      color: "#1976d2",
     },
     {
       title: "Avg Performance",
       value: "87%",
-      subtitle: "Team Score",
-      icon: <TrendingUp />,
-      color: "success",
-      trend: "+5% from last month",
-      trendColor: "success",
+      icon: <TrendingUp sx={{ fontSize: 40, color: "#4caf50" }} />,
+      color: "#4caf50",
     },
     {
       title: "Call Volume",
       value: "1,247",
-      subtitle: "Calls Today",
-      icon: <Phone />,
-      color: "info",
-      trend: "+12% from yesterday",
-      trendColor: "info",
+      icon: <Phone sx={{ fontSize: 40, color: "#ff9800" }} />,
+      color: "#ff9800",
     },
     {
       title: "Success Rate",
-      value: "94%",
-      subtitle: "Resolution Rate",
-      icon: <CheckCircle />,
-      color: "warning",
-      trend: "+3% this week",
-      trendColor: "success",
+      value: "92%",
+      icon: <CheckCircle sx={{ fontSize: 40, color: "#9c27b0" }} />,
+      color: "#9c27b0",
     },
   ];
 
   return (
-    <Grid container spacing={3} sx={{ mb: 4 }}>
-      {teamMetrics.map((metric, index) => (
-        <Grid xs={12} md={6} lg={3} key={index}>
+    <Grid container spacing={3}>
+      {metrics.map((metric, index) => (
+        <Grid xs={12} sm={6} md={3} key={index}>
           <Card
             sx={{
-              height: '100%',
-              transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-              '&:hover': {
-                transform: 'translateY(-4px)',
-                boxShadow: 3,
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              border: `2px solid ${metric.color}20`,
+              "&:hover": {
+                boxShadow: 4,
+                transform: "translateY(-2px)",
+                transition: "all 0.3s ease",
               },
             }}
           >
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                <Box
-                  sx={{
-                    p: 1.5,
-                    borderRadius: 2,
-                    backgroundColor: `${metric.color}.main`,
-                    color: 'white',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  {metric.icon}
-                </Box>
-                <Chip
-                  label={metric.trend}
-                  size="small"
-                  color={metric.trendColor as any}
-                  variant="outlined"
-                  sx={{ fontSize: '0.75rem' }}
-                />
+            <CardContent sx={{ flexGrow: 1, textAlign: "center" }}>
+              <Box sx={{ mb: 2 }}>
+                {metric.icon}
               </Box>
-              
-              <Typography variant="h4" fontWeight={700} gutterBottom>
+              <Typography variant="h4" component="h2" sx={{ fontWeight: "bold", mb: 1 }}>
                 {metric.value}
               </Typography>
-              
-              <Typography variant="h6" color="text.secondary" gutterBottom>
+              <Typography variant="h6" color="text.secondary">
                 {metric.title}
-              </Typography>
-              
-              <Typography variant="body2" color="text.secondary">
-                {metric.subtitle}
               </Typography>
             </CardContent>
           </Card>
