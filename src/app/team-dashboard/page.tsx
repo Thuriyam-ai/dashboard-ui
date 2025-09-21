@@ -6,7 +6,7 @@ import { TeamFilters } from "@/components/team-dashboard/team-filters";
 import { Leaderboards } from "@/components/team-dashboard/leaderboards";
 import { TrendAnalysis } from "@/components/team-dashboard/trend-analysis";
 import { TeamMetrics } from "@/components/team-dashboard/team-metrics";
-import { LCAPanel } from "@/components/lca";
+import { MuiLCAPanel } from "@/components/lca";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { DistributionPlots } from "@/components/team-dashboard/distribution-plots";
 import { CoachingLeaderboards } from "@/components/team-dashboard/coaching-leaderboards";
@@ -220,7 +220,7 @@ export default function TeamDashboardPage() {
 
       {/* LCA Panel Modal */}
       {showLCAPanel && (
-        <LCAPanel
+        <MuiLCAPanel
           conversationId="TEAM-DASHBOARD-001"
           onClose={() => setShowLCAPanel(false)}
         />

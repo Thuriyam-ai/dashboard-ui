@@ -11,7 +11,7 @@ import {
   EventCallouts,
   SpeechDynamicsPanel,
 } from "@/components/conversation-view";
-import { LCAPanel } from "@/components/lca";
+import { MuiLCAPanel } from "@/components/lca";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
   Box,
@@ -244,7 +244,7 @@ export default function AnalyticsConversationViewPage() {
 
       {/* LCA Panel Modal */}
       {showLCAPanel && (
-        <LCAPanel
+        <MuiLCAPanel
           conversationId="ANALYTICS-CONV-001"
           onClose={handleCloseLCAPanel}
         />
