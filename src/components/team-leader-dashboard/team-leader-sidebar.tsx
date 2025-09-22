@@ -41,7 +41,7 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
       id: "overview",
       label: "Overview",
       icon: <Dashboard />,
-      path: "/dashboard",
+      path: "/team-dashboard/overview",
     },
     {
       id: "call-quality",

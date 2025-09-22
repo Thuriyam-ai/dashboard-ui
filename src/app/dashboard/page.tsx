@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { MuiSidebar } from "@/components/dashboard/mui-sidebar";
 import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
 import { MetricsCards } from "@/components/dashboard/metrics-cards";
@@ -38,12 +39,20 @@ import {
  * @returns The Dashboard page layout
  */
 export default function DashboardPage() {
+  const router = useRouter();
   const [currentView, setCurrentView] = useState("generic");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleViewChange = (newView: string) => {
     setCurrentView(newView);
     setAnchorEl(null);
+    
+    // Navigate to the appropriate page based on view selection
+    if (newView === "team-lead") {
+      router.push("/team-dashboard/overview");
+    } else if (newView === "generic") {
+      router.push("/dashboard");
+    }
   };
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
