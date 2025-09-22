@@ -58,14 +58,20 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
         {
           id: "goal-mgmt",
           label: "Goal Mgmt",
-          icon: <Settings />,
+          icon: <Flag />,
           path: "/team-leader-dashboard/goal-mgmt",
         },
         {
           id: "campaign-mgmt",
           label: "Campaign Mgmt",
-          icon: <Settings />,
+          icon: <Campaign />,
           path: "/team-leader-dashboard/campaign-mgmt",
+        },
+        {
+          id: "alert-mgmt",
+          label: "Alert Mgmt",
+          icon: <Notifications />,
+          path: "/team-leader-dashboard/alert-mgmt",
         },
       ],
     },

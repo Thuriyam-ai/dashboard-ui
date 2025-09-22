@@ -53,35 +53,35 @@ export function MuiSidebar({ activeItem: propActiveItem }: MuiSidebarProps = {})
 
   const handleNavClick = (itemId: string) => {
     // Navigation logic with correct URLs including basePath for GitHub Pages
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
+    // Next.js router handles basePath automatically
     
     switch (itemId) {
       case "dashboard":
-        window.location.href = `${basePath}/dashboard`;
+        window.location.href = '/dashboard';
         break;
       case "analytics-overview":
-        window.location.href = `${basePath}/analytics`;
+        window.location.href = `/analytics`;
         break;
       case "team-dashboard":
-        window.location.href = `${basePath}/analytics/team`;
+        window.location.href = `/analytics/team`;
         break;
       case "conversation-view":
-        window.location.href = `${basePath}/conversation-view`;
+        window.location.href = `/conversation-view`;
         break;
       case "agent-config":
-        window.location.href = `${basePath}/agent-config`;
+        window.location.href = `/agent-config`;
         break;
       case "access-mgmt":
-        window.location.href = `${basePath}/access-management`;
+        window.location.href = `/access-management`;
         break;
       case "platform-settings":
-        window.location.href = `${basePath}/platform-settings`;
+        window.location.href = `/platform-settings`;
         break;
       case "observability":
-        window.location.href = `${basePath}/observability`;
+        window.location.href = `/observability`;
         break;
       case "developer-hub":
-        window.location.href = `${basePath}/developer-hub`;
+        window.location.href = `/developer-hub`;
         break;
       default:
         console.log(`Navigating to: ${itemId}`);
