@@ -108,8 +108,9 @@ export default function MuiAnalyticsPage() {
   ];
 
   const handleConversationSelect = (conversation: Conversation) => {
-    // Navigate to the conversation view page
-    window.location.href = `/analytics/conversation-view?id=${conversation.id}`;
+    // Navigate to the conversation view page with correct basePath
+    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
+    window.location.href = `${basePath}/analytics/conversation-view?id=${conversation.id}`;
   };
 
   const handleBackToOverview = () => {
