@@ -48,7 +48,9 @@ export function Sidebar({ activeItem: propActiveItem }: SidebarProps = {}) {
 
   const handleNavClick = (itemId: string) => {
     // Navigation logic with correct URLs including basePath for GitHub Pages
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
+    // Check if we're on GitHub Pages by looking at the hostname
+    const isGitHubPages = window.location.hostname === 'thuriyam-ai.github.io';
+    const basePath = isGitHubPages ? '/dashboard-ui' : '';
     
     switch (itemId) {
       case "dashboard":

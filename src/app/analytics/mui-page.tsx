@@ -109,7 +109,9 @@ export default function MuiAnalyticsPage() {
 
   const handleConversationSelect = (conversation: Conversation) => {
     // Navigate to the conversation view page with correct basePath
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
+    // Check if we're on GitHub Pages by looking at the hostname
+    const isGitHubPages = window.location.hostname === 'thuriyam-ai.github.io';
+    const basePath = isGitHubPages ? '/dashboard-ui' : '';
     window.location.href = `${basePath}/analytics/conversation-view?id=${conversation.id}`;
   };
 
