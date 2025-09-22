@@ -7,8 +7,11 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  basePath: process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/dashboard-ui/' : '',
+  // Only apply basePath and assetPrefix for GitHub Pages deployment
+  ...(process.env.GITHUB_PAGES === 'true' && {
+    basePath: '/dashboard-ui',
+    assetPrefix: '/dashboard-ui/',
+  }),
   trailingSlash: true,
   images: {
     unoptimized: true,

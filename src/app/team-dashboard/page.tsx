@@ -97,7 +97,7 @@ export default function TeamDashboardPage() {
           <Toolbar>
             <Box sx={{ flexGrow: 1 }}>
               <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
-                team-dashboard.localhost:3000
+                This is the Team Dashboard view.
               </Typography>
             </Box>
 

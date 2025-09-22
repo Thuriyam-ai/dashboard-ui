@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-// import { MuiSidebar } from "@/components/dashboard/mui-sidebar";
-// import {
-//   InteractiveTranscriptPlayer,
-//   SpeakerTimeline,
-//   KeyMetricsPanel,
-//   ConversationTimelineBar,
-//   TalkRatioGauge,
-//   EventCallouts,
-//   SpeechDynamicsPanel,
-// } from "@/components/conversation-view";
-// import { MuiLCAPanel } from "@/components/lca";
-// import { Breadcrumbs } from "@/components/ui/breadcrumbs";
+import { MuiSidebar } from "@/components/dashboard/mui-sidebar";
+import {
+  InteractiveTranscriptPlayer,
+  SpeakerTimeline,
+  KeyMetricsPanel,
+  ConversationTimelineBar,
+  TalkRatioGauge,
+  EventCallouts,
+  SpeechDynamicsPanel,
+} from "@/components/conversation-view";
+import { MuiLCAPanel } from "@/components/lca";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
   Box,
   Container,
