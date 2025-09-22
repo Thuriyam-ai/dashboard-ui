@@ -64,11 +64,10 @@ export default function CampaignManagementPage() {
 
   const handleViewChange = (newView: string) => {
     setAnchorEl(null);
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
     if (newView === "generic") {
-      router.push(`${basePath}/dashboard`);
+      router.push('/dashboard');
     } else if (newView === "team-lead") {
-      router.push(`${basePath}/team-dashboard/overview`);
+      router.push('/team-dashboard/overview');
     }
   };
 
@@ -81,18 +80,15 @@ export default function CampaignManagementPage() {
   };
 
   const handleCreateCampaign = () => {
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
-    router.push(`${basePath}/team-leader-dashboard/campaign-mgmt/editor`);
+    router.push('/team-leader-dashboard/campaign-mgmt/editor');
   };
 
   const handleEditCampaign = (campaignId: string) => {
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
-    router.push(`${basePath}/team-leader-dashboard/campaign-mgmt/editor?id=${campaignId}`);
+    router.push(`/team-leader-dashboard/campaign-mgmt/editor?id=${campaignId}`);
   };
 
   const handleCloneCampaign = (campaignId: string) => {
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
-    router.push(`${basePath}/team-leader-dashboard/campaign-mgmt/editor?clone=${campaignId}`);
+    router.push(`/team-leader-dashboard/campaign-mgmt/editor?clone=${campaignId}`);
   };
 
   const handleDeleteCampaign = (campaign: any) => {

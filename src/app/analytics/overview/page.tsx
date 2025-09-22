@@ -65,11 +65,10 @@ export default function AnalyticsOverviewPage() {
 
   const handleViewChange = (newView: string) => {
     setAnchorEl(null);
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
     if (newView === "generic") {
-      router.push(`${basePath}/dashboard`);
+      router.push('/dashboard');
     } else if (newView === "team-lead") {
-      router.push(`${basePath}/team-dashboard/overview`);
+      router.push('/team-dashboard/overview');
     }
   };
 
@@ -82,8 +81,7 @@ export default function AnalyticsOverviewPage() {
   };
 
   const handleViewDetails = (conversationId: string) => {
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
-    router.push(`${basePath}/team-leader-dashboard/conversation-detail?id=${conversationId}`);
+    router.push(`/team-leader-dashboard/conversation-detail?id=${conversationId}`);
   };
 
   // Mock data for conversations

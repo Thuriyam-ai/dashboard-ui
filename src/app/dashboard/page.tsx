@@ -47,12 +47,11 @@ export default function DashboardPage() {
     setCurrentView(newView);
     setAnchorEl(null);
     
-    // Navigate to the appropriate page based on view selection with correct base path
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
+    // Navigate to the appropriate page based on view selection
     if (newView === "team-lead") {
-      router.push(`${basePath}/team-dashboard/overview`);
+      router.push('/team-dashboard/overview');
     } else if (newView === "generic") {
-      router.push(`${basePath}/dashboard`);
+      router.push('/dashboard');
     }
   };
 

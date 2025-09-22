@@ -72,9 +72,8 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
   ];
 
   const handleNavClick = (path: string) => {
-    // Navigation logic with correct URLs including basePath for GitHub Pages
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
-    window.location.href = `${basePath}${path}`;
+    // Navigation logic - Next.js router handles basePath automatically
+    window.location.href = path;
   };
 
   return (

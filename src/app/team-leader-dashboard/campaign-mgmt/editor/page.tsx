@@ -89,11 +89,10 @@ function CampaignEditorContent() {
 
   const handleViewChange = (newView: string) => {
     setAnchorEl(null);
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
     if (newView === "generic") {
-      router.push(`${basePath}/dashboard`);
+      router.push('/dashboard');
     } else if (newView === "team-lead") {
-      router.push(`${basePath}/team-dashboard/overview`);
+      router.push('/team-dashboard/overview');
     }
   };
 
@@ -106,8 +105,7 @@ function CampaignEditorContent() {
   };
 
   const handleBack = () => {
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
-    router.push(`${basePath}/team-leader-dashboard/campaign-mgmt`);
+    router.push('/team-leader-dashboard/campaign-mgmt');
   };
 
   const handleSave = () => {

@@ -60,11 +60,10 @@ export default function GoalManagementPage() {
 
   const handleViewChange = (newView: string) => {
     setAnchorEl(null);
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
     if (newView === "generic") {
-      router.push(`${basePath}/dashboard`);
+      router.push('/dashboard');
     } else if (newView === "team-lead") {
-      router.push(`${basePath}/team-dashboard/overview`);
+      router.push('/team-dashboard/overview');
     }
   };
 
@@ -77,18 +76,15 @@ export default function GoalManagementPage() {
   };
 
   const handleCreateGoal = () => {
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
-    router.push(`${basePath}/team-leader-dashboard/goal-mgmt/editor`);
+    router.push('/team-leader-dashboard/goal-mgmt/editor');
   };
 
   const handleEditGoal = (goalId: string) => {
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
-    router.push(`${basePath}/team-leader-dashboard/goal-mgmt/editor?id=${goalId}`);
+    router.push(`/team-leader-dashboard/goal-mgmt/editor?id=${goalId}`);
   };
 
   const handleCloneGoal = (goalId: string) => {
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
-    router.push(`${basePath}/team-leader-dashboard/goal-mgmt/editor?clone=${goalId}`);
+    router.push(`/team-leader-dashboard/goal-mgmt/editor?clone=${goalId}`);
   };
 
   const handleDeleteGoal = (goal: any) => {

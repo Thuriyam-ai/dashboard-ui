@@ -92,11 +92,10 @@ export default function ConversationDetailPage() {
 
   const handleViewChange = (newView: string) => {
     setAnchorEl(null);
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
     if (newView === "generic") {
-      router.push(`${basePath}/dashboard`);
+      router.push('/dashboard');
     } else if (newView === "team-lead") {
-      router.push(`${basePath}/team-dashboard/overview`);
+      router.push('/team-dashboard/overview');
     }
   };
 
@@ -118,8 +117,7 @@ export default function ConversationDetailPage() {
   };
 
   const handleBackToConversations = () => {
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
-    router.push(`${basePath}/team-leader-dashboard/conversations`);
+    router.push('/team-leader-dashboard/conversations');
   };
 
   // Mock conversation detail data

@@ -90,11 +90,10 @@ export default function ConversationsPage() {
 
   const handleViewChange = (newView: string) => {
     setAnchorEl(null);
-    const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
     if (newView === "generic") {
-      router.push(`${basePath}/dashboard`);
+      router.push('/dashboard');
     } else if (newView === "team-lead") {
-      router.push(`${basePath}/team-dashboard/overview`);
+      router.push('/team-dashboard/overview');
     }
   };
 
@@ -586,10 +585,9 @@ export default function ConversationsPage() {
                             size="small"
                             startIcon={<Visibility />}
                             variant="outlined"
-                            onClick={() => {
-                              const basePath = process.env.NODE_ENV === 'production' ? '/dashboard-ui' : '';
-                              router.push(`${basePath}/team-leader-dashboard/conversation-detail`);
-                            }}
+      onClick={() => {
+        router.push('/team-leader-dashboard/conversation-detail');
+      }}
                           >
                             View Details
                           </Button>
