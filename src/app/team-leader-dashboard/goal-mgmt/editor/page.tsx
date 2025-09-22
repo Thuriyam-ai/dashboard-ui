@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
@@ -85,7 +85,7 @@ interface QualityParameter {
   rules: string;
 }
 
-export default function GoalEditorPage() {
+function GoalEditorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -759,5 +759,13 @@ export default function GoalEditorPage() {
         </Container>
       </Box>
     </Box>
+  );
+}
+
+export default function GoalEditorPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <GoalEditorContent />
+    </Suspense>
   );
 }

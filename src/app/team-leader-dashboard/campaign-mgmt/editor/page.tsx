@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
@@ -44,7 +44,7 @@ import {
 } from "@mui/icons-material";
 // Using simple date inputs instead of complex date pickers
 
-export default function CampaignEditorPage() {
+function CampaignEditorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -416,5 +416,13 @@ export default function CampaignEditorPage() {
           </Container>
         </Box>
       </Box>
+  );
+}
+
+export default function CampaignEditorPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CampaignEditorContent />
+    </Suspense>
   );
 }
