@@ -27,6 +27,9 @@ import {
   KeyboardArrowDown,
   SupervisorAccount,
   Dashboard,
+  Analytics,
+  Message,
+  Settings,
 } from "@mui/icons-material";
 
 /**
@@ -64,14 +67,20 @@ export default function DashboardPage() {
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
+    <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
       {currentView === "generic" ? (
         <MuiSidebar activeItem="dashboard" />
       ) : (
         <TeamLeaderSidebar activeItem="overview" />
       )}
       
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ 
+        flexGrow: 1, 
+        display: 'flex', 
+        flexDirection: 'column',
+        marginLeft: '280px', // Account for fixed sidebar width
+        minHeight: '100vh'
+      }}>
         {/* Top Bar */}
         <AppBar 
           position="static" 
@@ -214,23 +223,144 @@ export default function DashboardPage() {
           ) : (
             <>
               {/* Team Leader Dashboard Content */}
-              <Box>
-                <Typography variant="h5" gutterBottom>
-                  Team Leader View Content
+              <Box sx={{ mb: 4 }}>
+                <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
+                  Team Performance Overview
                 </Typography>
                 <Typography variant="body1" color="text.secondary" paragraph>
-                  This is the specialized Team Leader view with enhanced analytics, team management tools,
-                  and advanced reporting capabilities designed specifically for team leaders.
+                  Monitor team performance, analyze call quality, and manage configurations from your dedicated dashboard.
                 </Typography>
-                <Typography variant="body2" color="text.secondary" paragraph>
-                  Navigate using the sidebar to access:
-                </Typography>
-                <Box component="ul" sx={{ pl: 2 }}>
-                  <li>Call Quality Analytics</li>
-                  <li>Conversations View</li>
-                  <li>Support Call Analysis</li>
-                  <li>Customer Success Analysis</li>
-                  <li>Configuration Management (Goals, Campaigns, Alerts)</li>
+              </Box>
+
+              {/* Team Leader Metrics Grid */}
+              <Box sx={{ 
+                display: 'grid', 
+                gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }, 
+                gap: 3, 
+                mb: 4 
+              }}>
+                {/* Active Agents */}
+                <Box sx={{ 
+                  p: 3, 
+                  borderRadius: 2, 
+                  backgroundColor: 'background.paper',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  textAlign: 'center'
+                }}>
+                  <Typography variant="h3" sx={{ fontWeight: 700, color: 'primary.main', mb: 1 }}>
+                    24
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Active Agents
+                  </Typography>
+                </Box>
+
+                {/* Average Quality Score */}
+                <Box sx={{ 
+                  p: 3, 
+                  borderRadius: 2, 
+                  backgroundColor: 'background.paper',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  textAlign: 'center'
+                }}>
+                  <Typography variant="h3" sx={{ fontWeight: 700, color: 'success.main', mb: 1 }}>
+                    87%
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Avg Quality Score
+                  </Typography>
+                </Box>
+
+                {/* Total Conversations */}
+                <Box sx={{ 
+                  p: 3, 
+                  borderRadius: 2, 
+                  backgroundColor: 'background.paper',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  textAlign: 'center'
+                }}>
+                  <Typography variant="h3" sx={{ fontWeight: 700, color: 'info.main', mb: 1 }}>
+                    1,247
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Total Conversations
+                  </Typography>
+                </Box>
+
+                {/* Customer Satisfaction */}
+                <Box sx={{ 
+                  p: 3, 
+                  borderRadius: 2, 
+                  backgroundColor: 'background.paper',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  textAlign: 'center'
+                }}>
+                  <Typography variant="h3" sx={{ fontWeight: 700, color: 'warning.main', mb: 1 }}>
+                    4.8
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Customer Satisfaction
+                  </Typography>
+                </Box>
+              </Box>
+
+              {/* Team Leader Quick Actions */}
+              <Box sx={{ 
+                display: 'grid', 
+                gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' }, 
+                gap: 3 
+              }}>
+                <Box sx={{ 
+                  p: 3, 
+                  borderRadius: 2, 
+                  backgroundColor: 'background.paper',
+                  border: '1px solid',
+                  borderColor: 'divider'
+                }}>
+                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                    Quick Actions
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Button variant="outlined" fullWidth startIcon={<Analytics />}>
+                      View Call Quality Analytics
+                    </Button>
+                    <Button variant="outlined" fullWidth startIcon={<Message />}>
+                      Review Conversations
+                    </Button>
+                    <Button variant="outlined" fullWidth startIcon={<Settings />}>
+                      Manage Configurations
+                    </Button>
+                  </Box>
+                </Box>
+
+                <Box sx={{ 
+                  p: 3, 
+                  borderRadius: 2, 
+                  backgroundColor: 'background.paper',
+                  border: '1px solid',
+                  borderColor: 'divider'
+                }}>
+                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                    Recent Activity
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2">Team performance review completed</Typography>
+                      <Typography variant="caption" color="text.secondary">2h ago</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2">Quality score alert triggered</Typography>
+                      <Typography variant="caption" color="text.secondary">4h ago</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2">New agent onboarding completed</Typography>
+                      <Typography variant="caption" color="text.secondary">1d ago</Typography>
+                    </Box>
+                  </Box>
                 </Box>
               </Box>
             </>
