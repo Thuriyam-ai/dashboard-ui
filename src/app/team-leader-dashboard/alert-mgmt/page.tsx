@@ -59,12 +59,14 @@ import {
   PriorityHigh,
   LowPriority,
 } from "@mui/icons-material";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function AlertManagementPage() {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedAlert, setSelectedAlert] = useState<any>(null);
+  const { logout } = useAuth();
 
   const handleViewChange = (newView: string) => {
     setAnchorEl(null);
@@ -296,6 +298,7 @@ export default function AlertManagementPage() {
                 size="small"
                 startIcon={<Logout />}
                 sx={{ ml: 1 }}
+                onClick={logout}
               >
                 Logout
               </Button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { MuiSidebar } from "@/components/dashboard/mui-sidebar";
 import {
   InteractiveTranscriptPlayer,
@@ -34,6 +34,7 @@ import {
   Chat,
   Star,
 } from "@mui/icons-material";
+import { useAuth } from "@/contexts/auth-context";
 
 /**
  * Analytics Conversation View page component.
@@ -45,6 +46,7 @@ export default function AnalyticsConversationViewPage() {
     "conversation",
   );
   const [showLCAPanel, setShowLCAPanel] = useState(false);
+  const { logout } = useAuth();
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: "conversation" | "lca") => {
     setActiveTab(newValue);
@@ -105,6 +107,7 @@ export default function AnalyticsConversationViewPage() {
                 size="small"
                 startIcon={<Logout />}
                 sx={{ ml: 1 }}
+                onClick={logout}
               >
                 Logout
               </Button>

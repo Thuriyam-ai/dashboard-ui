@@ -55,6 +55,7 @@ import {
   Warning,
   Refresh,
 } from "@mui/icons-material";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function AnalyticsOverviewPage() {
   const router = useRouter();
@@ -62,6 +63,7 @@ export default function AnalyticsOverviewPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [teamFilter, setTeamFilter] = useState("all");
+  const { logout } = useAuth();
 
   const handleViewChange = (newView: string) => {
     setAnchorEl(null);
@@ -287,6 +289,7 @@ export default function AnalyticsOverviewPage() {
                 size="small"
                 startIcon={<Logout />}
                 sx={{ ml: 1 }}
+                onClick={logout}
               >
                 Logout
               </Button>

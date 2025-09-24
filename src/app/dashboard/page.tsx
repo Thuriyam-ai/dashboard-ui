@@ -32,6 +32,7 @@ import {
   Message,
   Settings,
 } from "@mui/icons-material";
+import { useAuth } from "@/contexts/auth-context";
 
 /**
  * Dashboard page component.
@@ -42,6 +43,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [currentView, setCurrentView] = useState("generic");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { logout } = useAuth();
 
   const handleViewChange = (newView: string) => {
     setCurrentView(newView);
@@ -176,6 +178,7 @@ export default function DashboardPage() {
                 size="small"
                 startIcon={<Logout />}
                 sx={{ ml: 1 }}
+                onClick={logout}
               >
                 Logout
               </Button>

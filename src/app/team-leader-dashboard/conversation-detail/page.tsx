@@ -56,6 +56,7 @@ import {
   Psychology,
   Analytics,
 } from "@mui/icons-material";
+import { useAuth } from "@/contexts/auth-context";
 
 interface ConversationDetail {
   id: string;
@@ -89,6 +90,7 @@ export default function ConversationDetailPage() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [activeTab, setActiveTab] = useState<"conversation" | "lca">("conversation");
   const [showLCAPanel, setShowLCAPanel] = useState(false);
+  const { logout } = useAuth();
 
   const handleViewChange = (newView: string) => {
     setAnchorEl(null);
@@ -291,6 +293,7 @@ export default function ConversationDetailPage() {
                 size="small"
                 startIcon={<Logout />}
                 sx={{ ml: 1 }}
+                onClick={logout}
               >
                 Logout
               </Button>

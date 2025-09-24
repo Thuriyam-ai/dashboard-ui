@@ -48,6 +48,7 @@ import {
   PriorityHigh,
   LowPriority,
 } from "@mui/icons-material";
+import { useAuth } from "@/contexts/auth-context";
 
 function AlertEditorContent() {
   const router = useRouter();
@@ -55,6 +56,7 @@ function AlertEditorContent() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [alertId, setAlertId] = useState<string | null>(null);
+  const { logout } = useAuth();
 
   // Alert Configuration State
   const [alertName, setAlertName] = useState("");
@@ -314,6 +316,7 @@ function AlertEditorContent() {
                 size="small"
                 startIcon={<Logout />}
                 sx={{ ml: 1 }}
+                onClick={logout}
               >
                 Logout
               </Button>

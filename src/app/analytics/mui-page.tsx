@@ -22,6 +22,7 @@ import {
 } from "@mui/icons-material";
 import { MuiSidebar } from "@/components/dashboard/mui-sidebar";
 import { MuiConversationOverview } from "@/components/analytics/mui-conversation-overview";
+import { useAuth } from "@/contexts/auth-context";
 
 interface Conversation {
   id: string;
@@ -42,6 +43,7 @@ interface Conversation {
  */
 export default function MuiAnalyticsPage() {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const { logout } = useAuth();
 
   // Mock conversation data with Indian names
   const conversations: Conversation[] = [
@@ -166,6 +168,7 @@ export default function MuiAnalyticsPage() {
                 size="small"
                 startIcon={<Logout />}
                 sx={{ ml: 1 }}
+                onClick={logout}
               >
                 Logout
               </Button>

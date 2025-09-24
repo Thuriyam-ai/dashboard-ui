@@ -51,12 +51,14 @@ import {
   CheckCircle,
   Schedule,
 } from "@mui/icons-material";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function GoalManagementPage() {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState<any>(null);
+  const { logout } = useAuth();
 
   const handleViewChange = (newView: string) => {
     setAnchorEl(null);
@@ -241,6 +243,7 @@ export default function GoalManagementPage() {
                 size="small"
                 startIcon={<Logout />}
                 sx={{ ml: 1 }}
+                onClick={logout}
               >
                 Logout
               </Button>

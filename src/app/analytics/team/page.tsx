@@ -29,6 +29,7 @@ import {
   Group,
   Star,
 } from "@mui/icons-material";
+import { useAuth } from "@/contexts/auth-context";
 
 /**
  * Team Analytics page component displaying team metrics and performance data.
@@ -38,6 +39,7 @@ import {
 export default function TeamAnalyticsPage() {
   const [activeTab, setActiveTab] = useState<"team" | "lca">("team");
   const [showLCAPanel, setShowLCAPanel] = useState(false);
+  const { logout } = useAuth();
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: "team" | "lca") => {
     setActiveTab(newValue);
@@ -93,6 +95,7 @@ export default function TeamAnalyticsPage() {
                 size="small"
                 startIcon={<Logout />}
                 sx={{ ml: 1 }}
+                onClick={logout}
               >
                 Logout
               </Button>

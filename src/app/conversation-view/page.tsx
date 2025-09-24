@@ -34,6 +34,7 @@ import {
   Chat,
   Star,
 } from "@mui/icons-material";
+import { useAuth } from "@/contexts/auth-context";
 
 /**
  * Single Conversation View page component.
@@ -47,6 +48,7 @@ export default function ConversationViewPage() {
     "conversation",
   );
   const [showLCAPanel, setShowLCAPanel] = useState(false);
+  const { logout } = useAuth();
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: "conversation" | "lca") => {
     setActiveTab(newValue);
@@ -107,6 +109,7 @@ export default function ConversationViewPage() {
                 size="small"
                 startIcon={<Logout />}
                 sx={{ ml: 1 }}
+                onClick={logout}
               >
                 Logout
               </Button>

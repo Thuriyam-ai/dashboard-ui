@@ -58,6 +58,7 @@ import {
   Download,
   Visibility,
 } from "@mui/icons-material";
+import { useAuth } from "@/contexts/auth-context";
 
 interface Conversation {
   id: string;
@@ -87,6 +88,7 @@ export default function ConversationsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [teamFilter, setTeamFilter] = useState("all");
+  const { logout } = useAuth();
 
   const handleViewChange = (newView: string) => {
     setAnchorEl(null);
@@ -342,6 +344,7 @@ export default function ConversationsPage() {
                 size="small"
                 startIcon={<Logout />}
                 sx={{ ml: 1 }}
+                onClick={logout}
               >
                 Logout
               </Button>

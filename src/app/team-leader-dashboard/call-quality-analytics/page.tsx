@@ -46,6 +46,7 @@ import {
   Person,
   Schedule,
 } from "@mui/icons-material";
+import { useAuth } from "@/contexts/auth-context";
 
 /**
  * Call Quality Analytics page component displaying comprehensive call quality metrics
@@ -55,6 +56,7 @@ import {
 export default function CallQualityAnalyticsPage() {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { logout } = useAuth();
 
   const handleViewChange = (newView: string) => {
     setAnchorEl(null);
@@ -278,6 +280,7 @@ export default function CallQualityAnalyticsPage() {
                 size="small"
                 startIcon={<Logout />}
                 sx={{ ml: 1 }}
+                onClick={logout}
               >
                 Logout
               </Button>
