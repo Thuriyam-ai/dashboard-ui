@@ -1,0 +1,58 @@
+pipeline {
+    agent any
+
+    parameters {
+        booleanParam(defaultValue: true, description: 'Should Deploy', name: 'deploy')
+    }
+
+    stages {
+        stage('Initialize') {
+            steps {
+                echo 'Deploying Dashboard UI service'
+            }
+        }
+
+        stage('Build') {
+            when {
+                expression { params.deploy == true }
+            }
+            steps {
+                dir(path: './build') {
+                    sh 'chmod u+x ./build.sh'
+                    sh "./build.sh ${env.BUILD_NUMBER}"
+                }
+            }
+        }
+
+        stage('Run Deployment Script') {
+            when {
+                expression { params.deploy == true }
+            }
+            steps {
+                dir(path: './build/staging') {
+                    sh 'chmod u+x ./restart-compose.sh'
+                    sh './restart-compose.sh'
+                }
+            }
+        }
+
+        stage('Notification for Build') {
+            steps {
+                wrap([$class: 'BuildUser']) {
+                    script {
+                        def commitMessage = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
+
+                        slackSend(channel: "#thuriyam-staging-environment-updates",
+                                  color: '#FFA500',
+                                  message: ":rocket: *Deployment Notification!* \n\n" +
+                                           "*Job:* ${env.JOB_NAME} \n\n" +
+                                           "*Deployed By:* ${BUILD_USER} \n\n" +
+                                           "*Status:* Deployment completed successfully! :tada: \n\n" +
+                                           "*Details:* ${commitMessage}\n\n" +
+                                           "*Build URL:* ${env.BUILD_URL}")
+                    }
+                }
+            }
+        }
+    }
+}
