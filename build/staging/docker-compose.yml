@@ -1,0 +1,14 @@
+services:
+  dashboard:
+    image: 472738512112.dkr.ecr.us-east-1.amazonaws.com/thuriyam/dashboard-ui:latest
+    pull_policy: always
+    container_name: dashboard
+    command: npm run dev
+    restart: always
+    ports:
+      - "3000:3000" # Dashboard UI service will be running on port 3000
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "170m"
+        max-file: "5"
