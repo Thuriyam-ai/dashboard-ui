@@ -177,49 +177,6 @@ export default function GoalManagementPage() {
             </Box>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              {/* View Type Dropdown */}
-              <Chip
-                icon={<SupervisorAccount />}
-                label="Team Lead view"
-                color="secondary"
-                onClick={handleMenuClick}
-                deleteIcon={<KeyboardArrowDown />}
-                onDelete={handleMenuClick}
-                variant="outlined"
-                sx={{
-                  fontWeight: 600,
-                  '& .MuiChip-deleteIcon': {
-                    color: 'inherit',
-                  },
-                }}
-              />
-
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                PaperProps={{
-                  sx: {
-                    mt: 1,
-                    minWidth: 200,
-                  },
-                }}
-              >
-                <MenuItem
-                  onClick={() => handleViewChange("generic")}
-                >
-                  <Dashboard sx={{ mr: 1 }} />
-                  Generic view
-                </MenuItem>
-                <MenuItem
-                  onClick={() => handleViewChange("team-lead")}
-                  selected={true}
-                >
-                  <SupervisorAccount sx={{ mr: 1 }} />
-                  Team Lead view
-                </MenuItem>
-              </Menu>
-
               <IconButton size="small" sx={{ color: 'text.secondary' }}>
                 <BookmarkBorder />
               </IconButton>
