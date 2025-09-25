@@ -238,15 +238,12 @@ export default function GoalManagementPage() {
             </Box>
           </Box>
 
-          {/* Goals Grid */}
-          <Grid container spacing={3}>
+          {/* Goals List (Row-wise) */}
+          <Grid container spacing={2}>
             {goals.map((goal) => (
-              <Grid item xs={12} md={6} lg={4} key={goal.id}>
+              <Grid item xs={12} key={goal.id}>
                 <Card 
                   sx={{ 
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
                     transition: 'all 0.2s ease-in-out',
                     '&:hover': {
                       transform: 'translateY(-4px)',
@@ -254,55 +251,54 @@ export default function GoalManagementPage() {
                     }
                   }}
                 >
-                  <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                    {/* Header */}
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                      <Box sx={{ flexGrow: 1 }}>
-                        <Typography variant="h6" fontWeight={600} gutterBottom>
-                          {goal.name}
+                  <CardContent>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
+                      
+                      {/* Left Section: Main Info */}
+                      <Box sx={{ flex: '1 1 40%', minWidth: 300 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
+                          <Typography variant="h6" fontWeight={600}>
+                            {goal.name}
+                          </Typography>
+                          <Chip
+                            label={goal.status}
+                            size="small"
+                            color={goal.status === 'active' ? 'success' : 'default'}
+                            icon={goal.status === 'active' ? <PlayArrow sx={{fontSize: 16}} /> : <Pause sx={{fontSize: 16}}/>}
+                          />
+                        </Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                          {goal.description}
                         </Typography>
-                        <Chip
-                          label={goal.status}
-                          size="small"
-                          color={goal.status === 'active' ? 'success' : 'default'}
-                          icon={goal.status === 'active' ? <PlayArrow /> : <Pause />}
-                          sx={{ mb: 1 }}
-                        />
+                         <Box sx={{ mb: 1 }}>
+                          {goal.tags.map((tag) => (
+                            <Chip
+                              key={tag}
+                              label={tag}
+                              size="small"
+                              variant="outlined"
+                              sx={{ mr: 0.5, mb: 0.5 }}
+                            />
+                          ))}
+                        </Box>
+                        <Typography variant="caption" color="text.secondary">
+                           Last updated: {goal.lastUpdated}
+                        </Typography>
                       </Box>
-                      <IconButton size="small">
-                        <MoreVert />
-                      </IconButton>
-                    </Box>
+                      
+                      {/* Center Section: Team */}
+                       <Box sx={{ flex: '1 1 150px', minWidth: 150}}>
+                         <Typography variant="caption" color="text.secondary" display="block" gutterBottom>Assigned Team</Typography>
+                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                           <Group sx={{ fontSize: 18, mr: 1, color: 'text.secondary' }} />
+                           <Typography variant="body2" fontWeight={500}>
+                             {goal.assignedTeam}
+                           </Typography>
+                         </Box>
+                       </Box>
 
-                    {/* Description */}
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2, flexGrow: 1 }}>
-                      {goal.description}
-                    </Typography>
-
-                    {/* Team Assignment */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <Group sx={{ fontSize: 16, mr: 1, color: 'text.secondary' }} />
-                      <Typography variant="body2" color="text.secondary">
-                        {goal.assignedTeam}
-                      </Typography>
-                    </Box>
-
-                    {/* Tags */}
-                    <Box sx={{ mb: 2 }}>
-                      {goal.tags.map((tag) => (
-                        <Chip
-                          key={tag}
-                          label={tag}
-                          size="small"
-                          variant="outlined"
-                          sx={{ mr: 0.5, mb: 0.5 }}
-                        />
-                      ))}
-                    </Box>
-
-                    {/* Metrics */}
-                    <Grid container spacing={2} sx={{ mb: 2 }}>
-                      <Grid item xs={4}>
+                      {/* Center Section: Metrics */}
+                      <Box sx={{ display: 'flex', gap: 3, flex: '1 1 300px', justifyContent: 'space-around' }}>
                         <Box sx={{ textAlign: 'center' }}>
                           <Typography variant="h6" fontWeight={700} color="primary">
                             {goal.totalConversations.toLocaleString()}
@@ -311,8 +307,6 @@ export default function GoalManagementPage() {
                             Conversations
                           </Typography>
                         </Box>
-                      </Grid>
-                      <Grid item xs={4}>
                         <Box sx={{ textAlign: 'center' }}>
                           <Typography variant="h6" fontWeight={700} color="success.main">
                             {goal.averageScore}%
@@ -321,8 +315,6 @@ export default function GoalManagementPage() {
                             Avg Score
                           </Typography>
                         </Box>
-                      </Grid>
-                      <Grid item xs={4}>
                         <Box sx={{ textAlign: 'center' }}>
                           <Typography variant="h6" fontWeight={700} color="info.main">
                             {goal.completionRate}%
@@ -331,42 +323,36 @@ export default function GoalManagementPage() {
                             Completion
                           </Typography>
                         </Box>
-                      </Grid>
-                    </Grid>
-
-                    {/* Actions */}
-                    <Box sx={{ display: 'flex', gap: 1, mt: 'auto' }}>
-                      <Button
-                        size="small"
-                        startIcon={<Edit />}
-                        onClick={() => handleEditGoal(goal.id)}
-                        sx={{ flexGrow: 1 }}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        size="small"
-                        startIcon={<ContentCopy />}
-                        onClick={() => handleCloneGoal(goal.id)}
-                        variant="outlined"
-                      >
-                        Clone
-                      </Button>
-                      <Button
-                        size="small"
-                        startIcon={<Delete />}
-                        onClick={() => handleDeleteGoal(goal)}
-                        color="error"
-                        variant="outlined"
-                      >
-                        Delete
-                      </Button>
+                      </Box>
+                      
+                      {/* Right Section: Actions */}
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button
+                          size="small"
+                          startIcon={<Edit />}
+                          onClick={() => handleEditGoal(goal.id)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          size="small"
+                          startIcon={<ContentCopy />}
+                          onClick={() => handleCloneGoal(goal.id)}
+                          variant="outlined"
+                        >
+                          Clone
+                        </Button>
+                        <Button
+                          size="small"
+                          startIcon={<Delete />}
+                          onClick={() => handleDeleteGoal(goal)}
+                          color="error"
+                          variant="outlined"
+                        >
+                          Delete
+                        </Button>
+                      </Box>
                     </Box>
-
-                    {/* Last Updated */}
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1, textAlign: 'center' }}>
-                      Last updated: {goal.lastUpdated}
-                    </Typography>
                   </CardContent>
                 </Card>
               </Grid>

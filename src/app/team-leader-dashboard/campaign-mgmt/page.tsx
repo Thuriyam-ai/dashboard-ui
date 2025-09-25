@@ -33,6 +33,8 @@ import {
   TableRow,
   Paper,
   LinearProgress,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import {
   BookmarkBorder,
@@ -57,29 +59,51 @@ import {
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
 
-export default function CampaignManagementPage() {
-  const router = useRouter();
+// A component for the actions menu to keep the main component cleaner
+const ActionsMenu = ({ campaign, onEdit, onClone, onDelete }: any) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
-  const { logout } = useAuth();
+  const open = Boolean(anchorEl);
 
-  const handleViewChange = (newView: string) => {
-    setAnchorEl(null);
-    if (newView === "generic") {
-      router.push('/dashboard');
-    } else if (newView === "team-lead") {
-      router.push('/team-dashboard/overview');
-    }
-  };
-
-  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleMenuClose = () => {
+  const handleClose = () => {
     setAnchorEl(null);
   };
+
+  return (
+    <>
+      <IconButton
+        aria-label="actions"
+        onClick={handleClick}
+      >
+        <MoreVert />
+      </IconButton>
+      <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+        <MenuItem onClick={() => { onEdit(campaign.id); handleClose(); }}>
+          <ListItemIcon><Edit fontSize="small" /></ListItemIcon>
+          <ListItemText>Edit</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => { onClone(campaign.id); handleClose(); }}>
+          <ListItemIcon><ContentCopy fontSize="small" /></ListItemIcon>
+          <ListItemText>Clone</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => { onDelete(campaign); handleClose(); }} sx={{ color: 'error.main' }}>
+          <ListItemIcon><Delete fontSize="small" color="error" /></ListItemIcon>
+          <ListItemText>Delete</ListItemText>
+        </MenuItem>
+      </Menu>
+    </>
+  );
+};
+
+
+export default function CampaignManagementPage() {
+  const router = useRouter();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
+  const { logout } = useAuth();
 
   const handleCreateCampaign = () => {
     router.push('/team-leader-dashboard/campaign-mgmt/editor');
@@ -169,7 +193,7 @@ export default function CampaignManagementPage() {
       default: return 'default';
     }
   };
-
+  
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'active': return <PlayArrow />;
@@ -177,6 +201,13 @@ export default function CampaignManagementPage() {
       case 'completed': return <CheckCircle />;
       default: return <Pause />;
     }
+  };
+
+  // Helper function to determine metric color
+  const getMetricColor = (value: number) => {
+    if (value >= 90) return "success";
+    if (value >= 70) return "warning";
+    return "error";
   };
 
   return (
@@ -266,156 +297,112 @@ export default function CampaignManagementPage() {
 
           {/* Campaigns Table */}
           <Card>
-            <CardContent>
-              <Typography variant="h5" fontWeight={600} gutterBottom sx={{ mb: 3 }}>
-                Active Campaigns
-              </Typography>
-              <TableContainer component={Paper} variant="outlined">
-                <Table>
-                  <TableHead>
-                    <TableRow sx={{ backgroundColor: 'action.hover' }}>
-                      <TableCell sx={{ fontWeight: 600 }}>Campaign Name</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>Goal Version</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>Assigned Team</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>Duration</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>Conversations</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>Avg Score</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>Completion Rate</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {campaigns.map((campaign) => (
-                      <TableRow key={campaign.id}>
-                        <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Campaign sx={{ color: 'primary.main' }} />
-                            <Typography variant="body2" fontWeight={600}>
-                              {campaign.name}
-                            </Typography>
-                          </Box>
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            label={campaign.status}
-                            size="small"
-                            color={getStatusColor(campaign.status) as any}
-                            icon={getStatusIcon(campaign.status)}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2" color="text.secondary">
-                            {campaign.goalVersion}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Group sx={{ fontSize: 16, color: 'text.secondary' }} />
-                            <Typography variant="body2">
-                              {campaign.assignedTeam}
-                            </Typography>
-                          </Box>
-                        </TableCell>
-                        <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <CalendarToday sx={{ fontSize: 16, color: 'text.secondary' }} />
-                            <Typography variant="body2">
-                              {campaign.startDate} - {campaign.endDate}
-                            </Typography>
-                          </Box>
-                        </TableCell>
-                        <TableCell>
+            <TableContainer component={Paper} variant="outlined">
+              <Table sx={{ minWidth: 650 }} aria-label="campaigns table">
+                <TableHead>
+                  <TableRow sx={{ backgroundColor: 'action.hover' }}>
+                    <TableCell sx={{ fontWeight: 600, width: '25%' }}>Campaign Name</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                    <TableCell sx={{ fontWeight: 600, width: '20%' }}>Goal Version</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Assigned Team</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Duration</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Metrics</TableCell>
+                    <TableCell sx={{ fontWeight: 600, textAlign: 'right' }}>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {campaigns.map((campaign) => (
+                    <TableRow key={campaign.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                      <TableCell component="th" scope="row">
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                          <Campaign sx={{ color: 'primary.main' }} />
                           <Typography variant="body2" fontWeight={600}>
-                            {campaign.totalConversations.toLocaleString()}
+                            {campaign.name}
                           </Typography>
-                        </TableCell>
-                        <TableCell>
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={campaign.status}
+                          size="small"
+                          color={getStatusColor(campaign.status) as any}
+                          icon={getStatusIcon(campaign.status)}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {campaign.goalVersion}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Group sx={{ fontSize: 18, color: 'text.secondary' }} />
+                          <Typography variant="body2">
+                            {campaign.assignedTeam}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <CalendarToday sx={{ fontSize: 18, color: 'text.secondary' }} />
+                          <Typography variant="body2">
+                            {campaign.startDate} - {campaign.endDate}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                          <Typography variant="body2" fontWeight={500}>
+                            Conv: {campaign.totalConversations.toLocaleString()}
+                          </Typography>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Typography 
-                              variant="body2" 
-                              fontWeight={600}
-                              color={
-                                campaign.averageScore >= 90
-                                  ? "success.main"
-                                  : campaign.averageScore >= 70
-                                    ? "warning.main"
-                                    : "error.main"
-                              }
-                            >
-                              {campaign.averageScore}%
+                            <Typography variant="body2" fontWeight={500} sx={{width: 75}}>
+                              Avg Score:
                             </Typography>
                             <LinearProgress
                               variant="determinate"
                               value={campaign.averageScore}
-                              sx={{ width: 40, height: 4, borderRadius: 2 }}
-                              color={campaign.averageScore >= 90 ? "success" : campaign.averageScore >= 70 ? "warning" : "error"}
+                              color={getMetricColor(campaign.averageScore)}
+                              sx={{ width: 50, height: 6, borderRadius: 3, flexGrow: 1 }}
                             />
+                            <Typography variant="body2" fontWeight={600} color={`${getMetricColor(campaign.averageScore)}.main`}>
+                              {campaign.averageScore}%
+                            </Typography>
                           </Box>
-                        </TableCell>
-                        <TableCell>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Typography 
-                              variant="body2" 
-                              fontWeight={600}
-                              color={
-                                campaign.completionRate >= 90
-                                  ? "success.main"
-                                  : campaign.completionRate >= 70
-                                    ? "warning.main"
-                                    : "error.main"
-                              }
-                            >
-                              {campaign.completionRate}%
+                            <Typography variant="body2" fontWeight={500} sx={{width: 75}}>
+                              Completion:
                             </Typography>
                             <LinearProgress
                               variant="determinate"
                               value={campaign.completionRate}
-                              sx={{ width: 40, height: 4, borderRadius: 2 }}
-                              color={campaign.completionRate >= 90 ? "success" : campaign.completionRate >= 70 ? "warning" : "error"}
+                              color={getMetricColor(campaign.completionRate)}
+                              sx={{ width: 50, height: 6, borderRadius: 3, flexGrow: 1 }}
                             />
+                            <Typography variant="body2" fontWeight={600} color={`${getMetricColor(campaign.completionRate)}.main`}>
+                              {campaign.completionRate}%
+                            </Typography>
                           </Box>
-                        </TableCell>
-                        <TableCell>
-                          <Box sx={{ display: 'flex', gap: 0.5 }}>
-                            <Button
-                              size="small"
-                              startIcon={<Edit />}
-                              onClick={() => handleEditCampaign(campaign.id)}
-                              variant="outlined"
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              size="small"
-                              startIcon={<ContentCopy />}
-                              onClick={() => handleCloneCampaign(campaign.id)}
-                              variant="outlined"
-                            >
-                              Clone
-                            </Button>
-                            <Button
-                              size="small"
-                              startIcon={<Delete />}
-                              onClick={() => handleDeleteCampaign(campaign)}
-                              color="error"
-                              variant="outlined"
-                            >
-                              Delete
-                            </Button>
-                          </Box>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </CardContent>
+                        </Box>
+                      </TableCell>
+                      <TableCell align="right">
+                        <ActionsMenu 
+                            campaign={campaign}
+                            onEdit={handleEditCampaign}
+                            onClone={handleCloneCampaign}
+                            onDelete={handleDeleteCampaign}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Card>
 
           {/* Empty State */}
           {campaigns.length === 0 && (
-            <Box sx={{ textAlign: 'center', py: 8 }}>
+            <Box sx={{ textAlign: 'center', py: 8, mt: 2 }}>
               <Campaign sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
               <Typography variant="h5" gutterBottom>
                 No Campaigns Created Yet
