@@ -332,7 +332,13 @@ export default function GoalManagementPage() {
                           startIcon={<Edit />}
                           onClick={() => handleEditGoal(goal.id)}
                         >
-                          Edit
+                          Edit Draft Version
+                        </Button>
+                        <Button
+                          size="small"
+                          startIcon={<CheckCircle />}
+                        >
+                          Publish Draft
                         </Button>
                         <Button
                           size="small"
