@@ -337,6 +337,7 @@ export default function GoalManagementPage() {
                         <Button
                           size="small"
                           startIcon={<CheckCircle />}
+                          disabled={goal.status === "active"}
                         >
                           Publish Draft
                         </Button>
