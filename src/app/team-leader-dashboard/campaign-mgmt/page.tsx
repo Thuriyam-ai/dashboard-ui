@@ -1,85 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
-  Box,
-  Container,
-  Typography,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Button,
-  Avatar,
-  Card,
-  CardContent,
-  Chip,
-  Menu,
-  MenuItem,
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Alert,
-  AlertTitle,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  LinearProgress,
-  ListItemIcon,
-  ListItemText,
+  Box, Container, Typography, AppBar, Toolbar, IconButton, Button, Avatar,
+  Card, CardContent, Chip, Menu, MenuItem, Dialog, DialogTitle, DialogContent,
+  DialogActions, Alert, AlertTitle, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, LinearProgress, ListItemIcon, ListItemText, CircularProgress,
 } from "@mui/material";
 import {
-  BookmarkBorder,
-  MoreVert,
-  Logout,
-  Dashboard,
-  SupervisorAccount,
-  KeyboardArrowDown,
-  Add,
-  Edit,
-  ContentCopy,
-  Delete,
-  PlayArrow,
-  Pause,
-  CheckCircle,
-  Schedule,
-  Campaign,
-  TrendingUp,
-  Assessment,
-  Group,
-  CalendarToday,
+  BookmarkBorder, MoreVert, Logout, Add, Edit, ContentCopy, Delete, PlayArrow,
+  Pause, CheckCircle, Schedule, Campaign, Group, CalendarToday,
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
+import { getAllCampaigns, deleteCampaign } from "@/data/services/campaign-service";
+import { Campaign as CampaignType } from "@/types/api/campaign";
 
-// A component for the actions menu to keep the main component cleaner
+// Actions Menu Component (no changes needed)
 const ActionsMenu = ({ campaign, onEdit, onClone, onDelete }: any) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
+  const handleClose = () => setAnchorEl(null);
 
   return (
     <>
-      <IconButton
-        aria-label="actions"
-        onClick={handleClick}
-      >
-        <MoreVert />
-      </IconButton>
+      <IconButton aria-label="actions" onClick={handleClick}><MoreVert /></IconButton>
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <MenuItem onClick={() => { onEdit(campaign.id); handleClose(); }}>
           <ListItemIcon><Edit fontSize="small" /></ListItemIcon>
@@ -98,116 +47,84 @@ const ActionsMenu = ({ campaign, onEdit, onClone, onDelete }: any) => {
   );
 };
 
-
 export default function CampaignManagementPage() {
   const router = useRouter();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
   const { logout } = useAuth();
+  
+  // State for API data
+  const [campaigns, setCampaigns] = useState<CampaignType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleCreateCampaign = () => {
-    router.push('/team-leader-dashboard/campaign-mgmt/editor');
-  };
+  // State for UI interactions
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedCampaign, setSelectedCampaign] = useState<CampaignType | null>(null);
 
-  const handleEditCampaign = (campaignId: string) => {
-    router.push(`/team-leader-dashboard/campaign-mgmt/editor?id=${campaignId}`);
-  };
+  // Fetch campaigns on component mount
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        setIsLoading(true);
+        const data = await getAllCampaigns();
+        setCampaigns(data);
+      } catch (err) {
+        setError("Failed to load campaigns. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCampaigns();
+  }, []);
 
-  const handleCloneCampaign = (campaignId: string) => {
-    router.push(`/team-leader-dashboard/campaign-mgmt/editor?clone=${campaignId}`);
-  };
+  const handleCreateCampaign = () => router.push('/team-leader-dashboard/campaign-mgmt/editor');
+  const handleEditCampaign = (campaignId: string) => router.push(`/team-leader-dashboard/campaign-mgmt/editor?id=${campaignId}`);
+  const handleCloneCampaign = (campaignId: string) => router.push(`/team-leader-dashboard/campaign-mgmt/editor?clone=${campaignId}`);
 
-  const handleDeleteCampaign = (campaign: any) => {
+  const handleDeleteCampaign = (campaign: CampaignType) => {
     setSelectedCampaign(campaign);
     setDeleteDialogOpen(true);
   };
 
-  const confirmDelete = () => {
-    // Handle delete logic here
-    console.log("Deleting campaign:", selectedCampaign);
-    setDeleteDialogOpen(false);
-    setSelectedCampaign(null);
+  const confirmDelete = async () => {
+    if (!selectedCampaign) return;
+    try {
+      await deleteCampaign(selectedCampaign.id);
+      setCampaigns(prevCampaigns => prevCampaigns.filter(c => c.id !== selectedCampaign.id));
+      setDeleteDialogOpen(false);
+      setSelectedCampaign(null);
+    } catch (err) {
+      // In a real app, you might show a toast notification here
+      console.error("Failed to delete campaign", err);
+    }
   };
 
-  // Mock data for campaigns
-  const campaigns = [
-    {
-      id: "campaign-1",
-      name: "Q1 Loan Qualification Drive",
-      status: "active",
-      goalVersion: "Loan Pre-Qualification v2.1",
-      assignedTeam: "Sales Team Alpha",
-      startDate: "2024-01-01",
-      endDate: "2024-03-31",
-      totalConversations: 1247,
-      averageScore: 87.3,
-      completionRate: 92.1,
-      lastUpdated: "2024-01-15",
-    },
-    {
-      id: "campaign-2",
-      name: "Customer Support Excellence",
-      status: "active",
-      goalVersion: "Customer Support Resolution v1.3",
-      assignedTeam: "Support Team Beta",
-      startDate: "2024-01-15",
-      endDate: "2024-04-15",
-      totalConversations: 2156,
-      averageScore: 91.7,
-      completionRate: 88.4,
-      lastUpdated: "2024-01-14",
-    },
-    {
-      id: "campaign-3",
-      name: "Enterprise Lead Generation",
-      status: "upcoming",
-      goalVersion: "Lead Generation v1.0",
-      assignedTeam: "Sales Team Gamma",
-      startDate: "2024-02-01",
-      endDate: "2024-05-31",
-      totalConversations: 0,
-      averageScore: 0,
-      completionRate: 0,
-      lastUpdated: "2024-01-13",
-    },
-    {
-      id: "campaign-4",
-      name: "Product Feedback Collection",
-      status: "completed",
-      goalVersion: "Product Feedback Collection v1.2",
-      assignedTeam: "Product Team Delta",
-      startDate: "2023-10-01",
-      endDate: "2023-12-31",
-      totalConversations: 543,
-      averageScore: 84.2,
-      completionRate: 95.6,
-      lastUpdated: "2023-12-31",
-    },
-  ];
-
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: CampaignType['status']) => {
     switch (status) {
-      case 'active': return 'success';
-      case 'upcoming': return 'info';
-      case 'completed': return 'default';
+      case 'ACTIVE': return 'success';
+      case 'UPCOMING': return 'info';
+      case 'COMPLETED': return 'default';
       default: return 'default';
     }
   };
   
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: CampaignType['status']) => {
     switch (status) {
-      case 'active': return <PlayArrow />;
-      case 'upcoming': return <Schedule />;
-      case 'completed': return <CheckCircle />;
+      case 'ACTIVE': return <PlayArrow />;
+      case 'UPCOMING': return <Schedule />;
+      case 'COMPLETED': return <CheckCircle />;
       default: return <Pause />;
     }
   };
 
-  // Helper function to determine metric color
   const getMetricColor = (value: number) => {
     if (value >= 90) return "success";
     if (value >= 70) return "warning";
     return "error";
+  };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('en-CA'); // 'en-CA' gives YYYY-MM-DD format
   };
 
   return (
@@ -216,51 +133,14 @@ export default function CampaignManagementPage() {
 
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginLeft: '280px' }}>
         {/* Top Bar */}
-        <AppBar
-          position="static"
-          elevation={1}
-          sx={{
-            backgroundColor: 'background.paper',
-            color: 'text.primary',
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-          }}
-        >
+        <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
           <Toolbar>
-            <Box sx={{ flexGrow: 1 }}>
-              <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
-                team-leader-dashboard.localhost:3000
-              </Typography>
-            </Box>
-
+            <Box sx={{ flexGrow: 1 }}><Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>team-leader-dashboard.localhost:3000</Typography></Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <IconButton size="small" sx={{ color: 'text.secondary' }}>
-                <BookmarkBorder />
-              </IconButton>
-
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 2 }}>
-                <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '0.875rem' }}>
-                  W
-                </Avatar>
-                <Typography variant="body2" fontWeight={500}>
-                  Work
-                </Typography>
-              </Box>
-
-              <IconButton size="small" sx={{ color: 'text.secondary' }}>
-                <MoreVert />
-              </IconButton>
-
-              <Button
-                variant="contained"
-                color="error"
-                size="small"
-                startIcon={<Logout />}
-                sx={{ ml: 1 }}
-                onClick={logout}
-              >
-                Logout
-              </Button>
+              <IconButton size="small" sx={{ color: 'text.secondary' }}><BookmarkBorder /></IconButton>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 2 }}><Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '0.875rem' }}>W</Avatar><Typography variant="body2" fontWeight={500}>Work</Typography></Box>
+              <IconButton size="small" sx={{ color: 'text.secondary' }}><MoreVert /></IconButton>
+              <Button variant="contained" color="error" size="small" startIcon={<Logout />} sx={{ ml: 1 }} onClick={logout}>Logout</Button>
             </Box>
           </Toolbar>
         </AppBar>
@@ -268,28 +148,13 @@ export default function CampaignManagementPage() {
         {/* Main Content */}
         <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3 }}>
           <Breadcrumbs />
-
           <Box sx={{ mb: 4 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Box>
-                <Typography variant="h3" component="h1" fontWeight={700} gutterBottom>
-                  Campaign Management
-                </Typography>
-                <Typography variant="h6" color="text.secondary">
-                  Create and manage conversation campaigns for your teams
-                </Typography>
+                <Typography variant="h3" component="h1" fontWeight={700} gutterBottom>Campaign Management</Typography>
+                <Typography variant="h6" color="text.secondary">Create and manage conversation campaigns for your teams</Typography>
               </Box>
-              <Button
-                variant="contained"
-                startIcon={<Add />}
-                onClick={handleCreateCampaign}
-                sx={{ 
-                  px: 3, 
-                  py: 1.5,
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                }}
-              >
+              <Button variant="contained" startIcon={<Add />} onClick={handleCreateCampaign} sx={{ px: 3, py: 1.5, fontSize: '1rem', fontWeight: 600 }}>
                 Create New Campaign
               </Button>
             </Box>
@@ -311,87 +176,32 @@ export default function CampaignManagementPage() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {campaigns.map((campaign) => (
+                  {isLoading ? (
+                    <TableRow><TableCell colSpan={7} align="center" sx={{ py: 5 }}><CircularProgress /></TableCell></TableRow>
+                  ) : error ? (
+                    <TableRow><TableCell colSpan={7} align="center" sx={{ py: 5 }}><Alert severity="error">{error}</Alert></TableCell></TableRow>
+                  ) : campaigns.map((campaign) => (
                     <TableRow key={campaign.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                       <TableCell component="th" scope="row">
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                          <Campaign sx={{ color: 'primary.main' }} />
-                          <Typography variant="body2" fontWeight={600}>
-                            {campaign.name}
-                          </Typography>
-                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}><Campaign sx={{ color: 'primary.main' }} /><Typography variant="body2" fontWeight={600}>{campaign.name}</Typography></Box>
                       </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={campaign.status}
-                          size="small"
-                          color={getStatusColor(campaign.status) as any}
-                          icon={getStatusIcon(campaign.status)}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2" color="text.secondary">
-                          {campaign.goalVersion}
-                        </Typography>
+                      <TableCell><Chip label={campaign.status} size="small" color={getStatusColor(campaign.status)} icon={getStatusIcon(campaign.status)} /></TableCell>
+                      <TableCell><Typography variant="body2" color="text.secondary">{campaign.goal_name}</Typography></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Group sx={{ fontSize: 18, color: 'text.secondary' }} /><Typography variant="body2">{campaign.team_name}</Typography></Box>
                       </TableCell>
                       <TableCell sx={{ whiteSpace: 'nowrap' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Group sx={{ fontSize: 18, color: 'text.secondary' }} />
-                          <Typography variant="body2">
-                            {campaign.assignedTeam}
-                          </Typography>
-                        </Box>
-                      </TableCell>
-                      <TableCell sx={{ whiteSpace: 'nowrap' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <CalendarToday sx={{ fontSize: 18, color: 'text.secondary' }} />
-                          <Typography variant="body2">
-                            {campaign.startDate} - {campaign.endDate}
-                          </Typography>
-                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><CalendarToday sx={{ fontSize: 18, color: 'text.secondary' }} /><Typography variant="body2">{formatDate(campaign.starts_at)} - {formatDate(campaign.ends_at)}</Typography></Box>
                       </TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                          <Typography variant="body2" fontWeight={500}>
-                            Conv: {campaign.totalConversations.toLocaleString()}
-                          </Typography>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Typography variant="body2" fontWeight={500} sx={{width: 75}}>
-                              Avg Score:
-                            </Typography>
-                            <LinearProgress
-                              variant="determinate"
-                              value={campaign.averageScore}
-                              color={getMetricColor(campaign.averageScore)}
-                              sx={{ width: 50, height: 6, borderRadius: 3, flexGrow: 1 }}
-                            />
-                            <Typography variant="body2" fontWeight={600} color={`${getMetricColor(campaign.averageScore)}.main`}>
-                              {campaign.averageScore}%
-                            </Typography>
-                          </Box>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Typography variant="body2" fontWeight={500} sx={{width: 75}}>
-                              Completion:
-                            </Typography>
-                            <LinearProgress
-                              variant="determinate"
-                              value={campaign.completionRate}
-                              color={getMetricColor(campaign.completionRate)}
-                              sx={{ width: 50, height: 6, borderRadius: 3, flexGrow: 1 }}
-                            />
-                            <Typography variant="body2" fontWeight={600} color={`${getMetricColor(campaign.completionRate)}.main`}>
-                              {campaign.completionRate}%
-                            </Typography>
-                          </Box>
+                          <Typography variant="body2" fontWeight={500}>Conv: {campaign.conversations.toLocaleString()}</Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Typography variant="body2" fontWeight={500} sx={{width: 75}}>Avg Score:</Typography><LinearProgress variant="determinate" value={campaign.avg_score} color={getMetricColor(campaign.avg_score)} sx={{ width: 50, height: 6, borderRadius: 3, flexGrow: 1 }} /><Typography variant="body2" fontWeight={600} color={`${getMetricColor(campaign.avg_score)}.main`}>{campaign.avg_score}%</Typography></Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Typography variant="body2" fontWeight={500} sx={{width: 75}}>Completion:</Typography><LinearProgress variant="determinate" value={campaign.completion_rate} color={getMetricColor(campaign.completion_rate)} sx={{ width: 50, height: 6, borderRadius: 3, flexGrow: 1 }} /><Typography variant="body2" fontWeight={600} color={`${getMetricColor(campaign.completion_rate)}.main`}>{campaign.completion_rate}%</Typography></Box>
                         </Box>
                       </TableCell>
                       <TableCell align="right">
-                        <ActionsMenu 
-                            campaign={campaign}
-                            onEdit={handleEditCampaign}
-                            onClone={handleCloneCampaign}
-                            onDelete={handleDeleteCampaign}
-                        />
+                        <ActionsMenu campaign={campaign} onEdit={handleEditCampaign} onClone={handleCloneCampaign} onDelete={handleDeleteCampaign} />
                       </TableCell>
                     </TableRow>
                   ))}
@@ -401,51 +211,26 @@ export default function CampaignManagementPage() {
           </Card>
 
           {/* Empty State */}
-          {campaigns.length === 0 && (
+          {!isLoading && !error && campaigns.length === 0 && (
             <Box sx={{ textAlign: 'center', py: 8, mt: 2 }}>
               <Campaign sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
-              <Typography variant="h5" gutterBottom>
-                No Campaigns Created Yet
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                Create your first campaign to start managing conversation objectives for your teams.
-              </Typography>
-              <Button
-                variant="contained"
-                startIcon={<Add />}
-                onClick={handleCreateCampaign}
-                size="large"
-              >
-                Create Your First Campaign
-              </Button>
+              <Typography variant="h5" gutterBottom>No Campaigns Created Yet</Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>Create your first campaign to start managing conversation objectives for your teams.</Typography>
+              <Button variant="contained" startIcon={<Add />} onClick={handleCreateCampaign} size="large">Create Your First Campaign</Button>
             </Box>
           )}
         </Container>
 
         {/* Delete Confirmation Dialog */}
-        <Dialog
-          open={deleteDialogOpen}
-          onClose={() => setDeleteDialogOpen(false)}
-          maxWidth="sm"
-          fullWidth
-        >
+        <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="sm" fullWidth>
           <DialogTitle>Delete Campaign</DialogTitle>
           <DialogContent>
-            <Typography>
-              Are you sure you want to delete the campaign "{selectedCampaign?.name}"? This action cannot be undone.
-            </Typography>
-            <Alert severity="warning" sx={{ mt: 2 }}>
-              <AlertTitle>Warning</AlertTitle>
-              Deleting this campaign will remove all associated data and historical records.
-            </Alert>
+            <Typography>Are you sure you want to delete the campaign "{selectedCampaign?.name}"? This action cannot be undone.</Typography>
+            <Alert severity="warning" sx={{ mt: 2 }}><AlertTitle>Warning</AlertTitle>Deleting this campaign will remove all associated data and historical records.</Alert>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDeleteDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={confirmDelete} color="error" variant="contained">
-              Delete Campaign
-            </Button>
+            <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+            <Button onClick={confirmDelete} color="error" variant="contained">Delete Campaign</Button>
           </DialogActions>
         </Dialog>
       </Box>

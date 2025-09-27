@@ -17,3 +17,9 @@ export interface Goal {
   published_version_no: number | null;
   draft_version_no: number | null;
 }
+
+export interface ActiveGoalSummary {
+  goal_id: string;
+  goal_name: string;
+  active_version_no: number;
+}
