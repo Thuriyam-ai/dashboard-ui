@@ -7,79 +7,30 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
-  Box,
-  Container,
-  Typography,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Button,
-  Card,
-  CardContent,
-  Tabs,
-  Tab,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  FormControlLabel,
-  Checkbox,
-  Grid,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  IconButton as MuiIconButton,
-  Alert,
-  AlertTitle,
-  Divider,
-  Stack,
-  MenuItem,
+  Box, Container, Typography, AppBar, Toolbar, IconButton, Button, Card, CardContent, Tabs, Tab,
+  TextField, FormControl, InputLabel, Select, FormControlLabel, Checkbox, Grid, Paper, Table,
+  TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton as MuiIconButton,
+  Alert, AlertTitle, Divider, Stack, MenuItem, CircularProgress,
 } from "@mui/material";
+import { Save, ArrowBack, Add, Delete, Psychology, DataObject, Analytics, Score } from "@mui/icons-material";
 import {
-  Save,
-  ArrowBack,
-  Add,
-  Delete,
-  Psychology,
-  DataObject,
-  Analytics,
-  Score,
-} from "@mui/icons-material";
-
-import {
-  Owner,
-  Team,
-  GoalCreateRequest
-} from "@/types/api/goal"
-
-// Assumes your service file is correctly set up as provided previously
-import {
-  getOwners,
-  getTeams,
-  createGoal,
+  getOwners, getTeams, createGoal, getGoalVersion, updateDraftVersion,
 } from "@/data/services/goal-service";
+import {
+  Owner, Team, GoalCreateRequest, GoalVersionDetailResponse, DataType, DispositionCategory, FailureType, ScoringType,
+} from "@/types/api/goal";
 
-
+// State interfaces for the form tables
 interface DataField {
-  id: string;
-  attribute: string;
-  dataType: string;
-  options: string;
-  elicitationPrompt: string;
-  required: boolean;
-  weight: number;
+  id: string; attribute_name: string; data_type: DataType; is_pii: boolean;
+  elicitation_prompt: string | null; is_required: boolean; weight: number;
 }
-
+interface Disposition {
+  id: string; name: string; category: DispositionCategory;
+}
 interface QualityParameter {
-  id: string;
-  parameter: string;
-  maxScore: number;
-  failureType: string;
-  rules: string;
+  id: string; name: string; max_score: number; failure_type: FailureType;
+  scoring_type: ScoringType; rules_and_explanation: string | null;
 }
 
 function GoalEditorContent() {
@@ -89,65 +40,78 @@ function GoalEditorContent() {
   const [isEditing, setIsEditing] = useState(false);
   const [goalId, setGoalId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // --- Dropdown Data State ---
+  // Dropdown Data
   const [owners, setOwners] = useState<Owner[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
 
-  // --- Form State ---
+  // Form State
   const [goalName, setGoalName] = useState("");
   const [ownerId, setOwnerId] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
   const [assignedTeamId, setAssignedTeamId] = useState("");
   const [systemPrompt, setSystemPrompt] = useState("");
-
-  const [dataFields, setDataFields] = useState<DataField[]>([
-    { id: "1", attribute: "customer_name", dataType: "TEXT", options: "", elicitationPrompt: "What is your full name?", required: true, weight: 10 },
-  ]);
-
+  const [dataFields, setDataFields] = useState<DataField[]>([]);
   const [sentimentAnalysis, setSentimentAnalysis] = useState(true);
   const [intentExtraction, setIntentExtraction] = useState(true);
   const [emergentTopics, setEmergentTopics] = useState(false);
-  const [dispositions, setDispositions] = useState(["Qualified Lead", "Callback Required", "Not Interested"]);
+  const [dispositions, setDispositions] = useState<Disposition[]>([]);
+  const [qualityParameters, setQualityParameters] = useState<QualityParameter[]>([]);
 
-  const [qualityParameters, setQualityParameters] = useState<QualityParameter[]>([
-    { id: "1", parameter: "Call Opening Adherence", maxScore: 5, failureType: "NON_FATAL", rules: "Agent must greet professionally." },
-  ]);
-
-  // --- Effects ---
   useEffect(() => {
-    const fetchDropdownData = async () => {
+    const initialize = async () => {
       try {
         const [ownersData, teamsData] = await Promise.all([getOwners(), getTeams()]);
         setOwners(ownersData);
         setTeams(teamsData);
+
+        const id = searchParams.get('id');
+        const cloneId = searchParams.get('clone');
+        
+        if (id) { // Edit Mode
+          setIsEditing(true);
+          setGoalId(id);
+          try {
+            // First, try to get the draft version
+            const draftData = await getGoalVersion(id, 'draft');
+            populateFormState(draftData);
+          } catch (error) {
+            // If draft doesn't exist, get the active version to create a new draft from it
+            console.log("No draft found, fetching active version to edit.");
+            const activeData = await getGoalVersion(id, 'active');
+            populateFormState(activeData);
+          }
+        } else if (cloneId) { // Clone Mode
+          const versionData = await getGoalVersion(cloneId, 'draft'); // Or 'active' as a fallback
+          populateFormState(versionData);
+        }
       } catch (error) {
-        console.error("Failed to load owners or teams", error);
+        console.error("Initialization failed:", error);
+        alert("Failed to load goal data for the editor.");
+        router.push('/team-leader-dashboard/goal-mgmt'); // Redirect back on error
+      } finally {
+        setIsLoading(false);
       }
     };
-    fetchDropdownData();
+    initialize();
+  }, [searchParams, router]);
 
-    const id = searchParams.get('id');
-    const clone = searchParams.get('clone');
-    if (id) {
-      setIsEditing(true);
-      setGoalId(id);
-      loadGoalData(id);
-    } else if (clone) {
-      setIsEditing(false);
-      setGoalId(null);
-      loadGoalData(clone);
-    }
-  }, [searchParams]);
-
-  // --- Data Loading and Saving ---
-  const loadGoalData = (id: string) => {
-    // Mock data loading
-    setGoalName("Loan Pre-Qualification");
-    setDescription("Qualify potential borrowers for loan products.");
-    setTags("sales,qualification,finance");
-    setSystemPrompt("You are a professional loan qualification specialist.");
+  const populateFormState = (data: GoalVersionDetailResponse) => {
+    const { interaction_blueprint, structured_data, conversation_insights, quality_scorecard } = data;
+    setGoalName(interaction_blueprint.goal_metadata.name);
+    setDescription(interaction_blueprint.goal_metadata.description || "");
+    setOwnerId(interaction_blueprint.goal_metadata.owner_id);
+    setAssignedTeamId(interaction_blueprint.goal_metadata.default_team_id || "");
+    setTags(interaction_blueprint.goal_metadata.tags || "");
+    setSystemPrompt(interaction_blueprint.prompt_text);
+    setDataFields(structured_data.map(d => ({ ...d, id: Math.random().toString() })));
+    setSentimentAnalysis(conversation_insights.conversation_insights_config.sentiment_analysis ?? false);
+    setIntentExtraction(conversation_insights.conversation_insights_config.intent_extraction ?? false);
+    setEmergentTopics(conversation_insights.conversation_insights_config.emergent_topics_detection ?? false);
+    setDispositions(conversation_insights.disposition_config.map(d => ({ ...d, id: Math.random().toString() })));
+    setQualityParameters(quality_scorecard.map(p => ({ ...p, id: Math.random().toString() })));
   };
 
   const handleSave = async () => {
@@ -159,42 +123,25 @@ function GoalEditorContent() {
     
     const payload: GoalCreateRequest = {
       interaction_blueprint: {
-        goal_metadata: {
-          name: goalName, description: description, owner_id: ownerId,
-          default_team_id: assignedTeamId, tags: tags,
-        },
-        prompt_text: systemPrompt,
-        dynamic_variables: "{}",
+        goal_metadata: { name: goalName, description, owner_id: ownerId, default_team_id: assignedTeamId, tags },
+        prompt_text: systemPrompt, dynamic_variables: "{}",
       },
-      structured_data: dataFields.map((field, index) => ({
-        attribute_name: field.attribute,
-        data_type: field.dataType.toUpperCase(),
-        is_required: field.required,
-        is_pii: false, weight: field.weight, display_order: index + 1,
-        configuration: "{}", elicitation_prompt: field.elicitationPrompt,
-      })),
+      structured_data: dataFields.map(({id, ...rest}, i) => ({ ...rest, display_order: i + 1, configuration: '{}' })),
       conversation_insights: {
-        conversation_insights_config: {
-          "sentiment_analysis": sentimentAnalysis,
-          "intent_extraction": intentExtraction,
-          "emergent_topics_detection": emergentTopics,
-        },
-        disposition_config: dispositions.map((name, index) => ({
-          name: name, category: "NEUTRAL", display_order: index + 1,
-          description: null,
-        })),
+        conversation_insights_config: { sentiment_analysis: sentimentAnalysis, intent_extraction: intentExtraction, emergent_topics_detection: emergentTopics },
+        disposition_config: dispositions.map(({id, ...rest}, i) => ({ ...rest, description: null, display_order: i + 1 })),
       },
-      quality_scorecard: qualityParameters.map((param, index) => ({
-        name: param.parameter, max_score: param.maxScore,
-        failure_type: param.failureType.toUpperCase(),
-        scoring_type: "MANUAL", display_order: index + 1,
-        rules_and_explanation: param.rules,
-      })),
+      quality_scorecard: qualityParameters.map(({id, ...rest}, i) => ({ ...rest, display_order: i + 1 })),
     };
 
     try {
-      const response = await createGoal(payload);
-      alert(response.message);
+      if (isEditing && goalId) {
+        await updateDraftVersion(goalId, payload);
+        alert("Goal draft updated successfully!");
+      } else {
+        await createGoal(payload);
+        alert("Goal created successfully!");
+      }
       router.push('/team-leader-dashboard/goal-mgmt');
     } catch (error) {
       console.error("Failed to save goal:", error);
@@ -207,17 +154,24 @@ function GoalEditorContent() {
   // --- UI Handlers ---
   const handleBack = () => router.push('/team-leader-dashboard/goal-mgmt');
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => setActiveTab(newValue);
-  const addDataField = () => setDataFields([...dataFields, { id: Date.now().toString(), attribute: "", dataType: "TEXT", options: "", elicitationPrompt: "", required: false, weight: 5 }]);
+  const totalScore = qualityParameters.reduce((sum, param) => sum + param.max_score, 0);
+  
+  // Handlers for tables (add, update, remove rows)
+  const addDataField = () => setDataFields([...dataFields, { id: Date.now().toString(), attribute_name: "", data_type: "TEXT", elicitation_prompt: "", is_pii: false, is_required: false, weight: 10 }]);
   const updateDataField = (id: string, field: Partial<DataField>) => setDataFields(dataFields.map(f => f.id === id ? { ...f, ...field } : f));
   const removeDataField = (id: string) => setDataFields(dataFields.filter(f => f.id !== id));
-  const addQualityParameter = () => setQualityParameters([...qualityParameters, { id: Date.now().toString(), parameter: "", maxScore: 5, failureType: "NON_FATAL", rules: "" }]);
+  
+  const addDisposition = () => setDispositions([...dispositions, { id: Date.now().toString(), name: "", category: "NEUTRAL" }]);
+  const updateDisposition = (id: string, field: Partial<Disposition>) => setDispositions(dispositions.map(d => d.id === id ? { ...d, ...field } : d));
+  const removeDisposition = (id: string) => setDispositions(dispositions.filter(d => d.id !== id));
+  
+  const addQualityParameter = () => setQualityParameters([...qualityParameters, { id: Date.now().toString(), name: "", max_score: 5, failure_type: "NON_FATAL", scoring_type: "MANUAL", rules_and_explanation: "" }]);
   const updateQualityParameter = (id: string, param: Partial<QualityParameter>) => setQualityParameters(qualityParameters.map(p => p.id === id ? { ...p, ...param } : p));
   const removeQualityParameter = (id: string) => setQualityParameters(qualityParameters.filter(p => p.id !== id));
-  const addDisposition = () => setDispositions([...dispositions, ""]);
-  const updateDisposition = (index: number, value: string) => setDispositions(dispositions.map((d, i) => i === index ? value : d));
-  const removeDisposition = (index: number) => setDispositions(dispositions.filter((_, i) => i !== index));
 
-  const totalScore = qualityParameters.reduce((sum, param) => sum + param.maxScore, 0);
+  if (isLoading) {
+    return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><CircularProgress /></Box>;
+  }
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
@@ -249,7 +203,7 @@ function GoalEditorContent() {
                 <Tab icon={<Score />} label="Quality Scorecard" value={3} iconPosition="start" />
               </Tabs>
             </Box>
-            <CardContent sx={{ p: 0 }}>
+            <CardContent sx={{ p: 0, '& .MuiTableCell-root': { p: 1 } }}>
               {activeTab === 0 && (
                  <Box sx={{ p: 3 }}>
                     <Typography variant="h5" fontWeight={600} gutterBottom sx={{ mb: 3 }}>Goal Configuration</Typography>
@@ -288,30 +242,25 @@ function GoalEditorContent() {
                   <TableContainer component={Paper} variant="outlined">
                     <Table>
                       <TableHead>
-                        <TableRow sx={{ backgroundColor: 'action.hover' }}>
-                          <TableCell>Attribute</TableCell>
-                          <TableCell>Data Type</TableCell>
-                          <TableCell>Options/Validation</TableCell>
-                          <TableCell>Elicitation Prompt</TableCell>
-                          <TableCell>Required</TableCell>
-                          <TableCell>Weight</TableCell>
-                          <TableCell>Actions</TableCell>
+                        <TableRow sx={{ '& .MuiTableCell-root': { fontWeight: 600, backgroundColor: 'action.hover' }}}>
+                          <TableCell>Attribute Name</TableCell><TableCell>Data Type</TableCell><TableCell>Elicitation Prompt</TableCell>
+                          <TableCell align="center">Required</TableCell><TableCell align="center">PII</TableCell><TableCell>Weight</TableCell><TableCell>Actions</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
                         {dataFields.map((field) => (
                           <TableRow key={field.id}>
-                            <TableCell><TextField size="small" value={field.attribute} onChange={(e) => updateDataField(field.id, { attribute: e.target.value })} fullWidth /></TableCell>
-                            <TableCell>
+                            <TableCell><TextField size="small" value={field.attribute_name} onChange={(e) => updateDataField(field.id, { attribute_name: e.target.value })} fullWidth /></TableCell>
+                            <TableCell sx={{ minWidth: 150 }}>
                               <FormControl size="small" fullWidth>
-                                <Select value={field.dataType} onChange={(e) => updateDataField(field.id, { dataType: e.target.value })}>
+                                <Select value={field.data_type} onChange={(e) => updateDataField(field.id, { data_type: e.target.value as DataType })}>
                                   <MenuItem value="TEXT">Text</MenuItem><MenuItem value="NUMBER">Number</MenuItem><MenuItem value="BOOLEAN">Boolean</MenuItem><MenuItem value="SELECT">Select</MenuItem>
                                 </Select>
                               </FormControl>
                             </TableCell>
-                            <TableCell><TextField size="small" value={field.options} onChange={(e) => updateDataField(field.id, { options: e.target.value })} fullWidth /></TableCell>
-                            <TableCell><TextField size="small" value={field.elicitationPrompt} onChange={(e) => updateDataField(field.id, { elicitationPrompt: e.target.value })} fullWidth /></TableCell>
-                            <TableCell><Checkbox checked={field.required} onChange={(e) => updateDataField(field.id, { required: e.target.checked })} /></TableCell>
+                            <TableCell><TextField size="small" value={field.elicitation_prompt || ''} onChange={(e) => updateDataField(field.id, { elicitation_prompt: e.target.value })} fullWidth /></TableCell>
+                            <TableCell align="center"><Checkbox checked={field.is_required} onChange={(e) => updateDataField(field.id, { is_required: e.target.checked })} /></TableCell>
+                            <TableCell align="center"><Checkbox checked={field.is_pii} onChange={(e) => updateDataField(field.id, { is_pii: e.target.checked })} /></TableCell>
                             <TableCell><TextField size="small" type="number" value={field.weight} onChange={(e) => updateDataField(field.id, { weight: parseInt(e.target.value) || 0 })} sx={{ width: 80 }} /></TableCell>
                             <TableCell><MuiIconButton size="small" color="error" onClick={() => removeDataField(field.id)}><Delete /></MuiIconButton></TableCell>
                           </TableRow>
@@ -328,7 +277,7 @@ function GoalEditorContent() {
                     <Grid size={{xs:12,md:6}}>
                       <Card variant="outlined"><CardContent>
                         <Typography variant="h6" gutterBottom>Analytics Models</Typography>
-                        <Stack spacing={2}>
+                        <Stack spacing={1}>
                           <FormControlLabel control={<Checkbox checked={sentimentAnalysis} onChange={(e) => setSentimentAnalysis(e.target.checked)}/>} label="Sentiment Analysis"/>
                           <FormControlLabel control={<Checkbox checked={intentExtraction} onChange={(e) => setIntentExtraction(e.target.checked)}/>} label="Intent Extraction"/>
                           <FormControlLabel control={<Checkbox checked={emergentTopics} onChange={(e) => setEmergentTopics(e.target.checked)}/>} label="Emergent Topics Detection"/>
@@ -338,14 +287,20 @@ function GoalEditorContent() {
                     <Grid size={{xs:12,md:6}}>
                       <Card variant="outlined"><CardContent>
                         <Typography variant="h6" gutterBottom>Disposition Configuration</Typography>
-                        <Stack spacing={1}>
-                          {dispositions.map((disposition, index) => (
-                            <Box key={index} sx={{ display: 'flex', gap: 1 }}>
-                              <TextField size="small" value={disposition} onChange={(e) => updateDisposition(index, e.target.value)} fullWidth />
-                              <MuiIconButton size="small" color="error" onClick={() => removeDisposition(index)}><Delete /></MuiIconButton>
+                        <Stack spacing={1.5}>
+                          {dispositions.map((disp) => (
+                            <Box key={disp.id} sx={{ display: 'flex', gap: 1 }}>
+                              <TextField size="small" label="Name" value={disp.name} onChange={(e) => updateDisposition(disp.id, {name: e.target.value})} fullWidth />
+                              <FormControl size="small" sx={{minWidth: 120}}>
+                                <InputLabel>Category</InputLabel>
+                                <Select value={disp.category} onChange={(e) => updateDisposition(disp.id, {category: e.target.value as DispositionCategory})} label="Category">
+                                  <MenuItem value="SUCCESS">Success</MenuItem><MenuItem value="FAILURE">Failure</MenuItem><MenuItem value="NEUTRAL">Neutral</MenuItem>
+                                </Select>
+                              </FormControl>
+                              <MuiIconButton size="small" color="error" onClick={() => removeDisposition(disp.id)}><Delete /></MuiIconButton>
                             </Box>
                           ))}
-                          <Button size="small" startIcon={<Add />} onClick={addDisposition} variant="text">Add Disposition</Button>
+                          <Button size="small" startIcon={<Add />} onClick={addDisposition} variant="outlined" sx={{alignSelf: 'flex-start'}}>Add Disposition</Button>
                         </Stack>
                       </CardContent></Card>
                     </Grid>
@@ -355,28 +310,35 @@ function GoalEditorContent() {
               {activeTab === 3 && (
                 <Box sx={{ p: 3 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                    <Box><Typography variant="h5" fontWeight={600}>Quality Parameters</Typography><Typography variant="body2" color="text.secondary">Total Score: {totalScore} points</Typography></Box>
+                    <Box><Typography variant="h5" fontWeight={600}>Quality Scorecard</Typography><Typography variant="body2" color="text.secondary">Total Score: {totalScore} points</Typography></Box>
                     <Button variant="outlined" startIcon={<Add />} onClick={addQualityParameter}>Add Parameter</Button>
                   </Box>
-                  <Alert severity="info" sx={{ mb: 3 }}><AlertTitle>Scoring Rules</AlertTitle>Details about fatal and non-fatal errors...</Alert>
                   <TableContainer component={Paper} variant="outlined">
                     <Table>
-                      <TableHead><TableRow sx={{ backgroundColor: 'action.hover' }}>
-                        <TableCell>Parameter</TableCell><TableCell>Max Score</TableCell><TableCell>Failure Type</TableCell><TableCell>Rules & Explanation</TableCell><TableCell>Actions</TableCell>
+                      <TableHead><TableRow sx={{ '& .MuiTableCell-root': { fontWeight: 600, backgroundColor: 'action.hover' }}}>
+                        <TableCell>Parameter Name</TableCell><TableCell>Scoring Type</TableCell><TableCell>Failure Type</TableCell>
+                        <TableCell>Max Score</TableCell><TableCell sx={{width: '30%'}}>Rules & Explanation</TableCell><TableCell>Actions</TableCell>
                       </TableRow></TableHead>
                       <TableBody>
                         {qualityParameters.map((param) => (
                           <TableRow key={param.id}>
-                            <TableCell><TextField size="small" value={param.parameter} onChange={(e) => updateQualityParameter(param.id, { parameter: e.target.value })} fullWidth /></TableCell>
-                            <TableCell><TextField size="small" type="number" value={param.maxScore} onChange={(e) => updateQualityParameter(param.id, { maxScore: parseInt(e.target.value) || 0 })} sx={{ width: 100 }} /></TableCell>
-                            <TableCell>
+                            <TableCell><TextField size="small" value={param.name} onChange={(e) => updateQualityParameter(param.id, { name: e.target.value })} fullWidth /></TableCell>
+                            <TableCell sx={{ minWidth: 180 }}>
                               <FormControl size="small" fullWidth>
-                                <Select value={param.failureType} onChange={(e) => updateQualityParameter(param.id, { failureType: e.target.value })}>
+                                <Select value={param.scoring_type} onChange={(e) => updateQualityParameter(param.id, { scoring_type: e.target.value as ScoringType })}>
+                                  <MenuItem value="MANUAL">Manual</MenuItem><MenuItem value="AUTO_KEYWORD">Auto Keyword</MenuItem><MenuItem value="AUTO_SENTIMENT">Auto Sentiment</MenuItem><MenuItem value="AUTO_COMPLETENESS">Auto Completeness</MenuItem>
+                                </Select>
+                              </FormControl>
+                            </TableCell>
+                            <TableCell sx={{ minWidth: 150 }}>
+                              <FormControl size="small" fullWidth>
+                                <Select value={param.failure_type} onChange={(e) => updateQualityParameter(param.id, { failure_type: e.target.value as FailureType })}>
                                   <MenuItem value="NON_FATAL">Non-Fatal</MenuItem><MenuItem value="FATAL">Fatal</MenuItem>
                                 </Select>
                               </FormControl>
                             </TableCell>
-                            <TableCell><TextField size="small" multiline rows={2} value={param.rules} onChange={(e) => updateQualityParameter(param.id, { rules: e.target.value })} fullWidth /></TableCell>
+                            <TableCell><TextField size="small" type="number" value={param.max_score} onChange={(e) => updateQualityParameter(param.id, { max_score: parseInt(e.target.value) || 0 })} sx={{ width: 80 }} /></TableCell>
+                            <TableCell><TextField size="small" value={param.rules_and_explanation || ''} onChange={(e) => updateQualityParameter(param.id, { rules_and_explanation: e.target.value })} fullWidth /></TableCell>
                             <TableCell><MuiIconButton size="small" color="error" onClick={() => removeQualityParameter(param.id)}><Delete /></MuiIconButton></TableCell>
                           </TableRow>
                         ))}
@@ -395,7 +357,7 @@ function GoalEditorContent() {
 
 export default function GoalEditorPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><CircularProgress /></Box>}>
       <GoalEditorContent />
     </Suspense>
   );
