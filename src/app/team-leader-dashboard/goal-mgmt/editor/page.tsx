@@ -339,7 +339,7 @@ function GoalEditorContent() {
                   </Typography>
 
                   <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
+                    <Grid size={{xs:12, md:6}}>
                       <TextField
                         fullWidth
                         label="Goal Name"
@@ -366,7 +366,7 @@ function GoalEditorContent() {
                         sx={{ mb: 2 }}
                       />
                     </Grid>
-                    <Grid item xs={12} md={6}>
+                    <Grid size={{xs:12, md:6}}>
                       <FormControl fullWidth sx={{ mb: 2 }}>
                         <InputLabel>Default Assigned Team</InputLabel>
                         <Select
@@ -529,7 +529,7 @@ function GoalEditorContent() {
                   </Typography>
 
                   <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
+                    <Grid size={{xs:12, md:6}}>
                       <Card variant="outlined">
                         <CardContent>
                           <Typography variant="h6" gutterBottom>
@@ -567,7 +567,7 @@ function GoalEditorContent() {
                         </CardContent>
                       </Card>
                     </Grid>
-                    <Grid item xs={12} md={6}>
+                    <Grid size={{xs:12, md:6}}>
                       <Card variant="outlined">
                         <CardContent>
                           <Typography variant="h6" gutterBottom>
