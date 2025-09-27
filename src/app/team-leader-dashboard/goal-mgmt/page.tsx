@@ -135,11 +135,11 @@ export default function GoalManagementPage() {
             <Card sx={{ transition: 'all 0.2s ease-in-out', '&:hover': { transform: 'translateY(-4px)', boxShadow: 4 } }}>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
-                  <Box sx={{ flex: '1 1 40%', minWidth: 300 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+                  <Box sx={{ flex: '1 1 50%', minWidth: 300 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'nowrap', overflow: 'hidden' }}>
                       <Typography variant="h6" fontWeight={600}>{goal.goal_name}</Typography>
-                        <Chip label={`Published: v${goal.published_version_no}`} size="small" color="success" icon={<PlayArrow sx={{ fontSize: 16 }} />} />
-                        <Chip label={`Draft: v${goal.draft_version_no}`} size="small" color="default" icon={<Pause sx={{ fontSize: 16 }} />} />
+                        <Chip label={`Published: ${goal.published_version_no != null ? `v${goal.published_version_no}` : 'None'}`} size="small" color="success" icon={<PlayArrow sx={{ fontSize: 16 }} />} />
+                        <Chip label={`Draft: ${goal.draft_version_no != null ? `v${goal.draft_version_no}` : 'None'}`} size="small" color="default" icon={<Pause sx={{ fontSize: 16 }} />} />
                     </Box>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>{goal.description}</Typography>
                     <Typography variant="caption" color="text.secondary">
