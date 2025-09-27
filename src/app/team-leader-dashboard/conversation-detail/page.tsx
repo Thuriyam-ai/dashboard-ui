@@ -81,7 +81,6 @@ interface ConversationDetail {
   callObjectives: string[];
   outcomes: string[];
   audioUrl: string;
-  evaluationScore: number | null;
 }
 
 /**
@@ -118,41 +117,6 @@ export default function ConversationDetailPage() {
     callObjectives: ["Resolve login issue", "Provide security guidance", "Ensure customer satisfaction"],
     outcomes: ["Issue resolved", "Customer educated", "Follow-up scheduled"],
     audioUrl: "/mock-audio/conversation-001.mp3",
-    evaluationScore: 88,
-  };
-
-  // State for the editable Evaluation Score feature
-  const [evaluationScore, setEvaluationScore] = useState<number | null>(conversationDetail.evaluationScore);
-  const [editedScore, setEditedScore] = useState<number>(conversationDetail.evaluationScore ?? 75);
-  const [isEditingScore, setIsEditingScore] = useState<boolean>(conversationDetail.evaluationScore === null);
-
-  const handleScoreInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // Handle empty input gracefully
-    if (event.target.value === "") {
-      setEditedScore(0);
-      return;
-    }
-
-    let value = parseInt(event.target.value, 10);
-
-    // Enforce 0-100 boundaries
-    if (value < 0) value = 0;
-    if (value > 100) value = 100;
-
-    setEditedScore(value);
-  };
-
-  const handleSaveScore = () => {
-    console.log("Saving new evaluation score:", editedScore);
-    setEvaluationScore(editedScore);
-    setIsEditingScore(false);
-    // In a real application, you would make an API call here.
-  };
-
-  const handleCancelEdit = () => {
-    // Reset input to the last saved score
-    setEditedScore(evaluationScore ?? 75);
-    setIsEditingScore(false);
   };
 
   const handleViewChange = (newView: string) => {
@@ -233,47 +197,6 @@ export default function ConversationDetailPage() {
                 </Box>
                 <LinearProgress variant="determinate" value={conversationDetail.lcaScore} sx={{ mt: 1, height: 8, borderRadius: 4 }} color={conversationDetail.lcaScore >= 80 ? "success" : "warning"} />
               </CardContent></Card>
-            </Grid>
-
-            {/* UPDATED: Editable Evaluation Score Card with TextField */}
-            <Grid item xs={12} sm={6} md={3}>
-              <Card>
-                <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
-                  {isEditingScore ? (
-                    <>
-                      <Typography color="text.secondary" gutterBottom>Set Evaluation Score</Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, my: 2 }}>
-                        <Psychology sx={{ fontSize: 40, color: 'text.secondary' }} />
-                        <TextField
-                          label="Score"
-                          type="number"
-                          value={editedScore}
-                          onChange={handleScoreInputChange}
-                          InputProps={{ inputProps: { min: 0, max: 100, step: 1 } }}
-                          variant="outlined"
-                          size="small"
-                          sx={{ flexGrow: 1 }}
-                        />
-                      </Box>
-                      <Box sx={{ display: 'flex', gap: 1, mt: 'auto' }}>
-                        <Button variant="outlined" size="small" onClick={handleCancelEdit} fullWidth>Cancel</Button>
-                        <Button variant="contained" size="small" onClick={handleSaveScore} fullWidth>Save</Button>
-                      </Box>
-                    </>
-                  ) : (
-                    <>
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Typography color="text.secondary">Evaluation Score</Typography>
-                        <Button size="small" startIcon={<Edit sx={{ fontSize: 16 }} />} onClick={() => setIsEditingScore(true)}>Edit</Button>
-                      </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
-                        <Typography variant="h4" fontWeight={700} color="info.main">{evaluationScore}</Typography>
-                        <Psychology sx={{ fontSize: 40, color: 'info.main' }} />
-                      </Box>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
             </Grid>
 
             <Grid item xs={12} sm={6} md={3}>
