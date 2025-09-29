@@ -86,7 +86,7 @@ export default function ConversationsPage() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [activeTab, setActiveTab] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [campaignFilter, setCampaignFilter] = useState("all");
   const [teamFilter, setTeamFilter] = useState("all");
   const { logout } = useAuth();
 
@@ -190,6 +190,17 @@ export default function ConversationsPage() {
     },
   ];
 
+  const campaignOptions = [
+    {
+      id: "Customer Support",
+      name: "Customer Support",
+    },
+    {
+      id: "Sales",
+      name: "Sales",
+    },
+  ];
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
@@ -237,10 +248,10 @@ export default function ConversationsPage() {
       conv.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       conv.id.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesStatus = statusFilter === "all" || conv.status === statusFilter;
+    const matchesCampaign = campaignFilter === "all" || conv.campaign === campaignFilter;
     const matchesTeam = teamFilter === "all" || conv.team === teamFilter;
     
-    return matchesSearch && matchesStatus && matchesTeam;
+    return matchesSearch && matchesCampaign && matchesTeam;
   });
 
   const completedConversations = conversations.filter(c => c.status === "completed");
@@ -341,16 +352,18 @@ export default function ConversationsPage() {
                 />
                 
                 <FormControl sx={{ minWidth: 150 }}>
-                  <InputLabel>Status</InputLabel>
+                  <InputLabel>Campaign</InputLabel>
                   <Select
-                    value={statusFilter}
-                    label="Status"
-                    onChange={(e) => setStatusFilter(e.target.value)}
+                    value={campaignFilter}
+                    label="Campaign"
+                    onChange={(e) => setCampaignFilter(e.target.value)}
                   >
-                    <MenuItem value="all">All Status</MenuItem>
-                    <MenuItem value="completed">Completed</MenuItem>
-                    <MenuItem value="in-progress">In Progress</MenuItem>
-                    <MenuItem value="failed">Failed</MenuItem>
+                    <MenuItem value="all">All Campaigns</MenuItem>
+                    {campaignOptions.map((campaign) => (
+                      <MenuItem key={campaign.id} value={campaign.id}>
+                        {campaign.name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
 
@@ -373,7 +386,7 @@ export default function ConversationsPage() {
                   startIcon={<Refresh />}
                   onClick={() => {
                     setSearchTerm("");
-                    setStatusFilter("all");
+                    setCampaignFilter("all");
                     setTeamFilter("all");
                   }}
                 >
@@ -393,7 +406,7 @@ export default function ConversationsPage() {
 
           {/* Key Metrics Cards */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -411,7 +424,7 @@ export default function ConversationsPage() {
               </Card>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -429,7 +442,7 @@ export default function ConversationsPage() {
               </Card>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -447,7 +460,7 @@ export default function ConversationsPage() {
               </Card>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -545,9 +558,9 @@ export default function ConversationsPage() {
                             size="small"
                             startIcon={<Visibility />}
                             variant="outlined"
-      onClick={() => {
-        router.push('/team-leader-dashboard/conversation-detail');
-      }}
+                            onClick={() => {
+                              router.push('/team-leader-dashboard/conversation-detail');
+                            }}
                           >
                             View Details
                           </Button>

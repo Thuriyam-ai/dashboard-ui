@@ -28,14 +28,17 @@ import {
   LinearProgress,
   Alert,
   AlertTitle,
+  FormControl,
+  InputLabel,
+  Select,
+  SelectChangeEvent,
+  Grid,
+  TextField,
 } from "@mui/material";
 import {
   BookmarkBorder,
   MoreVert,
   Logout,
-  Dashboard,
-  SupervisorAccount,
-  KeyboardArrowDown,
   TrendingUp,
   TrendingDown,
   Warning,
@@ -56,6 +59,9 @@ import { useAuth } from "@/contexts/auth-context";
 export default function CallQualityAnalyticsPage() {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedCampaign, setSelectedCampaign] = useState<string>("None");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
   const { logout } = useAuth();
 
   const handleViewChange = (newView: string) => {
@@ -75,6 +81,34 @@ export default function CallQualityAnalyticsPage() {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  // Mock data for campaigns and their dates
+  const campaigns = [
+    { id: "employer-feedback", name: "Employer Feedback Campaign" },
+    { id: "job-seeker-onboarding", name: "Job Seeker Onboarding" },
+    { id: "premium-plan-upsell", name: "Premium Plan Upsell" },
+    { id: "reactivation-drive", name: "Reactivation Drive" },
+  ];
+
+  const campaignDateMap: { [key: string]: { start: string; end: string } } = {
+    "employer-feedback": { start: "2025-09-01", end: "2025-09-30" },
+    "job-seeker-onboarding": { start: "2025-10-01", end: "2025-10-31" },
+    "premium-plan-upsell": { start: "2025-09-15", end: "2025-10-15" },
+    "reactivation-drive": { start: "2025-11-01", end: "2025-11-30" },
+  };
+  
+  const handleCampaignChange = (event: SelectChangeEvent<string>) => {
+    const campaignId = event.target.value;
+    setSelectedCampaign(campaignId);
+
+    if (campaignId && campaignDateMap[campaignId]) {
+      setStartDate(campaignDateMap[campaignId].start);
+      setEndDate(campaignDateMap[campaignId].end);
+    } else {
+      setStartDate("");
+      setEndDate("");
+    }
   };
 
   // Mock data for call quality metrics
@@ -274,6 +308,55 @@ export default function CallQualityAnalyticsPage() {
             </Typography>
           </Alert>
 
+          {/* Campaign & Date Selector */}
+          <Card sx={{ mb: 4 }}>
+            <CardContent>
+              <Grid container spacing={2} alignItems="center">
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <FormControl fullWidth>
+                    <InputLabel id="campaign-select-label">Campaign</InputLabel>
+                    <Select
+                      labelId="campaign-select-label"
+                      id="campaign-select"
+                      value={selectedCampaign}
+                      label="Campaign"
+                      onChange={handleCampaignChange}
+                    >
+                      <MenuItem key="None" value="None">
+                        <em>None</em>
+                      </MenuItem>
+                      {campaigns.map((campaign) => (
+                        <MenuItem key={campaign.id} value={campaign.id}>
+                          {campaign.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <TextField
+                    fullWidth
+                    disabled
+                    id="start-date"
+                    label="Start Date"
+                    value={startDate}
+                    InputLabelProps={{ shrink: !!startDate }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                   <TextField
+                    fullWidth
+                    disabled
+                    id="end-date"
+                    label="End Date"
+                    value={endDate}
+                    InputLabelProps={{ shrink: !!endDate }}
+                  />
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+
           {/* Key Metrics Cards */}
           <Box sx={{ 
             display: 'grid', 
@@ -400,7 +483,7 @@ export default function CallQualityAnalyticsPage() {
                           </Typography>
                         </TableCell>
                         <TableCell align="center">
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
                             <LinearProgress 
                               variant="determinate" 
                               value={item.adherence} 
