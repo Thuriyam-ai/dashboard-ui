@@ -121,7 +121,7 @@ function GoalEditorContent() {
     setIsSaving(true);
     
     const payload: GoalCreateRequest = {
-      organization_id: "org-123", // Replace with actual org ID from context or session
+      organization_id: "org-1",
       owner_id: ownerId,
       name: goalName,
       description: description,

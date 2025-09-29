@@ -103,10 +103,10 @@ function CampaignEditorContent() {
 
     try {
       if (isEditing && campaignId) {
-        const payload: CampaignUpdate = { name: campaignName, team_id: selectedTeamId, starts_at, ends_at };
+        const payload: CampaignUpdate = { name: campaignName, team_id: selectedTeamId, starts_at, ends_at, business_objective: "TBD", status: "UPCOMING" };
         await updateCampaign(campaignId, payload);
       } else {
-        const payload: CampaignCreate = { name: campaignName, goal_id: selectedGoalId, team_id: selectedTeamId, starts_at, ends_at };
+        const payload: CampaignCreate = { name: campaignName, goal_id: selectedGoalId, team_id: selectedTeamId, starts_at, ends_at, business_objective: "TBD", status: "UPCOMING", organization_id: "org-1" };
         await createCampaign(payload);
       }
       handleBack();
@@ -118,7 +118,7 @@ function CampaignEditorContent() {
     }
   };
   
-  const selectedGoalData = availableGoals.find(goal => goal.goal_id === selectedGoalId);
+  const selectedGoalData = availableGoals.find(goal => goal.goal_name === selectedGoalId);
   const selectedTeamData = availableTeams.find(team => team.id === selectedTeamId);
 
   if (isLoading) {
@@ -166,7 +166,7 @@ function CampaignEditorContent() {
                     <InputLabel>Goal Selection</InputLabel>
                     <Select value={selectedGoalId} onChange={(e) => setSelectedGoalId(e.target.value)} label="Goal Selection" disabled={isEditing}>
                       {availableGoals.map((goal) => (
-                        <MenuItem key={goal.goal_id} value={goal.goal_id}>
+                        <MenuItem key={goal.goal_name} value={goal.goal_id}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Psychology sx={{ fontSize: 16 }} /><Typography variant="body2">{goal.goal_name} (v{goal.active_version_no})</Typography></Box>
                         </MenuItem>
                       ))}

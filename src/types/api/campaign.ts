@@ -27,11 +27,14 @@ export interface CampaignDetail extends Campaign {
  * Payload for creating a new campaign.
  */
 export interface CampaignCreate {
+  organization_id: string;
   name: string;
   goal_id: string;
   team_id: string;
   starts_at?: string | null;
   ends_at?: string | null;
+  business_objective: string;
+  status: 'UPCOMING' | 'ACTIVE' | 'COMPLETED' | 'CANCELED' | 'ARCHIVED';
 }
 
 /**
@@ -42,4 +45,6 @@ export interface CampaignUpdate {
   team_id?: string;
   starts_at?: string | null;
   ends_at?: string | null;
+  business_objective?: string;
+  status?: 'UPCOMING' | 'ACTIVE' | 'COMPLETED' | 'CANCELED' | 'ARCHIVED';
 }
