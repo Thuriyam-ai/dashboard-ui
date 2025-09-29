@@ -7,7 +7,6 @@ node_modules
 
 # Build output from local development
 .next
-out
 
 # Environment files
 .env.local
