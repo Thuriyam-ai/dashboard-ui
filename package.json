@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:prod": "next build",
     "start": "next start",
     "lint": "next lint",
     "build:gh-pages": "next build && touch out/.nojekyll && git add -f out/ && git commit -m 'Fix navigation links to include basePath for GitHub Pages' && git subtree push --prefix out origin gh-pages"
