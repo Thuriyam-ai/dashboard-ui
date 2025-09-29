@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import styles from "./lca-panel.module.scss";
-import { DistributionPlots } from "@/components/team-dashboard/distribution-plots";
-import { CoachingLeaderboards } from "@/components/team-dashboard/coaching-leaderboards";
-import { RadarChart } from "@/components/team-dashboard/radar-chart";
+import { DistributionPlots } from "@/components/dashboard";
+import { CoachingLeaderboards } from "@/components/dashboard";
+import { RadarChart } from "@/components/dashboard";
 
 interface LCAMetrics {
   linguisticComplexity: number;

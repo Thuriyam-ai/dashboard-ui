@@ -1,92 +1,147 @@
-# Dashboard Components
+# Team Dashboard Components
 
-This directory contains the components for the BotConfig Admin Dashboard, implementing a modern admin interface similar to the reference design.
+This directory contains the components for the Team Dashboard, implementing aggregated team/campaign analytics with leaderboards, trend analysis, and filtering capabilities.
 
 ## Components
 
-### Sidebar
+### TeamFilters
 
-- **Purpose**: Navigation sidebar with dark theme
+- **Purpose**: Filtering component for Team, Campaign, and Date Range
 - **Features**:
-  - BotConfig branding with logo
-  - Management section with navigation items
-  - Active state highlighting
-  - Responsive design
-  - Analytics item (replacing Agent Analytics as requested)
+  - Team selection (All Teams, Customer Support, Sales, Technical Support)
+  - Campaign filtering (All Campaigns, Holiday Sale, Product Launch, etc.)
+  - Date range selection (Last 7/30/90 days, Custom range)
+  - Active filters display with removal capability
+  - Reset filters functionality
 
-### MetricsCards
+### Leaderboards
 
-- **Purpose**: Key metrics display cards
+- **Purpose**: Agent performance rankings and comparisons
 - **Features**:
-  - Four metric cards: Active Bots, Deployments Today, Active Users, Issues
-  - Color-coded icons and trends
-  - Hover animations
-  - Responsive grid layout
+  - **Best Talk-to-Listen Ratio**: Rankings based on optimal ratios (40-60%)
+  - **Lowest Interruptions**: Rankings by interruption count
+  - **Highest Quality Score**: Rankings by conversation quality
+  - Medal icons for top 3 performers (Gold, Silver, Bronze)
+  - Indian agent names (Priya Sharma, Arjun Patel, Kavya Reddy, etc.)
+  - Team color coding and hover effects
 
-### RecentDeployments
+### TrendAnalysis
 
-- **Purpose**: Recent bot deployments list
+- **Purpose**: Time-based trend analysis widgets
 - **Features**:
-  - Indian agent names (Priya, Arjun, Kavya)
-  - Status indicators (success, pending, failed)
-  - Environment and version information
-  - Timestamps
-  - Interactive hover effects
+  - Summary cards showing average metrics
+  - Trend indicators (Increasing, Decreasing, Stable)
+  - Interactive bar chart for Talk-to-Listen ratio trends
+  - 15-day trend visualization
+  - Performance indicators with color coding
 
-### SystemHealth
+### TeamMetrics
 
-- **Purpose**: System health metrics with progress bars
+- **Purpose**: Team performance overview metrics
 - **Features**:
-  - API Response Time tracking
-  - Bot Availability monitoring
-  - Error Rate visualization
-  - Color-coded progress bars
-  - Status indicators
+  - Active Agents count
+  - Average Quality Score
+  - Total Conversations
+  - Average Duration
+  - Interruption Rate
+  - Customer Satisfaction score
+  - Change indicators with trend icons
+
+## Requirements Fulfilled
+
+### ✅ FR-DV-4.4: Leaderboards & Comparisons
+
+- Agent leaderboards for best Talk-to-Listen ratios
+- Rankings for lowest interruption counts
+- Performance comparisons across teams
+- Medal system for top performers
+
+### ✅ FR-DV-4.5: Trend Analysis
+
+- Time-based trend widgets
+- Average talk ratio trends over time
+- Performance metrics visualization
+- Interactive charts and indicators
+
+### ✅ FR-DV-4.6: Filtering
+
+- Team-based filtering (Customer Support, Sales, Technical Support)
+- Campaign filtering (Holiday Sale, Product Launch, etc.)
+- Date range filtering (7/30/90 days, custom range)
+- Active filters display and management
 
 ## Indian Agent Names Used
 
-- **Priya Customer Support Bot** - Customer support operations
-- **Arjun Sales Assistant Bot** - Sales and lead generation
-- **Kavya FAQ Bot** - Frequently asked questions handling
+### Agents
 
-## Navigation Items
+- **Priya Sharma** - Customer Support (Top performer)
+- **Arjun Patel** - Sales Team
+- **Kavya Reddy** - Technical Support (Quality leader)
+- **Rajesh Kumar** - Customer Support
+- **Sneha Singh** - Sales Team
 
-1. **Dashboard** - Overview & Analytics (currently active)
-2. **Agent Configurations** - Deploy & Configure Agents
-3. **Access Management** - Users & Permissions
-4. **Platform Settings** - System Configuration
-5. **Observability** - Monitoring & Analytics
-6. **Developer Hub** - APIs & Documentation
-7. **Analytics** - Performance & Intelligence (replaced Agent Analytics)
+### Teams
+
+- **Customer Support** - Blue theme
+- **Sales** - Green theme
+- **Technical Support** - Purple theme
+
+## Data Structure
+
+### Agent Interface
+
+```typescript
+interface Agent {
+  id: string;
+  name: string;
+  team: string;
+  talkToListenRatio: number;
+  interruptions: number;
+  qualityScore: number;
+  totalConversations: number;
+  avgDuration: string;
+}
+```
+
+### Trend Data Interface
+
+```typescript
+interface TrendData {
+  date: string;
+  talkRatio: number;
+  interruptions: number;
+  qualityScore: number;
+  totalConversations: number;
+}
+```
 
 ## Usage
 
 ```tsx
-import { Sidebar, MetricsCards, RecentDeployments, SystemHealth } from '@/components/dashboard';
+import { TeamFilters, Leaderboards, TrendAnalysis, TeamMetrics } from '@/components/team-dashboard';
 
-// Use in your dashboard page
-<Sidebar />
-<MetricsCards />
-<RecentDeployments />
-<SystemHealth />
+// Use in Team Dashboard page
+<TeamFilters />
+<TeamMetrics />
+<Leaderboards />
+<TrendAnalysis />
 ```
 
-## Styling
+## Navigation Structure
 
-All components use SCSS modules with:
+### Analytics Sidebar (Nested)
 
-- Dark sidebar theme (#1a202c)
-- Light main content area
-- Consistent color palette
-- Smooth animations and transitions
-- Responsive design patterns
-- Modern card-based layouts
+1. **Analytics** (Parent)
+   - **Overview** - Conversation analysis (`/analytics`)
+   - **Team Dashboard** - Team & campaign analytics (`/team-dashboard`)
 
 ## Features Implemented
 
-- ✅ Dark sidebar navigation with Analytics item
-- ✅ Key metrics cards with Indian agent names
-- ✅ Recent deployments with status indicators
-- ✅ System health monitoring with progress bars
+- ✅ Nested sidebar navigation for Analytics
+- ✅ Team Dashboard with comprehensive filtering
+- ✅ Agent leaderboards with Indian names
+- ✅ Trend analysis with interactive charts
+- ✅ Team metrics overview
 - ✅ Responsive design and hover effects
-- ✅ Modern admin dashboard styling
+- ✅ Color-coded performance indicators
+- ✅ Medal system for top performers

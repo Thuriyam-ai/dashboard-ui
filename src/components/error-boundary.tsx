@@ -1,6 +1,8 @@
 "use client";
 
 import React from 'react';
+import { Alert, AlertTitle, Button, Box, Typography } from '@mui/material';
+import { ErrorOutline } from '@mui/icons-material';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -38,30 +40,26 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
       }
 
       return (
-        <div style={{ 
-          padding: '20px', 
-          border: '1px solid #e53e3e', 
-          borderRadius: '8px', 
-          backgroundColor: '#fed7d7',
-          color: '#c53030',
-          margin: '20px'
-        }}>
-          <h2>Something went wrong</h2>
-          <p>An error occurred while rendering this component.</p>
-          <button 
-            onClick={this.resetError}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#e53e3e',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
+        <Box sx={{ m: 3 }}>
+          <Alert 
+            severity="error" 
+            icon={<ErrorOutline />}
+            sx={{ mb: 2 }}
           >
-            Try again
-          </button>
-        </div>
+            <AlertTitle>Something went wrong</AlertTitle>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              An error occurred while rendering this component.
+            </Typography>
+            <Button 
+              onClick={this.resetError}
+              variant="contained"
+              color="error"
+              size="small"
+            >
+              Try again
+            </Button>
+          </Alert>
+        </Box>
       );
     }
 
