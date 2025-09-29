@@ -1,0 +1,107 @@
+// MetricCard component styles - converted from Tailwind CSS
+
+.metricCard {
+  background-color: white;
+  border-radius: 0.75rem; // rounded-xl
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); // shadow-sm
+  border: 1px solid #f3f4f6; // border-gray-100
+  padding: 1.5rem; // p-6
+  transition: all 0.2s ease; // transition-all duration-200
+
+  &:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); // hover:shadow-md
+    transform: translateY(-4px); // hover:-translate-y-1
+  }
+}
+
+.cardContent {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.cardMain {
+  flex: 1;
+}
+
+.iconContainer {
+  width: 3rem; // w-12
+  height: 3rem; // h-12
+  border-radius: 0.5rem; // rounded-lg
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem; // mb-4
+
+  &.blue {
+    background-color: rgba(59, 130, 246, 0.1); // bg-blue-500 bg-opacity-10
+    color: #3b82f6; // text-blue-500
+  }
+
+  &.emerald {
+    background-color: rgba(16, 185, 129, 0.1); // bg-emerald-500 bg-opacity-10
+    color: #10b981; // text-emerald-500
+  }
+
+  &.purple {
+    background-color: rgba(139, 92, 246, 0.1); // bg-purple-500 bg-opacity-10
+    color: #8b5cf6; // text-purple-500
+  }
+}
+
+.metricTitle {
+  color: #6b7280; // text-gray-600
+  font-size: 0.875rem; // text-sm
+  font-weight: 500; // font-medium
+  margin-bottom: 0.25rem; // mb-1
+  margin: 0;
+}
+
+.metricValue {
+  font-size: 1.875rem; // text-3xl
+  font-weight: 700; // font-bold
+  color: #111827; // text-gray-900
+  margin-bottom: 0.5rem; // mb-2
+  margin: 0;
+}
+
+.changeContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem; // space-x-1
+}
+
+.changeValue {
+  font-size: 0.875rem; // text-sm
+  font-weight: 500; // font-medium
+
+  &.positive {
+    color: #10b981; // text-emerald-500
+  }
+
+  &.negative {
+    color: #ef4444; // text-red-500
+  }
+
+  &.neutral {
+    color: #6b7280; // text-gray-500
+  }
+}
+
+.changeLabel {
+  color: #6b7280; // text-gray-500
+  font-size: 0.875rem; // text-sm
+}
+
+.trendIcon {
+  width: 0.875rem; // size-14 equivalent
+  height: 0.875rem;
+
+  &.positive {
+    color: #10b981; // text-emerald-500
+  }
+
+  &.negative {
+    color: #ef4444; // text-red-500
+  }
+}

@@ -1,0 +1,355 @@
+// Call Quality Analytics Styles
+.callQualityContainer {
+  flex: 1;
+  background-color: #f9fafb; // bg-gray-50
+  padding: 2rem; // p-8
+}
+
+.header {
+  margin-bottom: 2rem; // mb-8
+}
+
+.headerTitle {
+  font-size: 2.25rem; // text-4xl
+  font-weight: 700; // font-bold
+  color: #111827; // text-gray-900
+  margin-bottom: 0.5rem; // mb-2
+}
+
+.headerSubtitle {
+  color: #4b5563; // text-gray-600
+  font-size: 1.125rem; // text-lg
+}
+
+.scoringRulesCard {
+  background-color: #eff6ff; // bg-blue-50
+  border: 1px solid #bfdbfe; // border-blue-200
+  border-radius: 0.5rem; // rounded-lg
+  padding: 1.5rem; // p-6
+  margin-bottom: 2rem; // mb-8
+}
+
+.scoringRulesContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem; // space-x-3
+}
+
+.scoringRulesIcon {
+  width: 1.25rem; // w-5
+  height: 1.25rem; // h-5
+  color: #2563eb; // text-blue-600
+  margin-top: 0.125rem; // mt-0.5
+}
+
+.scoringRulesTitle {
+  font-size: 1.125rem; // text-lg
+  font-weight: 600; // font-semibold
+  color: #1e3a8a; // text-blue-900
+  margin-bottom: 0.5rem; // mb-2
+}
+
+.scoringRulesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem; // space-y-1
+}
+
+.scoringRulesItem {
+  font-size: 0.875rem; // text-sm
+  color: #1e40af; // text-blue-800
+
+  strong {
+    font-weight: 600;
+  }
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr)); // grid-cols-1
+  gap: 1.5rem; // gap-6
+  margin-bottom: 2rem; // mb-8
+
+  @media (min-width: 768px) { // md breakpoint
+    grid-template-columns: repeat(4, minmax(0, 1fr)); // md:grid-cols-4
+  }
+}
+
+.metricCard {
+  background-color: white;
+  border-radius: 0.75rem; // rounded-xl
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); // shadow-sm
+  border: 1px solid #f3f4f6; // border-gray-100
+  padding: 1.5rem; // p-6
+}
+
+.metricCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem; // mb-4
+}
+
+.metricCardIcon {
+  width: 3rem; // w-12
+  height: 3rem; // h-12
+  border-radius: 0.5rem; // rounded-lg
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.blueIcon {
+    background-color: rgba(59, 130, 246, 0.1); // bg-blue-500 bg-opacity-10
+  }
+
+  &.greenIcon {
+    background-color: rgba(16, 185, 129, 0.1); // bg-green-500 bg-opacity-10
+  }
+
+  &.redIcon {
+    background-color: rgba(239, 68, 68, 0.1); // bg-red-500 bg-opacity-10
+  }
+}
+
+.metricCardIconSvg {
+  width: 1.25rem; // size={20}
+  height: 1.25rem;
+
+  &.blueIcon {
+    color: #3b82f6; // text-blue-500
+  }
+
+  &.greenIcon {
+    color: #10b981; // text-green-500
+  }
+
+  &.redIcon {
+    color: #ef4444; // text-red-500
+  }
+}
+
+.metricCardTitle {
+  color: #4b5563; // text-gray-600
+  font-size: 0.875rem; // text-sm
+  font-weight: 500; // font-medium
+  margin-bottom: 0.25rem; // mb-1
+}
+
+.metricCardValue {
+  font-size: 2.25rem; // text-4xl
+  font-weight: 700; // font-bold
+
+  &.blueValue {
+    color: #2563eb; // text-blue-600
+  }
+
+  &.greenValue {
+    color: #059669; // text-green-600
+  }
+
+  &.redValue {
+    color: #dc2626; // text-red-600
+  }
+}
+
+.analysisCard {
+  background-color: white;
+  border-radius: 0.75rem; // rounded-xl
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); // shadow-sm
+  border: 1px solid #f3f4f6; // border-gray-100
+  padding: 1.5rem; // p-6
+  margin-bottom: 2rem; // mb-8
+}
+
+.analysisTitle {
+  font-size: 1.25rem; // text-xl
+  font-weight: 600; // font-semibold
+  color: #111827; // text-gray-900
+  margin-bottom: 1.5rem; // mb-6
+}
+
+.analysisTable {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+}
+
+.tableHeader {
+  border-bottom: 1px solid #e5e7eb; // border-b border-gray-200
+}
+
+.tableHeaderCell {
+  text-align: left;
+  padding: 0.75rem 1rem; // py-3 px-4
+  font-weight: 500; // font-medium
+  color: #374151; // text-gray-700
+}
+
+.tableBody {
+  // Default styles
+}
+
+.tableRow {
+  border-bottom: 1px solid #f3f4f6; // divide-y divide-gray-100
+}
+
+.tableCell {
+  padding: 1rem; // py-4 px-4
+}
+
+.parameterName {
+  font-weight: 500; // font-medium
+  color: #111827; // text-gray-900
+  margin-bottom: 0.25rem;
+}
+
+.parameterDescription {
+  font-size: 0.875rem; // text-sm
+  color: #6b7280; // text-gray-500
+}
+
+.parameterScore {
+  color: #374151; // text-gray-700
+}
+
+.parameterCurrentScore {
+  font-weight: 600; // font-semibold
+  color: #111827; // text-gray-900
+}
+
+.parameterBadge {
+  padding: 0.25rem 0.5rem; // px-2 py-1
+  font-size: 0.75rem; // text-xs
+  font-weight: 500; // font-medium
+  border-radius: 9999px; // rounded-full
+
+  &.nonFatal {
+    background-color: #fed7aa; // bg-orange-100
+    color: #c2410c; // text-orange-700
+  }
+
+  &.fatal {
+    background-color: #fecaca; // bg-red-100
+    color: #dc2626; // text-red-700
+  }
+}
+
+.adherenceContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; // space-x-2
+}
+
+.adherenceBar {
+  width: 4rem; // w-16
+  background-color: #e5e7eb; // bg-gray-200
+  border-radius: 9999px; // rounded-full
+  height: 0.5rem; // h-2
+}
+
+.adherenceFill {
+  height: 0.5rem; // h-2
+  border-radius: 9999px; // rounded-full
+
+  &.orange {
+    background-color: #f97316; // bg-orange-500
+  }
+
+  &.green {
+    background-color: #10b981; // bg-green-500
+  }
+}
+
+.adherenceText {
+  font-size: 0.875rem; // text-sm
+  font-weight: 500; // font-medium
+  color: #374151; // text-gray-700
+}
+
+.trendIcon {
+  width: 1rem; // w-4
+  height: 1rem; // h-4
+
+  &.up {
+    color: #10b981; // text-green-500
+  }
+
+  &.down {
+    color: #ef4444; // text-red-500
+  }
+}
+
+.summaryCard {
+  background-color: white;
+  border-radius: 0.75rem; // rounded-xl
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); // shadow-sm
+  border: 1px solid #f3f4f6; // border-gray-100
+  padding: 1.5rem; // p-6
+}
+
+.summaryTitle {
+  font-size: 1.25rem; // text-xl
+  font-weight: 600; // font-semibold
+  color: #111827; // text-gray-900
+  margin-bottom: 1.5rem; // mb-6
+}
+
+.agentCell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; // space-x-3
+}
+
+.agentAvatar {
+  width: 2rem; // w-8
+  height: 2rem; // h-8
+  background-color: #3b82f6; // bg-blue-500
+  border-radius: 9999px; // rounded-full
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.agentAvatarIcon {
+  width: 1rem; // size={16}
+  height: 1rem;
+  color: white;
+}
+
+.agentName {
+  font-weight: 500; // font-medium
+  color: #111827; // text-gray-900
+}
+
+.agentScore {
+  font-size: 1.125rem; // text-lg
+  font-weight: 600; // font-semibold
+
+  &.orange {
+    color: #ea580c; // text-orange-600
+  }
+
+  &.green {
+    color: #059669; // text-green-600
+  }
+}
+
+.agentStatus {
+  padding: 0.25rem 0.75rem; // px-3 py-1
+  font-size: 0.875rem; // text-sm
+  font-weight: 500; // font-medium
+  border-radius: 9999px; // rounded-full
+
+  &.excellent {
+    background-color: #dcfce7; // bg-green-100
+    color: #15803d; // text-green-700
+  }
+
+  &.good {
+    background-color: #fed7aa; // bg-orange-100
+    color: #c2410c; // text-orange-700
+  }
+}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Shield, Mail, Lock, AlertCircle } from 'lucide-react';
 import './login-page.scss'; // You can reuse the styles
-import { useAuth } from '@/contexts/auth-context';
+import { useAuth } from '../../contexts/auth-context';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');

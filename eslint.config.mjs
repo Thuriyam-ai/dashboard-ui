@@ -1,4 +1,7 @@
 import js from "@eslint/js";
+import globals from "globals";
+import reactHooks from "eslint-plugin-react-hooks";
+import tseslint from "typescript-eslint";
 
 import { dirname } from "path";
 import { fileURLToPath } from "url";
@@ -14,6 +17,28 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  // bolt-new style configuration for TypeScript files
+  {
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+    },
+    plugins: {
+      'react-hooks': reactHooks,
+    },
+    rules: {
+      ...reactHooks.configs.recommended.rules,
+      // bolt-new style rules
+      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      // Enhanced TypeScript rules from bolt-new
+      '@typescript-eslint/prefer-const': 'error',
+      '@typescript-eslint/no-var-requires': 'error',
+    },
+  },
+  // Next.js specific configuration
   ...compat.config({
     extends: [
       "eslint:recommended",
@@ -42,7 +67,6 @@ const eslintConfig = [
         "@typescript-eslint/restrict-template-expressions": "off",
         "@typescript-eslint/no-unnecessary-condition": "off",
         "@typescript-eslint/prefer-optional-chain": "off",
-        "@typescript-eslint/no-unused-vars": "warn",
         "react/no-unescaped-entities": "off",
         "jsdoc/require-jsdoc": "off",
       },

@@ -1,0 +1,355 @@
+.sidebarContainer {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f7fafc; /* bg-gray-100 */
+}
+
+.sidebar {
+  width: 80px; /* w-20 */
+  flex-shrink: 0;
+  background: linear-gradient(to bottom, #581c87, #6b21a8, #581c87); /* bg-gradient-to-b from-purple-900 via-purple-800 to-purple-900 */
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0; /* py-4 */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* shadow-2xl */
+  border-right: none;
+  position: fixed; /* Make sidebar fixed */
+  height: 100vh; /* Full height */
+  z-index: 1000; /* Ensure it's above other content */
+}
+
+.logoSection {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px; /* mb-8 */
+}
+
+.logoIcon {
+  width: 48px; /* w-12 */
+  height: 48px; /* h-12 */
+  background: linear-gradient(to bottom right, #3b82f6, #7c3aed); /* bg-gradient-to-br from-blue-500 to-purple-600 */
+  border-radius: 12px; /* rounded-xl */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+}
+
+.logoInner {
+  width: 24px;
+  height: 24px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoDot {
+  width: 12px; /* w-3 */
+  height: 12px; /* h-3 */
+  background-color: #3b82f6; /* bg-blue-500 */
+  border-radius: 9999px; /* rounded-full */
+}
+
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 80px; /* Account for fixed sidebar width */
+  width: calc(100% - 80px); /* Full width minus sidebar */
+}
+
+.header {
+  background: linear-gradient(to right, #581c87, #6b21a8, #581c87) !important; /* bg-gradient-to-r from-purple-900 via-purple-800 to-purple-900 */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important; /* shadow-lg */
+  padding: 24px !important; /* p-6 */
+}
+
+.headerContent {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 !important; /* Remove default toolbar padding */
+}
+
+.headerLeft {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important; /* space-x-4 */
+}
+
+.headerTitle {
+  font-size: 1.5rem !important; /* text-2xl */
+  font-weight: 700 !important; /* font-bold */
+  color: white !important; /* text-white */
+}
+
+.contentArea {
+  flex-grow: 1;
+  padding: 24px; /* p-6 */
+}
+
+.userSelector {
+  position: relative;
+}
+
+.selectorButton {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important; /* space-x-3 */
+  background-color: rgba(255, 255, 255, 0.1) !important; /* bg-white/10 */
+  backdrop-filter: blur(4px) !important; /* backdrop-blur-sm */
+  border: 1px solid rgba(255, 255, 255, 0.2) !important; /* border border-white/20 */
+  border-radius: 8px !important; /* rounded-lg */
+  padding: 8px 16px !important; /* px-4 py-2 */
+  transition: all 0.2s ease-in-out !important; /* transition-all duration-200 */
+  color: white !important; /* text-white */
+  cursor: pointer !important;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important; /* hover:bg-white/20 */
+  }
+}
+
+.selectorAvatar {
+  width: 32px !important; /* w-8 */
+  height: 32px !important; /* h-8 */
+  background: linear-gradient(to bottom right, #60a5fa, #a855f7) !important; /* bg-gradient-to-br from-blue-400 to-purple-500 */
+  border-radius: 9999px !important; /* rounded-full */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.selectorIcon {
+  width: 16px !important; /* w-4 */
+  height: 16px !important; /* h-4 */
+  color: white !important; /* text-white */
+}
+
+.navSection {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 0 16px;
+}
+
+.navItems {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.navItem {
+  position: relative;
+
+  &:hover .tooltip {
+    opacity: 1;
+  }
+}
+
+.navButton {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 200ms ease !important;
+  position: relative !important;
+  border: none !important;
+  cursor: pointer !important;
+  min-width: auto !important;
+  padding: 0 !important;
+}
+
+.navButtonActive {
+  background: white !important;
+  color: #7c3aed !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+  transform: scale(1.05) !important;
+}
+
+.navButtonInactive {
+  color: white !important; /* Make icons visible by default */
+  background: rgba(255, 255, 255, 0.1) !important; /* Add background by default */
+
+  &:hover {
+    color: white !important;
+    background: rgba(255, 255, 255, 0.2) !important; /* Darker background on hover */
+  }
+}
+
+.activeIndicator {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 32px;
+  background: white;
+  border-top-right-radius: 9999px;
+  border-bottom-right-radius: 9999px;
+}
+
+.tooltip {
+  position: absolute;
+  left: 64px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #1a202c;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+  z-index: 50;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.tooltipLabel {
+  font-weight: 500;
+}
+
+.tooltipDescription {
+  font-size: 0.75rem;
+  color: #d1d5db;
+  margin-top: 4px;
+}
+
+.tooltipArrow {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) translateX(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background: #1a202c;
+  z-index: -1;
+}
+
+.addButtonSection {
+  margin-top: 32px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.addButton {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 9999px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 200ms ease !important;
+  min-width: auto !important;
+  padding: 0 !important;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    transform: scale(1.05) !important;
+  }
+}
+
+.userSection {
+  margin-top: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.userAvatar {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 12px !important;
+  background: linear-gradient(to bottom right, #34d399, #60a5fa) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.userIcon {
+  color: white !important;
+}
+
+.userInfo {
+  text-align: left;
+}
+
+.userRole {
+  color: #e9d5ff !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+}
+
+.chevron {
+  color: white;
+  transition: transform 200ms ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  margin-top: 8px;
+}
+
+.dropdownPaper {
+  width: 256px !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+.userList {
+  padding: 8px !important;
+}
+
+.userOption {
+  border-radius: 8px !important;
+  transition: background-color 200ms ease !important;
+  margin-bottom: 4px !important;
+
+  &:last-child {
+    margin-bottom: 0 !important;
+  }
+}
+
+.userOptionActive {
+  background: #f3e8ff !important;
+  color: #581c87 !important;
+}
+
+.optionAvatar {
+  width: 32px !important;
+  height: 32px !important;
+  background: linear-gradient(to bottom right, #60a5fa, #a855f7) !important;
+  border-radius: 9999px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.optionIcon {
+  color: white !important;
+}
+
+.optionInfo {
+  text-align: left;
+}
+
+.optionRole {
+  font-size: 0.75rem !important;
+  color: #718096 !important;
+}

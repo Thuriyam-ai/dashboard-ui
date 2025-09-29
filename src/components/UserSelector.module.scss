@@ -1,0 +1,127 @@
+// UserSelector component styles - converted from Tailwind CSS
+
+.userSelector {
+  position: relative;
+}
+
+.selectorButton {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; // space-x-3
+  background-color: rgba(255, 255, 255, 0.1); // bg-white/10
+  backdrop-filter: blur(4px); // backdrop-blur-sm
+  border: 1px solid rgba(255, 255, 255, 0.2); // border border-white/20
+  border-radius: 0.5rem; // rounded-lg
+  padding: 0.5rem 1rem; // px-4 py-2
+  transition: all 0.2s ease; // transition-all duration-200
+  color: white; // text-white
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.2); // hover:bg-white/20
+  }
+}
+
+.selectorAvatar {
+  width: 2rem; // w-8
+  height: 2rem; // h-8
+  background: linear-gradient(to bottom right, #60a5fa, #a855f7); // bg-gradient-to-br from-blue-400 to-purple-500
+  border-radius: 9999px; // rounded-full
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.selectorIcon {
+  width: 1rem; // w-4
+  height: 1rem; // h-4
+  color: white; // text-white
+}
+
+.userInfo {
+  text-align: left;
+}
+
+.userRole {
+  color: #e9d5ff; // text-purple-200
+  font-size: 0.75rem; // text-xs
+}
+
+.chevron {
+  color: white;
+  transition: transform 0.2s ease; // transition-transform
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  position: absolute;
+  right: 0;
+  margin-top: 0.5rem; // mt-2
+  width: 16rem; // w-64
+  background: rgba(255, 255, 255, 0.95); // bg-white/95
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2); // border border-white/20
+  border-radius: 0.5rem; // rounded-lg
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); // shadow-xl
+  z-index: 50;
+}
+
+.userList {
+  padding: 0.5rem; // p-2
+}
+
+.userOption {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; // space-x-3
+  padding: 0.75rem; // p-3
+  border-radius: 0.5rem; // rounded-lg
+  transition: background-color 0.15s ease; // transition-colors
+  margin-bottom: 0.25rem; // mb-1
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &.active {
+    background: #f3e8ff; // bg-purple-100
+    color: #581c87; // text-purple-900
+  }
+
+  &.inactive {
+    color: #374151; // text-gray-700
+
+    &:hover {
+      background: #f3f4f6; // hover:bg-gray-100
+    }
+  }
+}
+
+.optionAvatar {
+  width: 2rem; // w-8
+  height: 2rem; // h-8
+  background: linear-gradient(to bottom right, #60a5fa, #a855f7); // bg-gradient-to-br from-blue-400 to-purple-500
+  border-radius: 9999px; // rounded-full
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.optionIcon {
+  width: 1rem; // w-4
+  height: 1rem; // h-4
+  color: white; // text-white
+}
+
+.optionInfo {
+  text-align: left;
+}
+
+.optionRole {
+  font-size: 0.75rem; // text-xs
+  color: #6b7280; // text-gray-500
+}

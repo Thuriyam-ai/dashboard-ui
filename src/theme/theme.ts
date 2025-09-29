@@ -1,26 +1,25 @@
 import { createTheme } from '@mui/material/styles';
 
-// Create a custom theme that matches your current design
 export const theme = createTheme({
   palette: {
     primary: {
-      main: '#3182ce', // Your current blue color
+      main: '#3182ce',
       light: '#63b3ed',
       dark: '#2c5aa0',
     },
     secondary: {
-      main: '#38a169', // Your current green color
+      main: '#38a169',
       light: '#68d391',
       dark: '#2f855a',
     },
     error: {
-      main: '#e53e3e', // Your current red color
+      main: '#e53e3e',
     },
     warning: {
-      main: '#dd6b20', // Your current orange color
+      main: '#dd6b20',
     },
     background: {
-      default: '#f7fafc', // Your current background color
+      default: '#f7fafc',
       paper: '#ffffff',
     },
     text: {
@@ -31,91 +30,43 @@ export const theme = createTheme({
   typography: {
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
     h1: {
-      fontSize: '2.25rem',
       fontWeight: 700,
-      lineHeight: 1.2,
     },
     h2: {
-      fontSize: '1.875rem',
       fontWeight: 600,
-      lineHeight: 1.3,
     },
     h3: {
-      fontSize: '1.5rem',
       fontWeight: 600,
-      lineHeight: 1.4,
     },
     h4: {
-      fontSize: '1.25rem',
       fontWeight: 600,
-      lineHeight: 1.4,
     },
     h5: {
-      fontSize: '1.125rem',
       fontWeight: 600,
-      lineHeight: 1.4,
     },
     h6: {
-      fontSize: '1rem',
       fontWeight: 600,
-      lineHeight: 1.4,
-    },
-    body1: {
-      fontSize: '1rem',
-      lineHeight: 1.5,
-    },
-    body2: {
-      fontSize: '0.875rem',
-      lineHeight: 1.5,
     },
   },
   shape: {
-    borderRadius: 8, // Match your current border radius
+    borderRadius: 8,
   },
   components: {
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-          border: '1px solid #e2e8f0',
-          '&:hover': {
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-          },
-        },
-      },
-    },
     MuiButton: {
       styleOverrides: {
         root: {
           textTransform: 'none',
           borderRadius: 8,
-          fontWeight: 500,
         },
       },
     },
-    MuiChip: {
+    MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 6,
+          borderRadius: 12,
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
         },
       },
-    },
-  },
-});
-
-// Dark theme variant
-export const darkTheme = createTheme({
-  ...theme,
-  palette: {
-    ...theme.palette,
-    mode: 'dark',
-    background: {
-      default: '#1a202c',
-      paper: '#2d3748',
-    },
-    text: {
-      primary: '#f7fafc',
-      secondary: '#a0aec0',
     },
   },
 });

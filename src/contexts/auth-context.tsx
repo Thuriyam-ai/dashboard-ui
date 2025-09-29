@@ -1,3 +1,5 @@
+"use client";
+
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 
 // Define the shape of the context data
@@ -26,14 +28,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true); // Start true to check localStorage
   const [error, setError] = useState<string>('');
+  const [isClient, setIsClient] = useState<boolean>(false);
 
   useEffect(() => {
+    // Set client flag to true after hydration
+    setIsClient(true);
+    
     // Check for saved authentication state on initial load
     const savedAuth = localStorage.getItem('botconfig_auth');
     if (savedAuth) {
-      const authData = JSON.parse(savedAuth);
-      if (allowedEmails.includes(authData.email)) {
-        setIsAuthenticated(true);
+      try {
+        const authData = JSON.parse(savedAuth);
+        if (allowedEmails.includes(authData.email)) {
+          setIsAuthenticated(true);
+        }
+      } catch (e) {
+        // Invalid stored data, clear it
+        localStorage.removeItem('botconfig_auth');
       }
     }
     setIsLoading(false); // Finished initial check

@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { LoaderCircle } from 'lucide-react';
 import { Button } from '@mui/material';
-import { useAuth } from '@/contexts/auth-context';
-import LoginPage from '@/components/login/login-page';
+import { useAuth } from '../../contexts/auth-context';
+import LoginPage from '../login/login-page';
 import './auth-guard.scss';
 import { Logout } from '@mui/icons-material';
 
