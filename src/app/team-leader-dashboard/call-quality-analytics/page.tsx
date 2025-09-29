@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
@@ -34,6 +34,7 @@ import {
   SelectChangeEvent,
   Grid,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import {
   BookmarkBorder,
@@ -50,6 +51,8 @@ import {
   Schedule,
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
+import { getAllCampaigns } from "@/data/services/campaign-service";
+import { Campaign } from "@/types/api/campaign";
 
 /**
  * Call Quality Analytics page component displaying comprehensive call quality metrics
@@ -64,10 +67,30 @@ export default function CallQualityAnalyticsPage() {
   const [endDate, setEndDate] = useState<string>("");
   const { logout } = useAuth();
 
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [loadingCampaigns, setLoadingCampaigns] = useState<boolean>(true);
+  const [campaignError, setCampaignError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        setLoadingCampaigns(true);
+        const fetchedCampaigns = await getAllCampaigns();
+        setCampaigns(fetchedCampaigns);
+        setCampaignError(null);
+      } catch (error) {
+        console.error("Failed to fetch campaigns for filter:", error);
+        setCampaignError("Could not load campaigns.");
+      } finally {
+        setLoadingCampaigns(false);
+      }
+    };
+
+    fetchCampaigns();
+  }, []);
+
   const handleViewChange = (newView: string) => {
     setAnchorEl(null);
-    
-    // Navigate to the appropriate page based on view selection
     if (newView === "generic") {
       router.push('/dashboard');
     } else if (newView === "team-lead") {
@@ -82,29 +105,21 @@ export default function CallQualityAnalyticsPage() {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-
-  // Mock data for campaigns and their dates
-  const campaigns = [
-    { id: "employer-feedback", name: "Employer Feedback Campaign" },
-    { id: "job-seeker-onboarding", name: "Job Seeker Onboarding" },
-    { id: "premium-plan-upsell", name: "Premium Plan Upsell" },
-    { id: "reactivation-drive", name: "Reactivation Drive" },
-  ];
-
-  const campaignDateMap: { [key: string]: { start: string; end: string } } = {
-    "employer-feedback": { start: "2025-09-01", end: "2025-09-30" },
-    "job-seeker-onboarding": { start: "2025-10-01", end: "2025-10-31" },
-    "premium-plan-upsell": { start: "2025-09-15", end: "2025-10-15" },
-    "reactivation-drive": { start: "2025-11-01", end: "2025-11-30" },
-  };
   
   const handleCampaignChange = (event: SelectChangeEvent<string>) => {
     const campaignId = event.target.value;
     setSelectedCampaign(campaignId);
 
-    if (campaignId && campaignDateMap[campaignId]) {
-      setStartDate(campaignDateMap[campaignId].start);
-      setEndDate(campaignDateMap[campaignId].end);
+    if (campaignId === "None") {
+      setStartDate("");
+      setEndDate("");
+      return;
+    }
+
+    const selected = campaigns.find(c => c.id === campaignId);
+    if (selected) {
+      setStartDate(selected.starts_at ? selected.starts_at.substring(0, 10) : "");
+      setEndDate(selected.ends_at ? selected.ends_at.substring(0, 10) : "");
     } else {
       setStartDate("");
       setEndDate("");
@@ -313,7 +328,7 @@ export default function CallQualityAnalyticsPage() {
             <CardContent>
               <Grid container spacing={2} alignItems="center">
                 <Grid size={{ xs: 12, md: 6 }}>
-                  <FormControl fullWidth>
+                  <FormControl fullWidth disabled={loadingCampaigns}>
                     <InputLabel id="campaign-select-label">Campaign</InputLabel>
                     <Select
                       labelId="campaign-select-label"
@@ -322,7 +337,7 @@ export default function CallQualityAnalyticsPage() {
                       label="Campaign"
                       onChange={handleCampaignChange}
                     >
-                      <MenuItem key="None" value="None">
+                      <MenuItem value="None">
                         <em>None</em>
                       </MenuItem>
                       {campaigns.map((campaign) => (
@@ -331,9 +346,11 @@ export default function CallQualityAnalyticsPage() {
                         </MenuItem>
                       ))}
                     </Select>
+                    {loadingCampaigns && <CircularProgress size={24} sx={{ position: 'absolute', top: '50%', right: 40, marginTop: '-12px' }} />}
                   </FormControl>
+                  {campaignError && <Typography color="error" variant="caption">{campaignError}</Typography>}
                 </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, md: 3 }}>
                   <TextField
                     fullWidth
                     disabled
@@ -343,7 +360,7 @@ export default function CallQualityAnalyticsPage() {
                     InputLabelProps={{ shrink: !!startDate }}
                   />
                 </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, md: 3 }}>
                    <TextField
                     fullWidth
                     disabled
