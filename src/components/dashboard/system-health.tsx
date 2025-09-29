@@ -1,6 +1,17 @@
 "use client";
 
-import styles from "./system-health.module.scss";
+import React from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Typography,
+  Box,
+  LinearProgress,
+  Chip,
+  useTheme,
+} from "@mui/material";
+import { Analytics } from "@mui/icons-material";
 
 interface HealthMetric {
   id: string;
@@ -12,6 +23,8 @@ interface HealthMetric {
 }
 
 export function SystemHealth() {
+  const theme = useTheme();
+  
   const healthMetrics: HealthMetric[] = [
     {
       id: "api-response-time",
@@ -39,57 +52,103 @@ export function SystemHealth() {
     },
   ];
 
-  const getProgressColor = (status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "good":
-        return "#38a169";
+        return "success";
       case "warning":
-        return "#dd6b20";
+        return "warning";
       case "critical":
-        return "#e53e3e";
+        return "error";
       default:
-        return "#718096";
+        return "default";
     }
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <div className={styles.headerIcon}>
-          <svg fill="currentColor" viewBox="0 0 24 24">
-            <path d="M3 13h2v8H3v-8zm4-6h2v14H7V7zm4-4h2v18h-2V3zm4 8h2v10h-2V11z" />
-          </svg>
-        </div>
-        <h2 className={styles.title}>System Health</h2>
-      </div>
-
-      <div className={styles.metricsList}>
-        {healthMetrics.map((metric) => (
-          <div key={metric.id} className={styles.metricItem}>
-            <div className={styles.metricHeader}>
-              <div className={styles.metricLabel}>{metric.label}</div>
-              <div className={styles.metricValue}>{metric.value}</div>
-            </div>
-            <div className={styles.progressContainer}>
-              <div className={styles.progressBar}>
-                <div
-                  className={styles.progressFill}
-                  style={{
-                    width: `${metric.progress}%`,
-                    backgroundColor: getProgressColor(metric.status),
+    <Card sx={{ height: "100%" }}>
+      <CardHeader
+        avatar={
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 40,
+              height: 40,
+              backgroundColor: "primary.main",
+              borderRadius: 2,
+              color: "white",
+            }}
+          >
+            <Analytics />
+          </Box>
+        }
+        title={
+          <Typography variant="h6" component="h2" fontWeight={600}>
+            System Health
+          </Typography>
+        }
+        sx={{ pb: 1 }}
+      />
+      
+      <CardContent sx={{ pt: 0 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          {healthMetrics.map((metric) => (
+            <Box key={metric.id}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 1,
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  fontWeight={500}
+                  color="text.primary"
+                >
+                  {metric.label}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ fontSize: "0.75rem" }}
+                >
+                  {metric.value}
+                </Typography>
+              </Box>
+              
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <Box sx={{ flex: 1 }}>
+                  <LinearProgress
+                    variant="determinate"
+                    value={metric.progress}
+                    color={getStatusColor(metric.status)}
+                    sx={{
+                      height: 8,
+                      borderRadius: 4,
+                      backgroundColor: theme.palette.grey[200],
+                    }}
+                  />
+                </Box>
+                
+                <Chip
+                  label={metric.statusText}
+                  color={getStatusColor(metric.status)}
+                  size="small"
+                  sx={{
+                    minWidth: 60,
+                    fontSize: "0.75rem",
+                    fontWeight: 500,
                   }}
                 />
-              </div>
-              <div
-                className={styles.statusText}
-                style={{ color: getProgressColor(metric.status) }}
-              >
-                {metric.statusText}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+      </CardContent>
+    </Card>
   );
 }

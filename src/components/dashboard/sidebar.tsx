@@ -1,5 +1,19 @@
 "use client";
 
+/**
+ * @deprecated This component uses inline sx styles and should be replaced with MuiSidebar.
+ * Use MuiSidebar from "./mui-sidebar" for better consistency with the design system.
+ * 
+ * Migration: Replace imports of Sidebar with MuiSidebar
+ * 
+ * @example
+ * // Old (deprecated)
+ * import { Sidebar } from "./sidebar";
+ * 
+ * // New (recommended)
+ * import { MuiSidebar } from "./mui-sidebar";
+ */
+
 import React, { useState, useEffect } from "react";
 import {
   Box,

@@ -1,0 +1,142 @@
+// SCSS Variables that match MUI Theme
+// This ensures consistency between MUI and SCSS components
+
+:root {
+  // Color Palette (matching MUI theme)
+  --primary-color: #3182ce;
+  --primary-light: #63b3ed;
+  --primary-dark: #2c5aa0;
+  
+  --secondary-color: #38a169;
+  --secondary-light: #68d391;
+  --secondary-dark: #2f855a;
+  
+  --error-color: #e53e3e;
+  --warning-color: #dd6b20;
+  
+  --background-default: #f7fafc;
+  --background-paper: #ffffff;
+  
+  --text-primary: #1a202c;
+  --text-secondary: #4a5568;
+  
+  --divider-color: #e2e8f0;
+  
+  // Spacing Scale (consistent with MUI spacing)
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  
+  // Border Radius (matching MUI theme)
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  
+  // Shadows (matching MUI theme)
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+  
+  // Component-specific variables
+  --sidebar-width: 280px;
+  --header-height: 64px;
+  
+  // Typography
+  --font-family: "Inter", "Roboto", "Helvetica", "Arial", sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  
+  // Font weights
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  // Transitions
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+  
+  // Z-index scale
+  --z-dropdown: 1000;
+  --z-modal: 1300;
+  --z-tooltip: 1500;
+}
+
+// SCSS Variables (for use in SCSS files)
+$primary-color: var(--primary-color);
+$primary-light: var(--primary-light);
+$primary-dark: var(--primary-dark);
+
+$secondary-color: var(--secondary-color);
+$secondary-light: var(--secondary-light);
+$secondary-dark: var(--secondary-dark);
+
+$error-color: var(--error-color);
+$warning-color: var(--warning-color);
+
+$background-default: var(--background-default);
+$background-paper: var(--background-paper);
+
+$text-primary: var(--text-primary);
+$text-secondary: var(--text-secondary);
+
+$divider-color: var(--divider-color);
+
+// Spacing
+$spacing-xs: var(--spacing-xs);
+$spacing-sm: var(--spacing-sm);
+$spacing-md: var(--spacing-md);
+$spacing-lg: var(--spacing-lg);
+$spacing-xl: var(--spacing-xl);
+$spacing-2xl: var(--spacing-2xl);
+
+// Border radius
+$border-radius-sm: var(--border-radius-sm);
+$border-radius-md: var(--border-radius-md);
+$border-radius-lg: var(--border-radius-lg);
+
+// Shadows
+$shadow-sm: var(--shadow-sm);
+$shadow-md: var(--shadow-md);
+$shadow-lg: var(--shadow-lg);
+$shadow-xl: var(--shadow-xl);
+
+// Component dimensions
+$sidebar-width: var(--sidebar-width);
+$header-height: var(--header-height);
+
+// Typography
+$font-family: var(--font-family);
+$font-size-xs: var(--font-size-xs);
+$font-size-sm: var(--font-size-sm);
+$font-size-base: var(--font-size-base);
+$font-size-lg: var(--font-size-lg);
+$font-size-xl: var(--font-size-xl);
+$font-size-2xl: var(--font-size-2xl);
+$font-size-3xl: var(--font-size-3xl);
+
+// Font weights
+$font-weight-normal: var(--font-weight-normal);
+$font-weight-medium: var(--font-weight-medium);
+$font-weight-semibold: var(--font-weight-semibold);
+$font-weight-bold: var(--font-weight-bold);
+
+// Transitions
+$transition-fast: var(--transition-fast);
+$transition-normal: var(--transition-normal);
+$transition-slow: var(--transition-slow);
+
+// Z-index
+$z-dropdown: var(--z-dropdown);
+$z-modal: var(--z-modal);
+$z-tooltip: var(--z-tooltip);
