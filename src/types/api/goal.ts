@@ -30,21 +30,7 @@ export type ScoringType = "MANUAL" | "AUTO_COMPLETENESS" | "AUTO_SENTIMENT" | "A
 
 // --- Schema Types for API Payloads & Responses ---
 
-export interface GoalMetadata {
-  name: string;
-  description: string | null;
-  default_team_id: string | null;
-  owner_id: string;
-  tags: string | null;
-}
-
-export interface InteractionBlueprint {
-  goal_metadata: GoalMetadata;
-  prompt_text: string;
-  dynamic_variables: string;
-}
-
-export interface StructuredDataItem {
+export interface OutcomefieldItem {
   attribute_name: string;
   data_type: DataType;
   configuration?: string;
@@ -55,19 +41,7 @@ export interface StructuredDataItem {
   display_order: number;
 }
 
-export interface DispositionConfigItem {
-  name: string;
-  description: string | null;
-  category: DispositionCategory;
-  display_order: number;
-}
-
-export interface ConversationInsights {
-  conversation_insights_config: { [key: string]: boolean };
-  disposition_config: DispositionConfigItem[];
-}
-
-export interface QualityScorecardItem {
+export interface ScorecardparametersItem {
   name: string;
   max_score: number;
   failure_type: FailureType;
@@ -76,16 +50,41 @@ export interface QualityScorecardItem {
   display_order: number;
 }
 
-// For creating or updating a goal
-export interface GoalCreateRequest {
-  interaction_blueprint: InteractionBlueprint;
-  structured_data: StructuredDataItem[];
-  conversation_insights: ConversationInsights;
-  quality_scorecard: QualityScorecardItem[];
+export interface InsightsItem {
+  name: string;
+  is_enabled: boolean;
+  display_order: number;
 }
+
+export interface DispositionItem {
+  name: string;
+  category: DispositionCategory;
+  display_order: number;
+  description: string | null;
+}
+
+// For creating a new goal (flat structure)
+export interface GoalCreateRequest {
+  organization_id: string;
+  owner_id: string;
+  name: string;
+  description: string | null;
+  team_id: string | null;
+  tags: string | null;
+  prompt_text: string | null;
+  dynamic_variables?: string;
+  model_params?: object | null;
+  output_config?: object | null;
+  outcomefields?: OutcomefieldItem[];
+  scorecardparameters?: ScorecardparametersItem[];
+  insights?: InsightsItem[];
+  dispositions?: DispositionItem[];
+}
+
+// For updating a draft (same as create)
 export type GoalUpdateRequest = GoalCreateRequest;
 
-// For the main goal listing page
+// For the main goal listing page (remains the same)
 export interface GoalDetailResponse {
   goal_id: string;
   goal_name: string;
@@ -100,10 +99,17 @@ export interface GoalDetailResponse {
   draft_version_no: number | null;
 }
 
-// For fetching a specific version to edit
+// For fetching a specific version to edit (flat structure)
 export interface GoalVersionDetailResponse {
-  interaction_blueprint: InteractionBlueprint;
-  structured_data: StructuredDataItem[];
-  conversation_insights: ConversationInsights;
-  quality_scorecard: QualityScorecardItem[];
+  name: string;
+  description: string | null;
+  team_id: string | null;
+  owner_id: string;
+  tags: string | null;
+  prompt_text: string;
+  dynamic_variables: string;
+  outcomefields: OutcomefieldItem[];
+  insights: InsightsItem[];
+  dispositions: DispositionItem[];
+  scorecardparameters: ScorecardparametersItem[];
 }

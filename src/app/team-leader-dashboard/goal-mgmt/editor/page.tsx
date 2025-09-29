@@ -17,7 +17,7 @@ import {
   getOwners, getTeams, createGoal, getGoalVersion, updateDraftVersion,
 } from "@/data/services/goal-service";
 import {
-  Owner, Team, GoalCreateRequest, GoalVersionDetailResponse, DataType, DispositionCategory, FailureType, ScoringType,
+  Owner, Team, GoalCreateRequest, GoalVersionDetailResponse, DataType, DispositionCategory, FailureType, ScoringType, InsightsItem,
 } from "@/types/api/goal";
 
 // State interfaces for the form tables
@@ -54,9 +54,7 @@ function GoalEditorContent() {
   const [assignedTeamId, setAssignedTeamId] = useState("");
   const [systemPrompt, setSystemPrompt] = useState("");
   const [dataFields, setDataFields] = useState<DataField[]>([]);
-  const [sentimentAnalysis, setSentimentAnalysis] = useState(true);
-  const [intentExtraction, setIntentExtraction] = useState(true);
-  const [emergentTopics, setEmergentTopics] = useState(false);
+  const [insights, setInsights] = useState<InsightsItem[]>([]);
   const [dispositions, setDispositions] = useState<Disposition[]>([]);
   const [qualityParameters, setQualityParameters] = useState<QualityParameter[]>([]);
 
@@ -74,23 +72,27 @@ function GoalEditorContent() {
           setIsEditing(true);
           setGoalId(id);
           try {
-            // First, try to get the draft version
             const draftData = await getGoalVersion(id, 'draft');
             populateFormState(draftData);
           } catch (error) {
-            // If draft doesn't exist, get the active version to create a new draft from it
             console.log("No draft found, fetching active version to edit.");
             const activeData = await getGoalVersion(id, 'active');
             populateFormState(activeData);
           }
         } else if (cloneId) { // Clone Mode
-          const versionData = await getGoalVersion(cloneId, 'draft'); // Or 'active' as a fallback
+          const versionData = await getGoalVersion(cloneId, 'draft');
           populateFormState(versionData);
+        } else { // Create Mode
+          setInsights([
+            { name: "Sentiment Analysis", is_enabled: true, display_order: 1 },
+            { name: "Intent Extraction", is_enabled: true, display_order: 2 },
+            { name: "Emergent Topics Detection", is_enabled: false, display_order: 3 },
+          ]);
         }
       } catch (error) {
         console.error("Initialization failed:", error);
         alert("Failed to load goal data for the editor.");
-        router.push('/team-leader-dashboard/goal-mgmt'); // Redirect back on error
+        router.push('/team-leader-dashboard/goal-mgmt');
       } finally {
         setIsLoading(false);
       }
@@ -99,39 +101,37 @@ function GoalEditorContent() {
   }, [searchParams, router]);
 
   const populateFormState = (data: GoalVersionDetailResponse) => {
-    const { interaction_blueprint, structured_data, conversation_insights, quality_scorecard } = data;
-    setGoalName(interaction_blueprint.goal_metadata.name);
-    setDescription(interaction_blueprint.goal_metadata.description || "");
-    setOwnerId(interaction_blueprint.goal_metadata.owner_id);
-    setAssignedTeamId(interaction_blueprint.goal_metadata.default_team_id || "");
-    setTags(interaction_blueprint.goal_metadata.tags || "");
-    setSystemPrompt(interaction_blueprint.prompt_text);
-    setDataFields(structured_data.map(d => ({ ...d, id: Math.random().toString() })));
-    setSentimentAnalysis(conversation_insights.conversation_insights_config.sentiment_analysis ?? false);
-    setIntentExtraction(conversation_insights.conversation_insights_config.intent_extraction ?? false);
-    setEmergentTopics(conversation_insights.conversation_insights_config.emergent_topics_detection ?? false);
-    setDispositions(conversation_insights.disposition_config.map(d => ({ ...d, id: Math.random().toString() })));
-    setQualityParameters(quality_scorecard.map(p => ({ ...p, id: Math.random().toString() })));
+    setGoalName(data.name);
+    setDescription(data.description || "");
+    setOwnerId(data.owner_id);
+    setAssignedTeamId(data.team_id || "");
+    setTags(data.tags || "");
+    setSystemPrompt(data.prompt_text);
+    setDataFields(data.outcomefields.map(d => ({ ...d, id: Math.random().toString() })));
+    setInsights(data.insights);
+    setDispositions(data.dispositions.map(d => ({ ...d, id: Math.random().toString() })));
+    setQualityParameters(data.scorecardparameters.map(p => ({ ...p, id: Math.random().toString() })));
   };
 
   const handleSave = async () => {
-    if (!goalName || !ownerId || !assignedTeamId) {
-        alert("Please fill in Goal Name, Owner, and Assigned Team.");
+    if (!goalName || !ownerId) {
+        alert("Please fill in Goal Name and Owner.");
         return;
     }
     setIsSaving(true);
     
     const payload: GoalCreateRequest = {
-      interaction_blueprint: {
-        goal_metadata: { name: goalName, description, owner_id: ownerId, default_team_id: assignedTeamId, tags },
-        prompt_text: systemPrompt, dynamic_variables: "{}",
-      },
-      structured_data: dataFields.map(({id, ...rest}, i) => ({ ...rest, display_order: i + 1, configuration: '{}' })),
-      conversation_insights: {
-        conversation_insights_config: { sentiment_analysis: sentimentAnalysis, intent_extraction: intentExtraction, emergent_topics_detection: emergentTopics },
-        disposition_config: dispositions.map(({id, ...rest}, i) => ({ ...rest, description: null, display_order: i + 1 })),
-      },
-      quality_scorecard: qualityParameters.map(({id, ...rest}, i) => ({ ...rest, display_order: i + 1 })),
+      organization_id: "org-123", // Replace with actual org ID from context or session
+      owner_id: ownerId,
+      name: goalName,
+      description: description,
+      team_id: assignedTeamId || null,
+      tags: tags,
+      prompt_text: systemPrompt,
+      outcomefields: dataFields.map(({id, ...rest}, i) => ({ ...rest, display_order: i + 1, configuration: '{}' })),
+      insights: insights.map((insight, i) => ({ ...insight, display_order: i + 1})),
+      dispositions: dispositions.map(({id, ...rest}, i) => ({ ...rest, description: null, display_order: i + 1 })),
+      scorecardparameters: qualityParameters.map(({id, ...rest}, i) => ({ ...rest, display_order: i + 1 })),
     };
 
     try {
@@ -156,7 +156,6 @@ function GoalEditorContent() {
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => setActiveTab(newValue);
   const totalScore = qualityParameters.reduce((sum, param) => sum + param.max_score, 0);
   
-  // Handlers for tables (add, update, remove rows)
   const addDataField = () => setDataFields([...dataFields, { id: Date.now().toString(), attribute_name: "", data_type: "TEXT", elicitation_prompt: "", is_pii: false, is_required: false, weight: 10 }]);
   const updateDataField = (id: string, field: Partial<DataField>) => setDataFields(dataFields.map(f => f.id === id ? { ...f, ...field } : f));
   const removeDataField = (id: string) => setDataFields(dataFields.filter(f => f.id !== id));
@@ -168,6 +167,10 @@ function GoalEditorContent() {
   const addQualityParameter = () => setQualityParameters([...qualityParameters, { id: Date.now().toString(), name: "", max_score: 5, failure_type: "NON_FATAL", scoring_type: "MANUAL", rules_and_explanation: "" }]);
   const updateQualityParameter = (id: string, param: Partial<QualityParameter>) => setQualityParameters(qualityParameters.map(p => p.id === id ? { ...p, ...param } : p));
   const removeQualityParameter = (id: string) => setQualityParameters(qualityParameters.filter(p => p.id !== id));
+
+  const handleInsightChange = (name: string, is_enabled: boolean) => {
+    setInsights(insights.map(i => i.name === name ? { ...i, is_enabled } : i));
+  };
 
   if (isLoading) {
     return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><CircularProgress /></Box>;
@@ -209,8 +212,8 @@ function GoalEditorContent() {
                     <Typography variant="h5" fontWeight={600} gutterBottom sx={{ mb: 3 }}>Goal Configuration</Typography>
                     <Grid container spacing={3}>
                       <Grid size={{xs:12,md:6}}>
-                        <TextField fullWidth label="Goal Name" value={goalName} onChange={(e) => setGoalName(e.target.value)} sx={{ mb: 2 }} />
-                        <FormControl fullWidth sx={{ mb: 2 }}>
+                        <TextField fullWidth label="Goal Name" value={goalName} onChange={(e) => setGoalName(e.target.value)} sx={{ mb: 2 }} required />
+                        <FormControl fullWidth sx={{ mb: 2 }} required>
                           <InputLabel>Owner</InputLabel>
                           <Select value={ownerId} onChange={(e) => setOwnerId(e.target.value)} label="Owner">
                             {owners.map((owner) => (<MenuItem key={owner.id} value={owner.id}>{owner.name}</MenuItem>))}
@@ -222,6 +225,7 @@ function GoalEditorContent() {
                         <FormControl fullWidth sx={{ mb: 2 }}>
                           <InputLabel>Default Assigned Team</InputLabel>
                           <Select value={assignedTeamId} onChange={(e) => setAssignedTeamId(e.target.value)} label="Default Assigned Team">
+                            <MenuItem value=""><em>None</em></MenuItem>
                             {teams.map((team) => (<MenuItem key={team.id} value={team.id}>{team.name}</MenuItem>))}
                           </Select>
                         </FormControl>
@@ -236,7 +240,7 @@ function GoalEditorContent() {
               {activeTab === 1 && (
                 <Box sx={{ p: 3 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                    <Typography variant="h5" fontWeight={600}>Data Fields Configuration</Typography>
+                    <Typography variant="h5" fontWeight={600}>Structured Data Capture (Outcome Fields)</Typography>
                     <Button variant="outlined" startIcon={<Add />} onClick={addDataField}>Add Field</Button>
                   </Box>
                   <TableContainer component={Paper} variant="outlined">
@@ -272,24 +276,33 @@ function GoalEditorContent() {
               )}
               {activeTab === 2 && (
                 <Box sx={{ p: 3 }}>
-                  <Typography variant="h5" fontWeight={600} gutterBottom sx={{ mb: 3 }}>Post-Conversation Analytics</Typography>
+                  <Typography variant="h5" fontWeight={600} gutterBottom sx={{ mb: 3 }}>Conversation Insights</Typography>
                   <Grid container spacing={3}>
                     <Grid size={{xs:12,md:6}}>
                       <Card variant="outlined"><CardContent>
-                        <Typography variant="h6" gutterBottom>Analytics Models</Typography>
+                        <Typography variant="h6" gutterBottom>Analytics Models (Insights)</Typography>
                         <Stack spacing={1}>
-                          <FormControlLabel control={<Checkbox checked={sentimentAnalysis} onChange={(e) => setSentimentAnalysis(e.target.checked)}/>} label="Sentiment Analysis"/>
-                          <FormControlLabel control={<Checkbox checked={intentExtraction} onChange={(e) => setIntentExtraction(e.target.checked)}/>} label="Intent Extraction"/>
-                          <FormControlLabel control={<Checkbox checked={emergentTopics} onChange={(e) => setEmergentTopics(e.target.checked)}/>} label="Emergent Topics Detection"/>
+                          {insights.map(insight => (
+                              <FormControlLabel 
+                                key={insight.name}
+                                control={
+                                  <Checkbox 
+                                    checked={insight.is_enabled} 
+                                    onChange={(e) => handleInsightChange(insight.name, e.target.checked)}
+                                  />
+                                } 
+                                label={insight.name}
+                              />
+                          ))}
                         </Stack>
                       </CardContent></Card>
                     </Grid>
                     <Grid size={{xs:12,md:6}}>
                       <Card variant="outlined"><CardContent>
-                        <Typography variant="h6" gutterBottom>Disposition Configuration</Typography>
+                        <Typography variant="h6" gutterBottom>Dispositions</Typography>
                         <Stack spacing={1.5}>
                           {dispositions.map((disp) => (
-                            <Box key={disp.id} sx={{ display: 'flex', gap: 1 }}>
+                            <Box key={disp.id} sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                               <TextField size="small" label="Name" value={disp.name} onChange={(e) => updateDisposition(disp.id, {name: e.target.value})} fullWidth />
                               <FormControl size="small" sx={{minWidth: 120}}>
                                 <InputLabel>Category</InputLabel>
@@ -297,7 +310,7 @@ function GoalEditorContent() {
                                   <MenuItem value="SUCCESS">Success</MenuItem><MenuItem value="FAILURE">Failure</MenuItem><MenuItem value="NEUTRAL">Neutral</MenuItem>
                                 </Select>
                               </FormControl>
-                              <MuiIconButton size="small" color="error" onClick={() => removeDisposition(disp.id)}><Delete /></MuiIconButton>
+                              <MuiIconButton color="error" onClick={() => removeDisposition(disp.id)}><Delete /></MuiIconButton>
                             </Box>
                           ))}
                           <Button size="small" startIcon={<Add />} onClick={addDisposition} variant="outlined" sx={{alignSelf: 'flex-start'}}>Add Disposition</Button>
