@@ -58,6 +58,7 @@ import {
   Download,
   Visibility,
 } from "@mui/icons-material";
+import { useAuth } from "@/contexts/auth-context";
 
 interface Conversation {
   id: string;
@@ -87,6 +88,7 @@ export default function ConversationsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [teamFilter, setTeamFilter] = useState("all");
+  const { logout } = useAuth();
 
   const handleViewChange = (newView: string) => {
     setAnchorEl(null);
@@ -276,49 +278,6 @@ export default function ConversationsPage() {
             </Box>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              {/* View Type Dropdown */}
-              <Chip
-                icon={<SupervisorAccount />}
-                label="Team Lead view"
-                color="secondary"
-                onClick={handleMenuClick}
-                deleteIcon={<KeyboardArrowDown />}
-                onDelete={handleMenuClick}
-                variant="outlined"
-                sx={{
-                  fontWeight: 600,
-                  '& .MuiChip-deleteIcon': {
-                    color: 'inherit',
-                  },
-                }}
-              />
-
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                PaperProps={{
-                  sx: {
-                    mt: 1,
-                    minWidth: 200,
-                  },
-                }}
-              >
-                <MenuItem
-                  onClick={() => handleViewChange("generic")}
-                >
-                  <Dashboard sx={{ mr: 1 }} />
-                  Generic view
-                </MenuItem>
-                <MenuItem
-                  onClick={() => handleViewChange("team-lead")}
-                  selected={true}
-                >
-                  <SupervisorAccount sx={{ mr: 1 }} />
-                  Team Lead view
-                </MenuItem>
-              </Menu>
-
               <IconButton size="small" sx={{ color: 'text.secondary' }}>
                 <BookmarkBorder />
               </IconButton>
@@ -342,6 +301,7 @@ export default function ConversationsPage() {
                 size="small"
                 startIcon={<Logout />}
                 sx={{ ml: 1 }}
+                onClick={logout}
               >
                 Logout
               </Button>
@@ -361,6 +321,75 @@ export default function ConversationsPage() {
               Monitor and analyze team conversations with comprehensive analytics
             </Typography>
           </Box>
+
+          {/* Filters and Search */}
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+                <TextField
+                  placeholder="Search conversations..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{ minWidth: 300 }}
+                />
+                
+                <FormControl sx={{ minWidth: 150 }}>
+                  <InputLabel>Status</InputLabel>
+                  <Select
+                    value={statusFilter}
+                    label="Status"
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                  >
+                    <MenuItem value="all">All Status</MenuItem>
+                    <MenuItem value="completed">Completed</MenuItem>
+                    <MenuItem value="in-progress">In Progress</MenuItem>
+                    <MenuItem value="failed">Failed</MenuItem>
+                  </Select>
+                </FormControl>
+
+                <FormControl sx={{ minWidth: 150 }}>
+                  <InputLabel>Team</InputLabel>
+                  <Select
+                    value={teamFilter}
+                    label="Team"
+                    onChange={(e) => setTeamFilter(e.target.value)}
+                  >
+                    <MenuItem value="all">All Teams</MenuItem>
+                    <MenuItem value="Technical Support">Technical Support</MenuItem>
+                    <MenuItem value="Sales Team">Sales Team</MenuItem>
+                    <MenuItem value="Customer Support">Customer Support</MenuItem>
+                  </Select>
+                </FormControl>
+
+                <Button
+                  variant="outlined"
+                  startIcon={<Refresh />}
+                  onClick={() => {
+                    setSearchTerm("");
+                    setStatusFilter("all");
+                    setTeamFilter("all");
+                  }}
+                >
+                  Reset Filters
+                </Button>
+
+                <Button
+                  variant="contained"
+                  startIcon={<Download />}
+                  sx={{ ml: 'auto' }}
+                >
+                  Export Data
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
 
           {/* Key Metrics Cards */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -436,75 +465,6 @@ export default function ConversationsPage() {
               </Card>
             </Grid>
           </Grid>
-
-          {/* Filters and Search */}
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-                <TextField
-                  placeholder="Search conversations..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Search />
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{ minWidth: 300 }}
-                />
-                
-                <FormControl sx={{ minWidth: 150 }}>
-                  <InputLabel>Status</InputLabel>
-                  <Select
-                    value={statusFilter}
-                    label="Status"
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                  >
-                    <MenuItem value="all">All Status</MenuItem>
-                    <MenuItem value="completed">Completed</MenuItem>
-                    <MenuItem value="in-progress">In Progress</MenuItem>
-                    <MenuItem value="failed">Failed</MenuItem>
-                  </Select>
-                </FormControl>
-
-                <FormControl sx={{ minWidth: 150 }}>
-                  <InputLabel>Team</InputLabel>
-                  <Select
-                    value={teamFilter}
-                    label="Team"
-                    onChange={(e) => setTeamFilter(e.target.value)}
-                  >
-                    <MenuItem value="all">All Teams</MenuItem>
-                    <MenuItem value="Technical Support">Technical Support</MenuItem>
-                    <MenuItem value="Sales Team">Sales Team</MenuItem>
-                    <MenuItem value="Customer Support">Customer Support</MenuItem>
-                  </Select>
-                </FormControl>
-
-                <Button
-                  variant="outlined"
-                  startIcon={<Refresh />}
-                  onClick={() => {
-                    setSearchTerm("");
-                    setStatusFilter("all");
-                    setTeamFilter("all");
-                  }}
-                >
-                  Reset Filters
-                </Button>
-
-                <Button
-                  variant="contained"
-                  startIcon={<Download />}
-                  sx={{ ml: 'auto' }}
-                >
-                  Export Data
-                </Button>
-              </Box>
-            </CardContent>
-          </Card>
 
           {/* Conversations Table */}
           <Card>

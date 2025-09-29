@@ -1,0 +1,22 @@
+name: dashboard-ui
+services:
+  app:
+    command: npm run dev
+    build:
+      context: ../../
+      dockerfile: build/Dockerfile
+    container_name: dashboard
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      # Mount source code for hot reloading
+      - ../../src:/app/src
+      - ../../public:/app/public
+      - ../../next.config.js:/app/next.config.js
+      - ../../tsconfig.json:/app/tsconfig.json
+      - ../../package.json:/app/package.json
+      # node_modules are packaged in the image, no volume needed
+
+    restart: always

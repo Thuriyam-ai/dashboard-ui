@@ -30,14 +30,8 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
 
   const navItems = [
     {
-      id: "overview",
-      label: "Overview",
-      icon: <Dashboard />,
-      path: "/team-dashboard/overview",
-    },
-    {
       id: "call-quality",
-      label: "Call Quality Analytics",
+      label: "Insights",
       icon: <Analytics />,
       path: "/team-leader-dashboard/call-quality-analytics",
     },
@@ -57,21 +51,15 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
       children: [
         {
           id: "goal-mgmt",
-          label: "Goal Mgmt",
+          label: "Goals",
           icon: <Flag />,
           path: "/team-leader-dashboard/goal-mgmt",
         },
         {
           id: "campaign-mgmt",
-          label: "Campaign Mgmt",
+          label: "Campaigns",
           icon: <Campaign />,
           path: "/team-leader-dashboard/campaign-mgmt",
-        },
-        {
-          id: "alert-mgmt",
-          label: "Alert Mgmt",
-          icon: <Notifications />,
-          path: "/team-leader-dashboard/alert-mgmt",
         },
       ],
     },
@@ -162,7 +150,8 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
           mt: '0.25rem',
           fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif',
         }}>
-          MANAGEMENT
+          {/* MANAGEMENT */}
+          ANALYTICS
         </Typography>
         
         <List sx={{ px: 0 }}>
@@ -232,7 +221,7 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
                 fontSize: '0.6875rem',
               }}
             >
-              Config Mgmt
+              CONFIGURATIONS
             </Typography>
             {configurationItems[0].children.map((item) => (
               <ListItem

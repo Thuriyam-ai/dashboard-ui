@@ -46,6 +46,7 @@ import {
   Person,
   Schedule,
 } from "@mui/icons-material";
+import { useAuth } from "@/contexts/auth-context";
 
 /**
  * Call Quality Analytics page component displaying comprehensive call quality metrics
@@ -55,6 +56,7 @@ import {
 export default function CallQualityAnalyticsPage() {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { logout } = useAuth();
 
   const handleViewChange = (newView: string) => {
     setAnchorEl(null);
@@ -212,49 +214,6 @@ export default function CallQualityAnalyticsPage() {
             </Box>
             
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              {/* View Type Dropdown */}
-              <Chip
-                icon={<SupervisorAccount />}
-                label="Team Lead view"
-                color="secondary"
-                onClick={handleMenuClick}
-                deleteIcon={<KeyboardArrowDown />}
-                onDelete={handleMenuClick}
-                variant="outlined"
-                sx={{ 
-                  fontWeight: 600,
-                  '& .MuiChip-deleteIcon': {
-                    color: 'inherit',
-                  },
-                }}
-              />
-
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                PaperProps={{
-                  sx: {
-                    mt: 1,
-                    minWidth: 200,
-                  },
-                }}
-              >
-                <MenuItem 
-                  onClick={() => handleViewChange("generic")}
-                >
-                  <Dashboard sx={{ mr: 1 }} />
-                  Generic view
-                </MenuItem>
-                <MenuItem 
-                  onClick={() => handleViewChange("team-lead")}
-                  selected={true}
-                >
-                  <SupervisorAccount sx={{ mr: 1 }} />
-                  Team Lead view
-                </MenuItem>
-              </Menu>
-
               <IconButton size="small" sx={{ color: 'text.secondary' }}>
                 <BookmarkBorder />
               </IconButton>
@@ -278,6 +237,7 @@ export default function CallQualityAnalyticsPage() {
                 size="small"
                 startIcon={<Logout />}
                 sx={{ ml: 1 }}
+                onClick={logout}
               >
                 Logout
               </Button>

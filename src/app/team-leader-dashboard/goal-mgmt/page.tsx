@@ -1,464 +1,209 @@
+// src/app/team-leader-dashboard/goal-mgmt/page.tsx
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
-  Box,
-  Container,
-  Typography,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Button,
-  Avatar,
-  Card,
-  CardContent,
-  Chip,
-  Menu,
-  MenuItem,
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  FormControlLabel,
-  Checkbox,
-  Alert,
-  AlertTitle,
+  Box, Container, Typography, AppBar, Toolbar, IconButton, Button,
+  Avatar, Card, CardContent, Chip, Grid, Dialog, DialogTitle,
+  DialogContent, DialogActions, Alert, AlertTitle, CircularProgress,
 } from "@mui/material";
 import {
-  BookmarkBorder,
-  MoreVert,
-  Logout,
-  Dashboard,
-  SupervisorAccount,
-  KeyboardArrowDown,
-  Add,
-  Edit,
-  ContentCopy,
-  Delete,
-  PlayArrow,
-  Pause,
-  TrendingUp,
-  Assessment,
-  Group,
-  CheckCircle,
-  Schedule,
+  BookmarkBorder, MoreVert, Logout, Add, Edit, ContentCopy,
+  Delete, PlayArrow, Pause, Assessment, Group, CheckCircle,
 } from "@mui/icons-material";
+import { useAuth } from "@/contexts/auth-context";
+import { getAllGoals, publishDraftVersion, deleteGoal } from "@/data/services/goal-service";
+import { GoalDetailResponse } from "@/types/api/goal";
 
 export default function GoalManagementPage() {
   const router = useRouter();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [goals, setGoals] = useState<GoalDetailResponse[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedGoal, setSelectedGoal] = useState<any>(null);
+  const [selectedGoal, setSelectedGoal] = useState<GoalDetailResponse | null>(null);
+  const { logout } = useAuth();
 
-  const handleViewChange = (newView: string) => {
-    setAnchorEl(null);
-    if (newView === "generic") {
-      router.push('/dashboard');
-    } else if (newView === "team-lead") {
-      router.push('/team-dashboard/overview');
+  const fetchGoals = async () => {
+    try {
+      setIsLoading(true);
+      const data = await getAllGoals();
+      setGoals(data);
+      setError(null);
+    } catch (err) {
+      setError("Failed to fetch goals. Please try again later.");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
+  useEffect(() => {
+    fetchGoals();
+  }, []);
+
+  const handlePublish = async (goalId: string) => {
+    try {
+        await publishDraftVersion(goalId);
+        alert("Draft published successfully!");
+        await fetchGoals();
+    } catch (error) {
+        console.error("Failed to publish draft:", error);
+        alert("Error: Could not publish draft.");
+    }
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
+  const confirmDelete = async () => {
+    if (!selectedGoal) return;
+    try {
+        await deleteGoal(selectedGoal.goal_id);
+        alert(`Goal "${selectedGoal.goal_name}" archived.`);
+        setGoals(goals.filter(g => g.goal_id !== selectedGoal.goal_id));
+    } catch (error) {
+        console.error("Failed to delete goal:", error);
+        alert("Error: Could not delete goal.");
+    } finally {
+        setDeleteDialogOpen(false);
+        setSelectedGoal(null);
+    }
   };
+  
+  const handleCreateGoal = () => router.push('/team-leader-dashboard/goal-mgmt/editor');
+  const handleEditGoal = (goalId: string) => router.push(`/team-leader-dashboard/goal-mgmt/editor?id=${goalId}`);
+  const handleCloneGoal = (goalId: string) => router.push(`/team-leader-dashboard/goal-mgmt/editor?clone=${goalId}`);
+  const handleDeleteGoal = (goal: GoalDetailResponse) => { setSelectedGoal(goal); setDeleteDialogOpen(true); };
 
-  const handleCreateGoal = () => {
-    router.push('/team-leader-dashboard/goal-mgmt/editor');
+  const renderContent = () => {
+    if (isLoading) {
+      return (<Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>);
+    }
+    if (error) {
+      return <Alert severity="error">{error}</Alert>;
+    }
+    if (goals.length === 0) {
+      return (
+        <Box sx={{ textAlign: 'center', py: 8 }}>
+          <Assessment sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
+          <Typography variant="h5" gutterBottom>No Goals Created Yet</Typography>
+          <Button variant="contained" startIcon={<Add />} onClick={handleCreateGoal} size="large">Create Your First Goal</Button>
+        </Box>
+      );
+    }
+    return (
+      <Grid container spacing={2}>
+        {goals.map((goal) => (
+          <Grid size={{xs:12}} key={goal.goal_id}>
+            <Card sx={{ transition: 'all 0.2s ease-in-out', '&:hover': { transform: 'translateY(-4px)', boxShadow: 4 } }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
+                  <Box sx={{ flex: '1 1 50%', minWidth: 300 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+                      <Typography variant="h6" fontWeight={600}>{goal.goal_name}</Typography>
+                      <Chip label={`Published: ${goal.published_version_no != null ? `v${goal.published_version_no}` : 'None'}`} size="small" color="success" icon={<PlayArrow sx={{ fontSize: 16 }} />} />
+                      <Chip label={`Draft: ${goal.draft_version_no != null ? `v${goal.draft_version_no}` : 'None'}`} size="small" color="default" icon={<Pause sx={{ fontSize: 16 }} />} />
+                    </Box>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>{goal.description}</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Last updated: {new Date(goal.updated_at).toLocaleDateString()}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ flex: '1 1 150px', minWidth: 150 }}>
+                    <Typography variant="caption" color="text.secondary" display="block" gutterBottom>Assigned Team</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Group sx={{ fontSize: 18, mr: 1, color: 'text.secondary' }} />
+                      <Typography variant="body2" fontWeight={500}>{goal.team_name || 'N/A'}</Typography>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', gap: 3, flex: '1 1 300px', justifyContent: 'space-around' }}>
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Typography variant="h6" fontWeight={700} color="primary">{goal.conversations.toLocaleString()}</Typography>
+                      <Typography variant="caption" color="text.secondary">Conversations</Typography>
+                    </Box>
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Typography variant="h6" fontWeight={700} color="success.main">{goal.avg_score.toFixed(1)}%</Typography>
+                      <Typography variant="caption" color="text.secondary">Avg Score</Typography>
+                    </Box>
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Typography variant="h6" fontWeight={700} color="info.main">{goal.completion_score.toFixed(1)}%</Typography>
+                      <Typography variant="caption" color="text.secondary">Completion</Typography>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    <Button 
+                      size="small" 
+                      startIcon={<Edit />} 
+                      onClick={() => handleEditGoal(goal.goal_id)} 
+                      disabled={!goal.draft_version_no && !goal.published_version_no}
+                    >
+                      Edit
+                    </Button>
+                    <Button size="small" startIcon={<CheckCircle />} onClick={() => handlePublish(goal.goal_id)} disabled={!goal.draft_version_no}>
+                      Publish Draft
+                    </Button>
+                    <Button size="small" startIcon={<ContentCopy />} onClick={() => handleCloneGoal(goal.goal_id)} variant="outlined">
+                      Clone
+                    </Button>
+                    <Button size="small" startIcon={<Delete />} onClick={() => handleDeleteGoal(goal)} color="error" variant="outlined">
+                      Delete
+                    </Button>
+                  </Box>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    );
   };
-
-  const handleEditGoal = (goalId: string) => {
-    router.push(`/team-leader-dashboard/goal-mgmt/editor?id=${goalId}`);
-  };
-
-  const handleCloneGoal = (goalId: string) => {
-    router.push(`/team-leader-dashboard/goal-mgmt/editor?clone=${goalId}`);
-  };
-
-  const handleDeleteGoal = (goal: any) => {
-    setSelectedGoal(goal);
-    setDeleteDialogOpen(true);
-  };
-
-  const confirmDelete = () => {
-    // Handle delete logic here
-    console.log("Deleting goal:", selectedGoal);
-    setDeleteDialogOpen(false);
-    setSelectedGoal(null);
-  };
-
-  // Mock data for goals
-  const goals = [
-    {
-      id: "goal-1",
-      name: "Loan Pre-Qualification",
-      status: "active",
-      description: "Qualify potential borrowers for loan products based on financial criteria and creditworthiness.",
-      assignedTeam: "Sales Team Alpha",
-      totalConversations: 1247,
-      averageScore: 87.3,
-      completionRate: 92.1,
-      lastUpdated: "2024-01-15",
-      tags: ["sales", "qualification", "finance"],
-    },
-    {
-      id: "goal-2",
-      name: "Customer Support Resolution",
-      status: "active",
-      description: "Resolve customer inquiries and technical issues with high satisfaction ratings.",
-      assignedTeam: "Support Team Beta",
-      totalConversations: 2156,
-      averageScore: 91.7,
-      completionRate: 88.4,
-      lastUpdated: "2024-01-14",
-      tags: ["support", "resolution", "customer"],
-    },
-    {
-      id: "goal-3",
-      name: "Lead Generation",
-      status: "draft",
-      description: "Generate qualified leads for enterprise sales opportunities through targeted outreach.",
-      assignedTeam: "Sales Team Gamma",
-      totalConversations: 0,
-      averageScore: 0,
-      completionRate: 0,
-      lastUpdated: "2024-01-13",
-      tags: ["sales", "leads", "enterprise"],
-    },
-    {
-      id: "goal-4",
-      name: "Product Feedback Collection",
-      status: "active",
-      description: "Collect structured feedback from users about product features and user experience.",
-      assignedTeam: "Product Team Delta",
-      totalConversations: 543,
-      averageScore: 84.2,
-      completionRate: 95.6,
-      lastUpdated: "2024-01-12",
-      tags: ["feedback", "product", "ux"],
-    },
-  ];
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
       <TeamLeaderSidebar activeItem="goal-mgmt" />
-
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginLeft: '280px' }}>
-        {/* Top Bar */}
-        <AppBar
-          position="static"
-          elevation={1}
-          sx={{
-            backgroundColor: 'background.paper',
-            color: 'text.primary',
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-          }}
-        >
+        <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
           <Toolbar>
-            <Box sx={{ flexGrow: 1 }}>
-              <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
-                team-leader-dashboard.localhost:3000
-              </Typography>
-            </Box>
-
+            <Box sx={{ flexGrow: 1 }}><Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>team-leader-dashboard.localhost:3000</Typography></Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              {/* View Type Dropdown */}
-              <Chip
-                icon={<SupervisorAccount />}
-                label="Team Lead view"
-                color="secondary"
-                onClick={handleMenuClick}
-                deleteIcon={<KeyboardArrowDown />}
-                onDelete={handleMenuClick}
-                variant="outlined"
-                sx={{
-                  fontWeight: 600,
-                  '& .MuiChip-deleteIcon': {
-                    color: 'inherit',
-                  },
-                }}
-              />
-
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                PaperProps={{
-                  sx: {
-                    mt: 1,
-                    minWidth: 200,
-                  },
-                }}
-              >
-                <MenuItem
-                  onClick={() => handleViewChange("generic")}
-                >
-                  <Dashboard sx={{ mr: 1 }} />
-                  Generic view
-                </MenuItem>
-                <MenuItem
-                  onClick={() => handleViewChange("team-lead")}
-                  selected={true}
-                >
-                  <SupervisorAccount sx={{ mr: 1 }} />
-                  Team Lead view
-                </MenuItem>
-              </Menu>
-
-              <IconButton size="small" sx={{ color: 'text.secondary' }}>
-                <BookmarkBorder />
-              </IconButton>
-
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 2 }}>
-                <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '0.875rem' }}>
-                  W
-                </Avatar>
-                <Typography variant="body2" fontWeight={500}>
-                  Work
-                </Typography>
-              </Box>
-
-              <IconButton size="small" sx={{ color: 'text.secondary' }}>
-                <MoreVert />
-              </IconButton>
-
-              <Button
-                variant="contained"
-                color="error"
-                size="small"
-                startIcon={<Logout />}
-                sx={{ ml: 1 }}
-              >
-                Logout
-              </Button>
+              <IconButton size="small" sx={{ color: 'text.secondary' }}><BookmarkBorder /></IconButton>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 2 }}><Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '0.875rem' }}>W</Avatar><Typography variant="body2" fontWeight={500}>Work</Typography></Box>
+              <IconButton size="small" sx={{ color: 'text.secondary' }}><MoreVert /></IconButton>
+              <Button variant="contained" color="error" size="small" startIcon={<Logout />} sx={{ ml: 1 }} onClick={logout}>Logout</Button>
             </Box>
           </Toolbar>
         </AppBar>
-
-        {/* Main Content */}
-        <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3 }}>
+        <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3}}>
           <Breadcrumbs />
-
-          <Box sx={{ mb: 4 }}>
+          <Box sx={{ my: 4 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Box>
-                <Typography variant="h3" component="h1" fontWeight={700} gutterBottom>
-                  Goal Management
-                </Typography>
-                <Typography variant="h6" color="text.secondary">
-                  Create and manage conversation goals for your teams
-                </Typography>
+                <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>Goal Management</Typography>
+                <Typography color="text.secondary">Create and manage conversation goals for your teams</Typography>
               </Box>
-              <Button
-                variant="contained"
-                startIcon={<Add />}
-                onClick={handleCreateGoal}
-                sx={{ 
-                  px: 3, 
-                  py: 1.5,
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                }}
-              >
+              <Button variant="contained" startIcon={<Add />} onClick={handleCreateGoal} sx={{ px: 2, py: 1 }}>
                 Create New Goal
               </Button>
             </Box>
           </Box>
-
-          {/* Goals Grid */}
-          <Grid container spacing={3}>
-            {goals.map((goal) => (
-              <Grid item xs={12} md={6} lg={4} key={goal.id}>
-                <Card 
-                  sx={{ 
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    transition: 'all 0.2s ease-in-out',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: 4,
-                    }
-                  }}
-                >
-                  <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                    {/* Header */}
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                      <Box sx={{ flexGrow: 1 }}>
-                        <Typography variant="h6" fontWeight={600} gutterBottom>
-                          {goal.name}
-                        </Typography>
-                        <Chip
-                          label={goal.status}
-                          size="small"
-                          color={goal.status === 'active' ? 'success' : 'default'}
-                          icon={goal.status === 'active' ? <PlayArrow /> : <Pause />}
-                          sx={{ mb: 1 }}
-                        />
-                      </Box>
-                      <IconButton size="small">
-                        <MoreVert />
-                      </IconButton>
-                    </Box>
-
-                    {/* Description */}
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2, flexGrow: 1 }}>
-                      {goal.description}
-                    </Typography>
-
-                    {/* Team Assignment */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <Group sx={{ fontSize: 16, mr: 1, color: 'text.secondary' }} />
-                      <Typography variant="body2" color="text.secondary">
-                        {goal.assignedTeam}
-                      </Typography>
-                    </Box>
-
-                    {/* Tags */}
-                    <Box sx={{ mb: 2 }}>
-                      {goal.tags.map((tag) => (
-                        <Chip
-                          key={tag}
-                          label={tag}
-                          size="small"
-                          variant="outlined"
-                          sx={{ mr: 0.5, mb: 0.5 }}
-                        />
-                      ))}
-                    </Box>
-
-                    {/* Metrics */}
-                    <Grid container spacing={2} sx={{ mb: 2 }}>
-                      <Grid item xs={4}>
-                        <Box sx={{ textAlign: 'center' }}>
-                          <Typography variant="h6" fontWeight={700} color="primary">
-                            {goal.totalConversations.toLocaleString()}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            Conversations
-                          </Typography>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={4}>
-                        <Box sx={{ textAlign: 'center' }}>
-                          <Typography variant="h6" fontWeight={700} color="success.main">
-                            {goal.averageScore}%
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            Avg Score
-                          </Typography>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={4}>
-                        <Box sx={{ textAlign: 'center' }}>
-                          <Typography variant="h6" fontWeight={700} color="info.main">
-                            {goal.completionRate}%
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            Completion
-                          </Typography>
-                        </Box>
-                      </Grid>
-                    </Grid>
-
-                    {/* Actions */}
-                    <Box sx={{ display: 'flex', gap: 1, mt: 'auto' }}>
-                      <Button
-                        size="small"
-                        startIcon={<Edit />}
-                        onClick={() => handleEditGoal(goal.id)}
-                        sx={{ flexGrow: 1 }}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        size="small"
-                        startIcon={<ContentCopy />}
-                        onClick={() => handleCloneGoal(goal.id)}
-                        variant="outlined"
-                      >
-                        Clone
-                      </Button>
-                      <Button
-                        size="small"
-                        startIcon={<Delete />}
-                        onClick={() => handleDeleteGoal(goal)}
-                        color="error"
-                        variant="outlined"
-                      >
-                        Delete
-                      </Button>
-                    </Box>
-
-                    {/* Last Updated */}
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1, textAlign: 'center' }}>
-                      Last updated: {goal.lastUpdated}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-
-          {/* Empty State */}
-          {goals.length === 0 && (
-            <Box sx={{ textAlign: 'center', py: 8 }}>
-              <Assessment sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
-              <Typography variant="h5" gutterBottom>
-                No Goals Created Yet
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                Create your first goal to start managing conversation objectives for your teams.
-              </Typography>
-              <Button
-                variant="contained"
-                startIcon={<Add />}
-                onClick={handleCreateGoal}
-                size="large"
-              >
-                Create Your First Goal
-              </Button>
-            </Box>
-          )}
+          {renderContent()}
         </Container>
-
-        {/* Delete Confirmation Dialog */}
-        <Dialog
-          open={deleteDialogOpen}
-          onClose={() => setDeleteDialogOpen(false)}
-          maxWidth="sm"
-          fullWidth
-        >
-          <DialogTitle>Delete Goal</DialogTitle>
+        <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="sm" fullWidth>
+          <DialogTitle>Archive Goal</DialogTitle>
           <DialogContent>
-            <Typography>
-              Are you sure you want to delete the goal "{selectedGoal?.name}"? This action cannot be undone.
-            </Typography>
+            <Typography>Are you sure you want to archive the goal "{selectedGoal?.goal_name}"?</Typography>
             <Alert severity="warning" sx={{ mt: 2 }}>
-              <AlertTitle>Warning</AlertTitle>
-              Deleting this goal will remove all associated configurations and historical data.
+              <AlertTitle>Warning</AlertTitle>Archiving this goal will remove it from active lists and disable associated campaigns.
             </Alert>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDeleteDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={confirmDelete} color="error" variant="contained">
-              Delete Goal
-            </Button>
+            <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+            <Button onClick={confirmDelete} color="error" variant="contained">Archive Goal</Button>
           </DialogActions>
         </Dialog>
       </Box>

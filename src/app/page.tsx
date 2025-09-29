@@ -5,5 +5,5 @@ import { redirect } from 'next/navigation';
  * @returns Redirects to /dashboard
  */
 export default function HomePage() {
-  redirect('/dashboard');
+  redirect('/team-leader-dashboard/call-quality-analytics/');
 }
