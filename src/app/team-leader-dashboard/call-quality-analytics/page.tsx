@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
@@ -28,14 +28,18 @@ import {
   LinearProgress,
   Alert,
   AlertTitle,
+  FormControl,
+  InputLabel,
+  Select,
+  SelectChangeEvent,
+  Grid,
+  TextField,
+  CircularProgress,
 } from "@mui/material";
 import {
   BookmarkBorder,
   MoreVert,
   Logout,
-  Dashboard,
-  SupervisorAccount,
-  KeyboardArrowDown,
   TrendingUp,
   TrendingDown,
   Warning,
@@ -47,6 +51,8 @@ import {
   Schedule,
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
+import { getAllCampaigns } from "@/data/services/campaign-service";
+import { Campaign } from "@/types/api/campaign";
 
 /**
  * Call Quality Analytics page component displaying comprehensive call quality metrics
@@ -56,12 +62,35 @@ import { useAuth } from "@/contexts/auth-context";
 export default function CallQualityAnalyticsPage() {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedCampaign, setSelectedCampaign] = useState<string>("None");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
   const { logout } = useAuth();
+
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [loadingCampaigns, setLoadingCampaigns] = useState<boolean>(true);
+  const [campaignError, setCampaignError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        setLoadingCampaigns(true);
+        const fetchedCampaigns = await getAllCampaigns();
+        setCampaigns(fetchedCampaigns);
+        setCampaignError(null);
+      } catch (error) {
+        console.error("Failed to fetch campaigns for filter:", error);
+        setCampaignError("Could not load campaigns.");
+      } finally {
+        setLoadingCampaigns(false);
+      }
+    };
+
+    fetchCampaigns();
+  }, []);
 
   const handleViewChange = (newView: string) => {
     setAnchorEl(null);
-    
-    // Navigate to the appropriate page based on view selection
     if (newView === "generic") {
       router.push('/dashboard');
     } else if (newView === "team-lead") {
@@ -75,6 +104,26 @@ export default function CallQualityAnalyticsPage() {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+  
+  const handleCampaignChange = (event: SelectChangeEvent<string>) => {
+    const campaignId = event.target.value;
+    setSelectedCampaign(campaignId);
+
+    if (campaignId === "None") {
+      setStartDate("");
+      setEndDate("");
+      return;
+    }
+
+    const selected = campaigns.find(c => c.id === campaignId);
+    if (selected) {
+      setStartDate(selected.starts_at ? selected.starts_at.substring(0, 10) : "");
+      setEndDate(selected.ends_at ? selected.ends_at.substring(0, 10) : "");
+    } else {
+      setStartDate("");
+      setEndDate("");
+    }
   };
 
   // Mock data for call quality metrics
@@ -274,6 +323,57 @@ export default function CallQualityAnalyticsPage() {
             </Typography>
           </Alert>
 
+          {/* Campaign & Date Selector */}
+          <Card sx={{ mb: 4 }}>
+            <CardContent>
+              <Grid container spacing={2} alignItems="center">
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <FormControl fullWidth disabled={loadingCampaigns}>
+                    <InputLabel id="campaign-select-label">Campaign</InputLabel>
+                    <Select
+                      labelId="campaign-select-label"
+                      id="campaign-select"
+                      value={selectedCampaign}
+                      label="Campaign"
+                      onChange={handleCampaignChange}
+                    >
+                      <MenuItem value="None">
+                        <em>None</em>
+                      </MenuItem>
+                      {campaigns.map((campaign) => (
+                        <MenuItem key={campaign.id} value={campaign.id}>
+                          {campaign.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {loadingCampaigns && <CircularProgress size={24} sx={{ position: 'absolute', top: '50%', right: 40, marginTop: '-12px' }} />}
+                  </FormControl>
+                  {campaignError && <Typography color="error" variant="caption">{campaignError}</Typography>}
+                </Grid>
+                <Grid size={{ xs: 12, md: 3 }}>
+                  <TextField
+                    fullWidth
+                    disabled
+                    id="start-date"
+                    label="Start Date"
+                    value={startDate}
+                    InputLabelProps={{ shrink: !!startDate }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, md: 3 }}>
+                   <TextField
+                    fullWidth
+                    disabled
+                    id="end-date"
+                    label="End Date"
+                    value={endDate}
+                    InputLabelProps={{ shrink: !!endDate }}
+                  />
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+
           {/* Key Metrics Cards */}
           <Box sx={{ 
             display: 'grid', 
@@ -400,7 +500,7 @@ export default function CallQualityAnalyticsPage() {
                           </Typography>
                         </TableCell>
                         <TableCell align="center">
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
                             <LinearProgress 
                               variant="determinate" 
                               value={item.adherence} 

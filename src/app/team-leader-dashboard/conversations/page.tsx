@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
@@ -26,31 +26,22 @@ import {
   TableRow,
   Paper,
   LinearProgress,
-  Alert,
-  AlertTitle,
   Grid,
   TextField,
   InputAdornment,
   Select,
   FormControl,
   InputLabel,
-  Tabs,
-  Tab,
+  CircularProgress,
 } from "@mui/material";
 import {
   BookmarkBorder,
   MoreVert,
   Logout,
-  Dashboard,
-  SupervisorAccount,
-  KeyboardArrowDown,
   Search,
-  FilterList,
   Message,
-  Phone,
   Schedule,
   TrendingUp,
-  TrendingDown,
   CheckCircle,
   Cancel,
   Warning,
@@ -59,6 +50,10 @@ import {
   Visibility,
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
+import { getAllCampaigns } from "@/data/services/campaign-service";
+import { getAllTeams } from "@/data/services/util-service";
+import { Campaign } from "@/types/api/campaign";
+import { TeamSummary } from "@/types/api/team";
 
 interface Conversation {
   id: string;
@@ -84,11 +79,47 @@ interface Conversation {
 export default function ConversationsPage() {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [activeTab, setActiveTab] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [campaignFilter, setCampaignFilter] = useState("all");
   const [teamFilter, setTeamFilter] = useState("all");
   const { logout } = useAuth();
+  
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [loadingCampaigns, setLoadingCampaigns] = useState<boolean>(true);
+  const [campaignError, setCampaignError] = useState<string | null>(null);
+
+  const [teams, setTeams] = useState<TeamSummary[]>([]);
+  const [loadingTeams, setLoadingTeams] = useState<boolean>(true);
+  const [teamError, setTeamError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoadingCampaigns(true);
+        setLoadingTeams(true);
+
+        const [fetchedCampaigns, fetchedTeams] = await Promise.all([
+          getAllCampaigns(),
+          getAllTeams()
+        ]);
+
+        setCampaigns(fetchedCampaigns);
+        setCampaignError(null);
+
+        setTeams(fetchedTeams);
+        setTeamError(null);
+      } catch (error) {
+        console.error("Failed to fetch filter data:", error);
+        setCampaignError("Could not load campaigns.");
+        setTeamError("Could not load teams.");
+      } finally {
+        setLoadingCampaigns(false);
+        setLoadingTeams(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleViewChange = (newView: string) => {
     setAnchorEl(null);
@@ -105,10 +136,6 @@ export default function ConversationsPage() {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-  };
-
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
   };
 
   // Mock conversation data
@@ -237,10 +264,10 @@ export default function ConversationsPage() {
       conv.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       conv.id.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesStatus = statusFilter === "all" || conv.status === statusFilter;
+    const matchesCampaign = campaignFilter === "all" || conv.campaign === campaignFilter;
     const matchesTeam = teamFilter === "all" || conv.team === teamFilter;
     
-    return matchesSearch && matchesStatus && matchesTeam;
+    return matchesSearch && matchesCampaign && matchesTeam;
   });
 
   const completedConversations = conversations.filter(c => c.status === "completed");
@@ -340,21 +367,25 @@ export default function ConversationsPage() {
                   sx={{ minWidth: 300 }}
                 />
                 
-                <FormControl sx={{ minWidth: 150 }}>
-                  <InputLabel>Status</InputLabel>
+                <FormControl sx={{ minWidth: 150 }} disabled={loadingCampaigns}>
+                  <InputLabel>Campaign</InputLabel>
                   <Select
-                    value={statusFilter}
-                    label="Status"
-                    onChange={(e) => setStatusFilter(e.target.value)}
+                    value={campaignFilter}
+                    label="Campaign"
+                    onChange={(e) => setCampaignFilter(e.target.value)}
                   >
-                    <MenuItem value="all">All Status</MenuItem>
-                    <MenuItem value="completed">Completed</MenuItem>
-                    <MenuItem value="in-progress">In Progress</MenuItem>
-                    <MenuItem value="failed">Failed</MenuItem>
+                    <MenuItem value="all">All Campaigns</MenuItem>
+                    {campaigns.map((campaign) => (
+                      <MenuItem key={campaign.id} value={campaign.name}>
+                        {campaign.name}
+                      </MenuItem>
+                    ))}
                   </Select>
+                  {loadingCampaigns && <CircularProgress size={24} sx={{ position: 'absolute', top: '50%', right: 40, marginTop: '-12px' }} />}
                 </FormControl>
+                {campaignError && <Typography color="error" variant="caption" sx={{ ml: -1.5 }}>{campaignError}</Typography>}
 
-                <FormControl sx={{ minWidth: 150 }}>
+                <FormControl sx={{ minWidth: 150 }} disabled={loadingTeams}>
                   <InputLabel>Team</InputLabel>
                   <Select
                     value={teamFilter}
@@ -362,18 +393,22 @@ export default function ConversationsPage() {
                     onChange={(e) => setTeamFilter(e.target.value)}
                   >
                     <MenuItem value="all">All Teams</MenuItem>
-                    <MenuItem value="Technical Support">Technical Support</MenuItem>
-                    <MenuItem value="Sales Team">Sales Team</MenuItem>
-                    <MenuItem value="Customer Support">Customer Support</MenuItem>
+                    {teams.map((team) => (
+                      <MenuItem key={team.id} value={team.name}>
+                        {team.name}
+                      </MenuItem>
+                    ))}
                   </Select>
+                  {loadingTeams && <CircularProgress size={24} sx={{ position: 'absolute', top: '50%', right: 40, marginTop: '-12px' }} />}
                 </FormControl>
+                {teamError && <Typography color="error" variant="caption" sx={{ ml: -1.5 }}>{teamError}</Typography>}
 
                 <Button
                   variant="outlined"
                   startIcon={<Refresh />}
                   onClick={() => {
                     setSearchTerm("");
-                    setStatusFilter("all");
+                    setCampaignFilter("all");
                     setTeamFilter("all");
                   }}
                 >
@@ -393,7 +428,7 @@ export default function ConversationsPage() {
 
           {/* Key Metrics Cards */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -411,7 +446,7 @@ export default function ConversationsPage() {
               </Card>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -429,7 +464,7 @@ export default function ConversationsPage() {
               </Card>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -447,7 +482,7 @@ export default function ConversationsPage() {
               </Card>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -545,9 +580,9 @@ export default function ConversationsPage() {
                             size="small"
                             startIcon={<Visibility />}
                             variant="outlined"
-      onClick={() => {
-        router.push('/team-leader-dashboard/conversation-detail');
-      }}
+                            onClick={() => {
+                              router.push('/team-leader-dashboard/conversation-detail');
+                            }}
                           >
                             View Details
                           </Button>
