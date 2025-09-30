@@ -52,9 +52,12 @@ import {
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
 import { getAllCampaigns } from "@/data/services/campaign-service";
-import { getCampaignParametersAnalysis } from "@/data/services/analytics-service"; // Import the new service
+import { 
+  getCampaignParametersAnalysis, 
+  getAgentsPerformanceSummaryForCampaign 
+} from "@/data/services/analytics-service";
 import { Campaign } from "@/types/api/campaign";
-import { ParameterAnalysis } from "@/types/api/analytics"; // Import the new type
+import { ParameterAnalysis, AgentPerformance } from "@/types/api/analytics";
 
 /**
  * Call Quality Analytics page component displaying comprehensive call quality metrics
@@ -79,6 +82,11 @@ export default function CallQualityAnalyticsPage() {
   const [loadingParameters, setLoadingParameters] = useState<boolean>(false);
   const [parametersError, setParametersError] = useState<string | null>(null);
 
+  // State for agent performance data
+  const [agentPerformance, setAgentPerformance] = useState<AgentPerformance[]>([]);
+  const [loadingAgents, setLoadingAgents] = useState<boolean>(false);
+  const [agentError, setAgentError] = useState<string | null>(null);
+
   // Fetch campaigns for the dropdown
   useEffect(() => {
     const fetchCampaigns = async () => {
@@ -97,29 +105,41 @@ export default function CallQualityAnalyticsPage() {
     fetchCampaigns();
   }, []);
 
-  // Fetch parameters analysis when a campaign is selected
+  // Fetch analysis data when a campaign is selected
   useEffect(() => {
     if (selectedCampaign === "None") {
       setParameters([]);
+      setAgentPerformance([]);
       setParametersError(null);
+      setAgentError(null);
       return;
     }
 
-    const fetchParameters = async () => {
-      try {
-        setLoadingParameters(true);
-        setParametersError(null);
-        const data = await getCampaignParametersAnalysis(selectedCampaign);
-        setParameters(data);
-      } catch (error) {
-        console.error("Failed to fetch parameters analysis:", error);
-        setParametersError("Failed to load campaign parameters analysis. Please try again.");
-      } finally {
-        setLoadingParameters(false);
-      }
+    const fetchCampaignData = async () => {
+      // Fetch parameters analysis
+      setLoadingParameters(true);
+      setParametersError(null);
+      getCampaignParametersAnalysis(selectedCampaign)
+        .then(data => setParameters(data))
+        .catch(error => {
+          console.error("Failed to fetch parameters analysis:", error);
+          setParametersError("Failed to load campaign parameters analysis. Please try again.");
+        })
+        .finally(() => setLoadingParameters(false));
+
+      // Fetch agent performance
+      setLoadingAgents(true);
+      setAgentError(null);
+      getAgentsPerformanceSummaryForCampaign(selectedCampaign)
+        .then(data => setAgentPerformance(data))
+        .catch(error => {
+          console.error("Failed to fetch agent performance:", error);
+          setAgentError("Failed to load agent performance summary. Please try again.");
+        })
+        .finally(() => setLoadingAgents(false));
     };
 
-    fetchParameters();
+    fetchCampaignData();
   }, [selectedCampaign]);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -149,15 +169,6 @@ export default function CallQualityAnalyticsPage() {
       setEndDate("");
     }
   };
-  
-  // Mock data for agent performance - leaving this as is, per instructions
-  const agentPerformance = [
-    { name: "Priya Sharma", totalScore: 87.2, fatalErrors: 0, nonFatalErrors: 2, calls: 45 },
-    { name: "Arjun Patel", totalScore: 82.1, fatalErrors: 1, nonFatalErrors: 3, calls: 38 },
-    { name: "Kavya Reddy", totalScore: 94.5, fatalErrors: 0, nonFatalErrors: 1, calls: 52 },
-    { name: "Rajesh Kumar", totalScore: 76.8, fatalErrors: 2, nonFatalErrors: 4, calls: 41 },
-    { name: "Sneha Singh", totalScore: 89.3, fatalErrors: 0, nonFatalErrors: 2, calls: 36 }
-  ];
 
   const getScoreColor = (score: number) => {
     if (score >= 90) return "success";
@@ -166,7 +177,6 @@ export default function CallQualityAnalyticsPage() {
   };
 
   const getTypeColor = (type: string) => {
-    // Assuming 'FATAL' and 'NON_FATAL' from the API schema
     return type.toUpperCase() === "FATAL" ? "error" : "warning";
   };
 
@@ -304,7 +314,6 @@ export default function CallQualityAnalyticsPage() {
 
           {/* Key Metrics Cards - Hardcoded as requested */}
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 3, mb: 4 }}>
-            {/* Card Items remain unchanged */}
             <Card>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -367,7 +376,7 @@ export default function CallQualityAnalyticsPage() {
             </Card>
           </Box>
 
-          {/* Call Quality Parameters Table - Now Dynamic */}
+          {/* Call Quality Parameters Table - Dynamic */}
           <Card sx={{ mb: 4 }}>
             <CardContent>
               <Typography variant="h5" fontWeight={600} gutterBottom sx={{ mb: 3 }}>
@@ -465,7 +474,7 @@ export default function CallQualityAnalyticsPage() {
             </CardContent>
           </Card>
 
-          {/* Agent Performance Table - Mock data */}
+          {/* Agent Performance Table - Dynamic */}
           <Card>
             <CardContent>
               <Typography variant="h5" fontWeight={600} gutterBottom sx={{ mb: 3 }}>
@@ -475,7 +484,7 @@ export default function CallQualityAnalyticsPage() {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell><strong>Agent Name</strong></TableCell>
+                      <TableCell><strong>Agent ID</strong></TableCell>
                       <TableCell align="center"><strong>Total Score</strong></TableCell>
                       <TableCell align="center"><strong>Fatal Errors</strong></TableCell>
                       <TableCell align="center"><strong>Non-Fatal Errors</strong></TableCell>
@@ -484,57 +493,83 @@ export default function CallQualityAnalyticsPage() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {agentPerformance.map((agent, index) => (
-                      <TableRow key={index}>
-                        <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Person sx={{ fontSize: 20, color: 'text.secondary' }} />
-                            <Typography variant="body2" fontWeight={600}>
-                              {agent.name}
-                            </Typography>
-                          </Box>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Typography 
-                            variant="body2" 
-                            fontWeight={600}
-                            color={`${getScoreColor(agent.totalScore)}.main`}
-                          >
-                            {agent.totalScore}%
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Typography 
-                            variant="body2" 
-                            fontWeight={600}
-                            color={agent.fatalErrors > 0 ? "error.main" : "success.main"}
-                          >
-                            {agent.fatalErrors}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Typography 
-                            variant="body2" 
-                            fontWeight={600}
-                            color={agent.nonFatalErrors > 2 ? "warning.main" : "success.main"}
-                          >
-                            {agent.nonFatalErrors}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Typography variant="body2" fontWeight={600}>
-                            {agent.calls}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Chip 
-                            label={agent.fatalErrors === 0 ? "Excellent" : agent.fatalErrors === 1 ? "Good" : "Needs Improvement"}
-                            color={agent.fatalErrors === 0 ? "success" : agent.fatalErrors === 1 ? "warning" : "error"}
-                            size="small"
-                          />
+                    {loadingAgents ? (
+                       <TableRow>
+                        <TableCell colSpan={6} align="center">
+                          <CircularProgress />
                         </TableCell>
                       </TableRow>
-                    ))}
+                    ) : agentError ? (
+                      <TableRow>
+                        <TableCell colSpan={6}>
+                          <Alert severity="error">{agentError}</Alert>
+                        </TableCell>
+                      </TableRow>
+                    ) : agentPerformance.length === 0 && selectedCampaign !== "None" ? (
+                      <TableRow>
+                         <TableCell colSpan={6} align="center">
+                          No agent performance data available for this campaign.
+                        </TableCell>
+                      </TableRow>
+                    ) : agentPerformance.length === 0 ? (
+                      <TableRow>
+                         <TableCell colSpan={6} align="center">
+                          Select a campaign to view agent performance.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      agentPerformance.map((agent) => (
+                        <TableRow key={agent.agent_id}>
+                          <TableCell>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Person sx={{ fontSize: 20, color: 'text.secondary' }} />
+                              <Typography variant="body2" fontWeight={600}>
+                                {agent.agent_id}
+                              </Typography>
+                            </Box>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Typography 
+                              variant="body2" 
+                              fontWeight={600}
+                              color={`${getScoreColor(agent.total_score)}.main`}
+                            >
+                              {agent.total_score.toFixed(1)}%
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Typography 
+                              variant="body2" 
+                              fontWeight={600}
+                              color={agent.fatal_errors > 0 ? "error.main" : "success.main"}
+                            >
+                              {agent.fatal_errors}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Typography 
+                              variant="body2" 
+                              fontWeight={600}
+                              color={agent.non_fatal_errors > 2 ? "warning.main" : "success.main"}
+                            >
+                              {agent.non_fatal_errors}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Typography variant="body2" fontWeight={600}>
+                              {agent.total_calls}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Chip 
+                              label={agent.fatal_errors === 0 ? "Excellent" : agent.fatal_errors === 1 ? "Good" : "Needs Improvement"}
+                              color={agent.fatal_errors === 0 ? "success" : agent.fatal_errors === 1 ? "warning" : "error"}
+                              size="small"
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
                   </TableBody>
                 </Table>
               </TableContainer>
