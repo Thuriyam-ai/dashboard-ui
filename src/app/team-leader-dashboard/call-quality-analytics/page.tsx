@@ -52,7 +52,9 @@ import {
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
 import { getAllCampaigns } from "@/data/services/campaign-service";
+import { getCampaignParametersAnalysis } from "@/data/services/analytics-service"; // Import the new service
 import { Campaign } from "@/types/api/campaign";
+import { ParameterAnalysis } from "@/types/api/analytics"; // Import the new type
 
 /**
  * Call Quality Analytics page component displaying comprehensive call quality metrics
@@ -67,10 +69,17 @@ export default function CallQualityAnalyticsPage() {
   const [endDate, setEndDate] = useState<string>("");
   const { logout } = useAuth();
 
+  // State for campaigns dropdown
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loadingCampaigns, setLoadingCampaigns] = useState<boolean>(true);
   const [campaignError, setCampaignError] = useState<string | null>(null);
 
+  // State for parameters analysis data
+  const [parameters, setParameters] = useState<ParameterAnalysis[]>([]);
+  const [loadingParameters, setLoadingParameters] = useState<boolean>(false);
+  const [parametersError, setParametersError] = useState<string | null>(null);
+
+  // Fetch campaigns for the dropdown
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
@@ -85,18 +94,33 @@ export default function CallQualityAnalyticsPage() {
         setLoadingCampaigns(false);
       }
     };
-
     fetchCampaigns();
   }, []);
 
-  const handleViewChange = (newView: string) => {
-    setAnchorEl(null);
-    if (newView === "generic") {
-      router.push('/dashboard');
-    } else if (newView === "team-lead") {
-      router.push('/team-dashboard/overview');
+  // Fetch parameters analysis when a campaign is selected
+  useEffect(() => {
+    if (selectedCampaign === "None") {
+      setParameters([]);
+      setParametersError(null);
+      return;
     }
-  };
+
+    const fetchParameters = async () => {
+      try {
+        setLoadingParameters(true);
+        setParametersError(null);
+        const data = await getCampaignParametersAnalysis(selectedCampaign);
+        setParameters(data);
+      } catch (error) {
+        console.error("Failed to fetch parameters analysis:", error);
+        setParametersError("Failed to load campaign parameters analysis. Please try again.");
+      } finally {
+        setLoadingParameters(false);
+      }
+    };
+
+    fetchParameters();
+  }, [selectedCampaign]);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -105,7 +129,7 @@ export default function CallQualityAnalyticsPage() {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-  
+
   const handleCampaignChange = (event: SelectChangeEvent<string>) => {
     const campaignId = event.target.value;
     setSelectedCampaign(campaignId);
@@ -125,92 +149,8 @@ export default function CallQualityAnalyticsPage() {
       setEndDate("");
     }
   };
-
-  // Mock data for call quality metrics
-  const callQualityData = [
-    {
-      id: 1,
-      parameter: "Call Opening / Adherence to Opening Script",
-      score: 5,
-      type: "Non-Fatal",
-      currentScore: 4.2,
-      adherence: 84,
-      description: "Greet employer, introduce with name, mention WorkIndia, state feedback call purpose"
-    },
-    {
-      id: 2,
-      parameter: "Effective Questioning and Probing",
-      score: 35,
-      type: "Fatal",
-      currentScore: 28.5,
-      adherence: 81,
-      description: "Agent must ask all 5 mandatory questions clearly and appropriately"
-    },
-    {
-      id: 3,
-      parameter: "Interruptions (if any)",
-      score: 5,
-      type: "Non-Fatal",
-      currentScore: 4.8,
-      adherence: 96,
-      description: "Agent should not interrupt employer unless absolutely necessary"
-    },
-    {
-      id: 4,
-      parameter: "Unnecessary or Off-topic Conversation",
-      score: 5,
-      type: "Non-Fatal",
-      currentScore: 4.6,
-      adherence: 92,
-      description: "Avoid irrelevant, personal, or casual talk not related to feedback objective"
-    },
-    {
-      id: 5,
-      parameter: "Incomplete Notes",
-      score: 20,
-      type: "Fatal",
-      currentScore: 18.2,
-      adherence: 91,
-      description: "Fails to capture, records incorrectly, or leaves field blank"
-    },
-    {
-      id: 6,
-      parameter: "Correct Disposition Selection",
-      score: 10,
-      type: "Fatal",
-      currentScore: 9.1,
-      adherence: 91,
-      description: "Final disposition must match employer's actual response"
-    },
-    {
-      id: 7,
-      parameter: "Proper Call Flow / Sequence Followed",
-      score: 10,
-      type: "Non-Fatal",
-      currentScore: 9.3,
-      adherence: 93,
-      description: "Introduction → Feedback Questions → Call Closing"
-    },
-    {
-      id: 8,
-      parameter: "No False or Misleading Promises Made",
-      score: 5,
-      type: "Non-Fatal",
-      currentScore: 4.9,
-      adherence: 98,
-      description: "Avoid misleading or over-promising statements"
-    },
-    {
-      id: 9,
-      parameter: "Proper Call Disconnection / Call Closing",
-      score: 5,
-      type: "Non-Fatal",
-      currentScore: 4.7,
-      adherence: 94,
-      description: "Agent must politely thank employer and clearly close the call"
-    }
-  ];
-
+  
+  // Mock data for agent performance - leaving this as is, per instructions
   const agentPerformance = [
     { name: "Priya Sharma", totalScore: 87.2, fatalErrors: 0, nonFatalErrors: 2, calls: 45 },
     { name: "Arjun Patel", totalScore: 82.1, fatalErrors: 1, nonFatalErrors: 3, calls: 38 },
@@ -226,7 +166,8 @@ export default function CallQualityAnalyticsPage() {
   };
 
   const getTypeColor = (type: string) => {
-    return type === "Fatal" ? "error" : "warning";
+    // Assuming 'FATAL' and 'NON_FATAL' from the API schema
+    return type.toUpperCase() === "FATAL" ? "error" : "warning";
   };
 
   const getTrendIcon = (score: number) => {
@@ -241,7 +182,7 @@ export default function CallQualityAnalyticsPage() {
         flexGrow: 1, 
         display: 'flex', 
         flexDirection: 'column',
-        marginLeft: '280px', // Account for fixed sidebar width
+        marginLeft: '280px',
         minHeight: '100vh'
       }}>
         {/* Top Bar */}
@@ -261,12 +202,10 @@ export default function CallQualityAnalyticsPage() {
                 call-quality-analytics.localhost:3000
               </Typography>
             </Box>
-            
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <IconButton size="small" sx={{ color: 'text.secondary' }}>
                 <BookmarkBorder />
               </IconButton>
-
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 2 }}>
                 <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '0.875rem' }}>
                   W
@@ -275,11 +214,9 @@ export default function CallQualityAnalyticsPage() {
                   Work
                 </Typography>
               </Box>
-
               <IconButton size="small" sx={{ color: 'text.secondary' }}>
                 <MoreVert />
               </IconButton>
-
               <Button
                 variant="contained"
                 color="error"
@@ -295,16 +232,9 @@ export default function CallQualityAnalyticsPage() {
         </AppBar>
 
         {/* Main Content */}
-        <Container maxWidth="xl" sx={{ 
-          flexGrow: 1, 
-          py: 3,
-          maxWidth: '100%',
-          overflow: 'hidden'
-        }}>
-          {/* Breadcrumbs */}
+        <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3, maxWidth: '100%', overflow: 'hidden' }}>
           <Breadcrumbs />
           
-          {/* Header */}
           <Box sx={{ mb: 4 }}>
             <Typography variant="h3" component="h1" fontWeight={700} gutterBottom>
               Call Quality Analytics
@@ -314,7 +244,6 @@ export default function CallQualityAnalyticsPage() {
             </Typography>
           </Box>
 
-          {/* Scoring Rules Alert */}
           <Alert severity="info" sx={{ mb: 4 }}>
             <AlertTitle>Scoring Rules</AlertTitle>
             <Typography variant="body2">
@@ -323,11 +252,10 @@ export default function CallQualityAnalyticsPage() {
             </Typography>
           </Alert>
 
-          {/* Campaign & Date Selector */}
           <Card sx={{ mb: 4 }}>
             <CardContent>
               <Grid container spacing={2} alignItems="center">
-                <Grid size={{ xs: 12, md: 6 }}>
+                <Grid item xs={12} md={6}>
                   <FormControl fullWidth disabled={loadingCampaigns}>
                     <InputLabel id="campaign-select-label">Campaign</InputLabel>
                     <Select
@@ -350,7 +278,7 @@ export default function CallQualityAnalyticsPage() {
                   </FormControl>
                   {campaignError && <Typography color="error" variant="caption">{campaignError}</Typography>}
                 </Grid>
-                <Grid size={{ xs: 12, md: 3 }}>
+                <Grid item xs={12} md={3}>
                   <TextField
                     fullWidth
                     disabled
@@ -360,7 +288,7 @@ export default function CallQualityAnalyticsPage() {
                     InputLabelProps={{ shrink: !!startDate }}
                   />
                 </Grid>
-                <Grid size={{ xs: 12, md: 3 }}>
+                <Grid item xs={12} md={3}>
                    <TextField
                     fullWidth
                     disabled
@@ -374,13 +302,9 @@ export default function CallQualityAnalyticsPage() {
             </CardContent>
           </Card>
 
-          {/* Key Metrics Cards */}
-          <Box sx={{ 
-            display: 'grid', 
-            gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' },
-            gap: 3, 
-            mb: 4 
-          }}>
+          {/* Key Metrics Cards - Hardcoded as requested */}
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 3, mb: 4 }}>
+            {/* Card Items remain unchanged */}
             <Card>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -396,7 +320,6 @@ export default function CallQualityAnalyticsPage() {
                 </Box>
               </CardContent>
             </Card>
-
             <Card>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -412,7 +335,6 @@ export default function CallQualityAnalyticsPage() {
                 </Box>
               </CardContent>
             </Card>
-
             <Card>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -428,7 +350,6 @@ export default function CallQualityAnalyticsPage() {
                 </Box>
               </CardContent>
             </Card>
-
             <Card>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -446,7 +367,7 @@ export default function CallQualityAnalyticsPage() {
             </Card>
           </Box>
 
-          {/* Call Quality Parameters Table */}
+          {/* Call Quality Parameters Table - Now Dynamic */}
           <Card sx={{ mb: 4 }}>
             <CardContent>
               <Typography variant="h5" fontWeight={600} gutterBottom sx={{ mb: 3 }}>
@@ -465,65 +386,86 @@ export default function CallQualityAnalyticsPage() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {callQualityData.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell>
-                          <Box>
+                    {loadingParameters ? (
+                      <TableRow>
+                        <TableCell colSpan={6} align="center">
+                          <CircularProgress />
+                        </TableCell>
+                      </TableRow>
+                    ) : parametersError ? (
+                      <TableRow>
+                        <TableCell colSpan={6}>
+                          <Alert severity="error">{parametersError}</Alert>
+                        </TableCell>
+                      </TableRow>
+                    ) : parameters.length === 0 && selectedCampaign !== "None" ? (
+                      <TableRow>
+                         <TableCell colSpan={6} align="center">
+                          No parameter data available for this campaign.
+                        </TableCell>
+                      </TableRow>
+                    ) : parameters.length === 0 ? (
+                        <TableRow>
+                         <TableCell colSpan={6} align="center">
+                          Select a campaign to view its parameters analysis.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      parameters.map((item) => (
+                        <TableRow key={item.parameter}>
+                          <TableCell>
                             <Typography variant="body2" fontWeight={600}>
                               {item.parameter}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              {item.description}
-                            </Typography>
-                          </Box>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Typography variant="body2" fontWeight={600}>
-                            {item.score}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Chip 
-                            label={item.type} 
-                            color={getTypeColor(item.type)}
-                            size="small"
-                            icon={item.type === "Fatal" ? <Warning /> : <CheckCircle />}
-                          />
-                        </TableCell>
-                        <TableCell align="center">
-                          <Typography 
-                            variant="body2" 
-                            fontWeight={600}
-                            color={`${getScoreColor(item.currentScore)}.main`}
-                          >
-                            {item.currentScore.toFixed(1)}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                            <LinearProgress 
-                              variant="determinate" 
-                              value={item.adherence} 
-                              sx={{ width: 60, height: 8, borderRadius: 4 }}
-                              color={getScoreColor(item.adherence)}
-                            />
+                          </TableCell>
+                          <TableCell align="center">
                             <Typography variant="body2" fontWeight={600}>
-                              {item.adherence}%
+                              {item.max_score}
                             </Typography>
-                          </Box>
-                        </TableCell>
-                        <TableCell align="center">
-                          {getTrendIcon(item.adherence)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                          </TableCell>
+                          <TableCell align="center">
+                            <Chip 
+                              label={item.type} 
+                              color={getTypeColor(item.type)}
+                              size="small"
+                              icon={item.type.toUpperCase() === "FATAL" ? <Warning /> : <CheckCircle />}
+                            />
+                          </TableCell>
+                          <TableCell align="center">
+                            <Typography 
+                              variant="body2" 
+                              fontWeight={600}
+                              color={`${getScoreColor(item.current_score)}.main`}
+                            >
+                              {item.current_score.toFixed(1)}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                              <LinearProgress 
+                                variant="determinate" 
+                                value={item.adherence_percentage} 
+                                sx={{ width: 60, height: 8, borderRadius: 4 }}
+                                color={getScoreColor(item.adherence_percentage)}
+                              />
+                              <Typography variant="body2" fontWeight={600}>
+                                {item.adherence_percentage}%
+                              </Typography>
+                            </Box>
+                          </TableCell>
+                          <TableCell align="center">
+                            {getTrendIcon(item.adherence_percentage)}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
                   </TableBody>
                 </Table>
               </TableContainer>
             </CardContent>
           </Card>
 
-          {/* Agent Performance Table */}
+          {/* Agent Performance Table - Mock data */}
           <Card>
             <CardContent>
               <Typography variant="h5" fontWeight={600} gutterBottom sx={{ mb: 3 }}>
