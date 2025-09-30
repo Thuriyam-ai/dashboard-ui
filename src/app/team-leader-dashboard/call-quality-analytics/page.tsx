@@ -405,7 +405,7 @@ export default function CallQualityAnalyticsPage() {
                       Total Calls
                     </Typography>
                     <Typography variant="h4" fontWeight={700} color="success.main">
-                      212
+                      10
                     </Typography>
                   </Box>
                   <Phone sx={{ fontSize: 40, color: 'success.main' }} />
@@ -421,7 +421,7 @@ export default function CallQualityAnalyticsPage() {
                       Fatal Errors
                     </Typography>
                     <Typography variant="h4" fontWeight={700} color="error.main">
-                      3
+                      0
                     </Typography>
                   </Box>
                   <Error sx={{ fontSize: 40, color: 'error.main' }} />
