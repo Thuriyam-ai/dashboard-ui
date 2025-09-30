@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
-import { Breadcrumbs } from "@/components/ui/breadcrumbs";
+import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar"; // Ensure this path is correct
+import { Breadcrumbs } from "@/components/ui/breadcrumbs"; // Ensure this path is correct
 import {
   Box,
   Container,
@@ -33,6 +33,8 @@ import {
   InputLabel,
   CircularProgress,
   Alert,
+  useTheme, // <-- 1. Import hooks
+  useMediaQuery,
 } from "@mui/material";
 import {
   BookmarkBorder,
@@ -48,6 +50,7 @@ import {
   Refresh,
   Download,
   Visibility,
+  Menu as MenuIcon, // <-- 1. Import MenuIcon
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
 import { getAllCampaigns } from "@/data/services/campaign-service";
@@ -56,6 +59,9 @@ import { listConversations } from "@/data/services/conversation-service";
 import { Campaign } from "@/types/api/campaign";
 import { TeamSummary } from "@/types/api/team";
 import { ConversationResponse } from "@/types/api/conversation";
+
+// Define a constant for the sidebar width to reuse it
+const DRAWER_WIDTH = 280;
 
 /**
  * Conversations page component for Team Leader Dashboard
@@ -66,6 +72,15 @@ export default function ConversationsPage() {
   const router = useRouter();
   const { logout } = useAuth();
   
+  // 2. Add state and hooks for responsive drawer
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
   // State for filters
   const [searchTerm, setSearchTerm] = useState("");
   const [campaignFilter, setCampaignFilter] = useState("all");
@@ -177,11 +192,37 @@ export default function ConversationsPage() {
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
-      <TeamLeaderSidebar activeItem="conversations" />
+      {/* 4. Pass new props to the sidebar */}
+      <TeamLeaderSidebar 
+        activeItem="conversations"
+        drawerWidth={DRAWER_WIDTH}
+        mobileOpen={mobileOpen}
+        onDrawerToggle={handleDrawerToggle}
+      />
 
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginLeft: '280px' }}>
+      {/* 3. Make the main content area responsive */}
+      <Box 
+        component="main"
+        sx={{ 
+          flexGrow: 1, 
+          display: 'flex', 
+          flexDirection: 'column',
+          width: { xs: '100%', md: `calc(100% - ${DRAWER_WIDTH}px)` },
+          marginLeft: { md: `${DRAWER_WIDTH}px` } // Only apply margin on medium screens and up
+        }}
+      >
         <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
           <Toolbar>
+            {/* 3. Add a menu button that only appears on mobile */}
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, display: { md: 'none' } }}
+            >
+              <MenuIcon />
+            </IconButton>
             <Box sx={{ flexGrow: 1 }}>
               <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
                 team-leader-dashboard-conversations.localhost:3000
@@ -209,8 +250,9 @@ export default function ConversationsPage() {
 
           <Card sx={{ mb: 3 }}>
             <CardContent>
+              {/* This part was already responsive with flexWrap, which is great! */}
               <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-                <TextField placeholder="Search by ID, Agent, Customer..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} InputProps={{ startAdornment: (<InputAdornment position="start"><Search /></InputAdornment>), }} sx={{ minWidth: 300 }} />
+                <TextField placeholder="Search by ID, Agent, Customer..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} InputProps={{ startAdornment: (<InputAdornment position="start"><Search /></InputAdornment>), }} sx={{ minWidth: 300, flexGrow: { xs: 1, md: 0 } }} />
                 
                 <FormControl sx={{ minWidth: 150 }} disabled={loadingCampaigns}>
                   <InputLabel>Campaign</InputLabel>
@@ -236,7 +278,7 @@ export default function ConversationsPage() {
             </CardContent>
           </Card>
 
-          {/* Key Metrics Cards - Hardcoded as requested */}
+          {/* This Grid is already responsive, perfect! */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
             <Grid item xs={12} sm={6} md={3}>
               <Card><CardContent><Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}><Box><Typography color="text.secondary" gutterBottom>Total Conversations</Typography><Typography variant="h4" fontWeight={700} color="primary">{conversations.length}</Typography></Box><Message sx={{ fontSize: 40, color: 'primary.main' }} /></Box></CardContent></Card>
@@ -251,7 +293,8 @@ export default function ConversationsPage() {
               <Card><CardContent><Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}><Box><Typography color="text.secondary" gutterBottom>Avg Duration</Typography><Typography variant="h4" fontWeight={700} color="warning.main">12m</Typography></Box><Schedule sx={{ fontSize: 40, color: 'warning.main' }} /></Box></CardContent></Card>
             </Grid>
           </Grid>
-
+          
+          {/* Note: TableContainer will automatically enable horizontal scrolling on small screens, which is the standard responsive behavior for complex tables. */}
           <Card>
             <CardContent>
               <Typography variant="h5" fontWeight={600} gutterBottom sx={{ mb: 3 }}>
@@ -280,7 +323,7 @@ export default function ConversationsPage() {
                       <TableRow><TableCell colSpan={10} align="center">No conversations found for the selected filters.</TableCell></TableRow>
                     ) : (
                       filteredConversations.map((conv) => {
-                        const qualityScore = conv.analytics_data?.QC_score;
+                        const qualityScore = conv.QC_score;
                         return (
                           <TableRow key={conv.conversation_id}>
                             <TableCell><Typography variant="body2" fontWeight={600}>{conv.conversation_id}</Typography></TableCell>
@@ -295,7 +338,7 @@ export default function ConversationsPage() {
                               {typeof qualityScore === 'number' ? (
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                   <Typography variant="body2" fontWeight={600} color={getQualityColor(qualityScore)}>{qualityScore}</Typography>
-                                  <LinearProgress variant="determinate" value={qualityScore} sx={{ width: 50, height: 6, borderRadius: 3 }} color={qualityScore >= 80 ? "success" : qualityScore >= 60 ? "warning" : "error"} />
+                                  <LinearProgress variant="determinate" value={qualityScore} sx={{ width: 50, height: 6, borderRadius: 3 }} color={qualityScore >= 80 ? "success" : qualityScore >= 50 ? "warning" : "error"} />
                                 </Box>
                               ) : (<Typography variant="body2" color="text.secondary">-</Typography>)}
                             </TableCell>

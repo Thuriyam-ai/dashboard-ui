@@ -12,10 +12,7 @@ export interface ConversationResponse {
   call_timestamp: string; // ISO date string
   avyukta_status: string | null; // e.g., "COMPLETED", "FAILED"
   lamh_disposition: string;
-  analytics_data?: {
-    QC_score?: number;
-    // other analytics fields can be added here
-  } | null;
+  QC_score: number;
   // Other fields from the API can be added as needed
   [key: string]: any; 
 }
