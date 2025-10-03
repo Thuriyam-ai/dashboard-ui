@@ -1,12 +1,5 @@
 import apiClient from './api-client';
-import { ConversationResponse } from '@/types/api/conversation';
-
-interface ListConversationsParams {
-  campaignId?: string | null;
-  teamId?: string | null;
-  skip?: number;
-  limit?: number;
-}
+import { ConversationDetailResponse, ConversationResponse, ListConversationsParams } from '@/types/api/conversation';
 
 /**
  * Fetches a paginated and filtered list of conversations from the API.
@@ -39,3 +32,23 @@ export const listConversations = async (params: ListConversationsParams): Promis
     throw new Error('Could not fetch conversations data. Please try again.');
   }
 };
+
+/**
+ * Fetches a single conversation's details by ID from the API.
+ * Corresponds to: GET /api/v1/conversations/{id}
+ * @param conversationId - The unique ID of the conversation.
+ * @returns A promise that resolves to a detailed conversation object.
+ */
+export const getConversationDetail = async (conversationId: string): Promise<ConversationDetailResponse> => {
+  try {
+    const response = await apiClient.get<ConversationDetailResponse>(
+      `/api/v1/conversations/${conversationId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to fetch conversation detail for ID: ${conversationId}`, error);
+    throw new Error(`Could not fetch conversation details for ${conversationId}. Please try again.`);
+  }
+};
+
+// Removed getCampaignParametersAnalysis and getActiveGoalVersion as the data is now nested in getConversationDetail response.

@@ -33,7 +33,7 @@ import {
   InputLabel,
   CircularProgress,
   Alert,
-  useTheme, // <-- 1. Import hooks
+  useTheme,
   useMediaQuery,
 } from "@mui/material";
 import {
@@ -50,7 +50,7 @@ import {
   Refresh,
   Download,
   Visibility,
-  Menu as MenuIcon, // <-- 1. Import MenuIcon
+  Menu as MenuIcon,
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
 import { getAllCampaigns } from "@/data/services/campaign-service";
@@ -72,7 +72,7 @@ export default function ConversationsPage() {
   const router = useRouter();
   const { logout } = useAuth();
   
-  // 2. Add state and hooks for responsive drawer
+  // Add state and hooks for responsive drawer
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -172,7 +172,18 @@ export default function ConversationsPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-IN", {
+    // Assuming dateString can be a plain string or a MongoDate object from ConversationResponse
+    let date;
+    try {
+        // Handle potential MongoDate format if present
+        date = new Date(dateString.includes('$date') ? JSON.parse(dateString).$date : dateString);
+    } catch {
+        date = new Date(dateString);
+    }
+
+    if (isNaN(date.getTime())) return '-';
+    
+    return date.toLocaleDateString("en-IN", {
       day: "numeric", month: "short", year: "numeric",
     });
   };
@@ -190,9 +201,13 @@ export default function ConversationsPage() {
     conv.conversation_id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleViewDetails = (conversationId: string) => {
+    // FIXED: Pass the conversation ID as a query parameter
+    router.push(`/team-leader-dashboard/conversation-detail?id=${conversationId}`);
+  };
+
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
-      {/* 4. Pass new props to the sidebar */}
       <TeamLeaderSidebar 
         activeItem="conversations"
         drawerWidth={DRAWER_WIDTH}
@@ -200,7 +215,6 @@ export default function ConversationsPage() {
         onDrawerToggle={handleDrawerToggle}
       />
 
-      {/* 3. Make the main content area responsive */}
       <Box 
         component="main"
         sx={{ 
@@ -208,12 +222,11 @@ export default function ConversationsPage() {
           display: 'flex', 
           flexDirection: 'column',
           width: { xs: '100%', md: `calc(100% - ${DRAWER_WIDTH}px)` },
-          marginLeft: { md: `${DRAWER_WIDTH}px` } // Only apply margin on medium screens and up
+          marginLeft: { md: `${DRAWER_WIDTH}px` }
         }}
       >
         <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
           <Toolbar>
-            {/* 3. Add a menu button that only appears on mobile */}
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -250,7 +263,6 @@ export default function ConversationsPage() {
 
           <Card sx={{ mb: 3 }}>
             <CardContent>
-              {/* This part was already responsive with flexWrap, which is great! */}
               <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
                 <TextField placeholder="Search by ID, Agent, Customer..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} InputProps={{ startAdornment: (<InputAdornment position="start"><Search /></InputAdornment>), }} sx={{ minWidth: 300, flexGrow: { xs: 1, md: 0 } }} />
                 
@@ -278,7 +290,6 @@ export default function ConversationsPage() {
             </CardContent>
           </Card>
 
-          {/* This Grid is already responsive, perfect! */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
             <Grid item xs={12} sm={6} md={3}>
               <Card><CardContent><Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}><Box><Typography color="text.secondary" gutterBottom>Total Conversations</Typography><Typography variant="h4" fontWeight={700} color="primary">{conversations.length}</Typography></Box><Message sx={{ fontSize: 40, color: 'primary.main' }} /></Box></CardContent></Card>
@@ -294,7 +305,6 @@ export default function ConversationsPage() {
             </Grid>
           </Grid>
           
-          {/* Note: TableContainer will automatically enable horizontal scrolling on small screens, which is the standard responsive behavior for complex tables. */}
           <Card>
             <CardContent>
               <Typography variant="h5" fontWeight={600} gutterBottom sx={{ mb: 3 }}>
@@ -345,7 +355,14 @@ export default function ConversationsPage() {
                             <TableCell><Chip label={teamMap.get(conv.team_id) || 'Unknown'} size="small" variant="outlined" /></TableCell>
                             <TableCell>{conv.lamh_disposition}</TableCell>
                             <TableCell>
-                              <Button size="small" startIcon={<Visibility />} variant="outlined" onClick={() => router.push('/team-leader-dashboard/conversation-detail')}>View Details</Button>
+                              <Button 
+                                size="small" 
+                                startIcon={<Visibility />} 
+                                variant="outlined" 
+                                onClick={() => handleViewDetails(conv.conversation_id)} // FIXED: Pass ID to handler
+                              >
+                                View Details
+                              </Button>
                             </TableCell>
                           </TableRow>
                         );
