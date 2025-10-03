@@ -915,10 +915,9 @@ export default function ConversationDetailPage() {
                                   </Divider>
                                   <Box sx={{ flexGrow: 1 }}>
                                     <TextField
-                                      label="Review Score"
+                                      label="Reviewer Score"
                                       type="number"
                                       size="small"
-                                      fullWidth
                                       value={
                                         scorecardReviews[param.parameter]
                                           ?.score || ""
@@ -938,7 +937,7 @@ export default function ConversationDetailPage() {
                                         ),
                                         inputProps: { min: 0, max: maxScore },
                                       }}
-                                      sx={{ mb: 2 }}
+                                      sx={{ width: 120, mb: 2 }}
                                     />
                                     <TextField
                                       label="Reason for Change"
@@ -1067,7 +1066,7 @@ export default function ConversationDetailPage() {
                                       <Divider sx={{ my: 1 }} />
                                       <Box sx={{ flexGrow: 1 }}>
                                         <TextField
-                                          label="Reviewed Outcome"
+                                          label="Reviewer Outcome"
                                           fullWidth
                                           variant="filled"
                                           value={
