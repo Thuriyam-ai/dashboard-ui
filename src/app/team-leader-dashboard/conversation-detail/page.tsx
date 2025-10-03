@@ -310,6 +310,31 @@ export default function ConversationDetailPage() {
             </Grid>
           </Grid>
 
+          {/* --- NEW LOCATION: PERSISTENT AUDIO PLAYER & TRANSCRIPT --- */}
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>Conversation Playback & Transcript</Typography>
+                <Box sx={{ p: 2, border: 1, borderColor: 'divider', borderRadius: 1, backgroundColor: 'action.hover' }}>
+                    <audio controls style={{ width: '100%' }}>
+                      <source src={detail.audioUrl} type="audio/mpeg" />
+                      Your browser does not support the audio element.
+                    </audio>
+                </Box>
+                <Card variant="outlined" sx={{ mt: 2 }}>
+                    <CardContent>
+                        <Box sx={{ height: 200, overflow: 'auto' }}>
+                            <Box sx={{ mb: 2 }}><Chip label={`Agent: ${detail.agentName}`} size="small" color="primary" sx={{ mr: 1 }} /><Typography variant="body2" color="text.secondary" component="span">00:00 - 00:15</Typography></Box>
+                            <Typography variant="body2" sx={{ mb: 2 }}>"Hello Mr. Kumar, thank you for calling our support line. I'm Kavya from the technical support team. How can I assist you today?"</Typography>
+                            <Box sx={{ mb: 2 }}><Chip label={`Customer: ${detail.customerName}`} size="small" color="secondary" sx={{ mr: 1 }} /><Typography variant="body2" color="text.secondary" component="span">00:15 - 00:45</Typography></Box>
+                            <Typography variant="body2" sx={{ mb: 2 }}>"Hi Kavya, I'm having trouble logging into my account. It keeps saying my password is incorrect, but I'm sure I'm entering it right."</Typography>
+                            <Box sx={{ mb: 2 }}><Chip label={`Agent: ${detail.agentName}`} size="small" color="primary" sx={{ mr: 1 }} /><Typography variant="body2" color="text.secondary" component="span">00:45 - 01:20</Typography></Box>
+                            <Typography variant="body2">"I understand your frustration. Let me help you resolve this. First, let me verify your account details and then we'll reset your password securely."</Typography>
+                        </Box>
+                    </CardContent>
+                </Card>
+            </CardContent>
+          </Card>
+
           {/* Analysis Tabs */}
           <Card sx={{ mb: 3 }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -320,31 +345,10 @@ export default function ConversationDetailPage() {
               </Tabs>
             </Box>
             <CardContent sx={{ p: 0 }}>
-              {/* Conversation Analysis Tab Content (Hardcoded) */}
+              {/* Conversation Analysis Tab Content (Cleaned up) */}
               {activeTab === "conversation" && (
                 <Box sx={{ p: 3 }}>
-                  <Typography variant="h5" fontWeight={600} gutterBottom sx={{ mb: 3 }}>Interactive Conversation Analysis (Hardcoded)</Typography>
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="h6" gutterBottom>Conversation Playback & Transcript</Typography>
-                    <Card variant="outlined">
-                      <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', backgroundColor: 'action.hover' }}>
-                        <audio controls style={{ width: '100%' }}>
-                          <source src={detail.audioUrl} type="audio/mpeg" />
-                          Your browser does not support the audio element.
-                        </audio>
-                      </Box>
-                      <CardContent>
-                        <Box sx={{ height: 200, overflow: 'auto' }}>
-                          <Box sx={{ mb: 2 }}><Chip label={`Agent: ${detail.agentName}`} size="small" color="primary" sx={{ mr: 1 }} /><Typography variant="body2" color="text.secondary" component="span">00:00 - 00:15</Typography></Box>
-                          <Typography variant="body2" sx={{ mb: 2 }}>"Hello Mr. Kumar, thank you for calling our support line. I'm Kavya from the technical support team. How can I assist you today?"</Typography>
-                          <Box sx={{ mb: 2 }}><Chip label={`Customer: ${detail.customerName}`} size="small" color="secondary" sx={{ mr: 1 }} /><Typography variant="body2" color="text.secondary" component="span">00:15 - 00:45</Typography></Box>
-                          <Typography variant="body2" sx={{ mb: 2 }}>"Hi Kavya, I'm having trouble logging into my account. It keeps saying my password is incorrect, but I'm sure I'm entering it right."</Typography>
-                          <Box sx={{ mb: 2 }}><Chip label={`Agent: ${detail.agentName}`} size="small" color="primary" sx={{ mr: 1 }} /><Typography variant="body2" color="text.secondary" component="span">00:45 - 01:20</Typography></Box>
-                          <Typography variant="body2">"I understand your frustration. Let me help you resolve this. First, let me verify your account details and then we'll reset your password securely."</Typography>
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  </Box>
+                  <Typography variant="h5" fontWeight={600} gutterBottom sx={{ mb: 3 }}>Call Analysis Details</Typography>
                   <Grid container spacing={3}>
                     <Grid item xs={12} md={6}>
                       <Typography variant="h6" gutterBottom>Speaker Timeline</Typography>
