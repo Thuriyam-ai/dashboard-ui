@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar"; // Ensure this path is correct
-import { Breadcrumbs } from "@/components/ui/breadcrumbs"; // Ensure this path is correct
+import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
   Box,
   Container,
@@ -42,7 +42,7 @@ import {
   Logout,
   Search,
   Message,
-  Schedule,
+  Schedule, // <-- Imported Schedule
   TrendingUp,
   CheckCircle,
   Cancel,
@@ -65,14 +65,11 @@ const DRAWER_WIDTH = 280;
 
 /**
  * Conversations page component for Team Leader Dashboard
- * Displays comprehensive conversation analytics and management interface
- * @returns The ConversationsPage component
  */
 export default function ConversationsPage() {
   const router = useRouter();
   const { logout } = useAuth();
   
-  // Add state and hooks for responsive drawer
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -172,10 +169,9 @@ export default function ConversationsPage() {
   };
 
   const formatDate = (dateString: string) => {
-    // Assuming dateString can be a plain string or a MongoDate object from ConversationResponse
+    // Helper to handle potential MongoDate format
     let date;
     try {
-        // Handle potential MongoDate format if present
         date = new Date(dateString.includes('$date') ? JSON.parse(dateString).$date : dateString);
     } catch {
         date = new Date(dateString);
@@ -202,7 +198,6 @@ export default function ConversationsPage() {
   );
 
   const handleViewDetails = (conversationId: string) => {
-    // FIXED: Pass the conversation ID as a query parameter
     router.push(`/team-leader-dashboard/conversation-detail?id=${conversationId}`);
   };
 
@@ -334,13 +329,16 @@ export default function ConversationsPage() {
                     ) : (
                       filteredConversations.map((conv) => {
                         const qualityScore = conv.QC_score;
+                        // Correctly extract the date for display
+                        const callDate = typeof conv.call_timestamp === 'string' ? conv.call_timestamp : conv.call_timestamp?.$date || new Date().toISOString();
+                        
                         return (
                           <TableRow key={conv.conversation_id}>
                             <TableCell><Typography variant="body2" fontWeight={600}>{conv.conversation_id}</Typography></TableCell>
                             <TableCell>{conv.agent_id}</TableCell>
                             <TableCell>{conv.employer_user_id}</TableCell>
                             <TableCell>{formatSeconds(conv.length_in_sec)}</TableCell>
-                            <TableCell>{formatDate(conv.call_timestamp)}</TableCell>
+                            <TableCell>{formatDate(callDate)}</TableCell>
                             <TableCell>
                               <Chip icon={getStatusIcon(conv.avyukta_status)} label={conv.avyukta_status || 'Unknown'} color={getStatusColor(conv.avyukta_status)} size="small" />
                             </TableCell>
@@ -359,7 +357,7 @@ export default function ConversationsPage() {
                                 size="small" 
                                 startIcon={<Visibility />} 
                                 variant="outlined" 
-                                onClick={() => handleViewDetails(conv.conversation_id)} // FIXED: Pass ID to handler
+                                onClick={() => handleViewDetails(conv.conversation_id)}
                               >
                                 View Details
                               </Button>

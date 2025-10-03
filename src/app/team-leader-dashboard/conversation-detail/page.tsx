@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation"; // <-- Added useSearchParams
+import { useRouter, useSearchParams } from "next/navigation";
 import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
@@ -38,6 +38,7 @@ import {
   Analytics,
   PlaylistAddCheck, // For Scorecard
   DoneAll, // For Outcomes
+  Schedule, // <-- FIXED: Added Schedule import
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
 import { getConversationDetail } from "@/data/services/conversation-service";
@@ -128,7 +129,7 @@ const mapToUI = (apiData: ConversationDetailResponse): UIEnhancedConversationDet
  */
 export default function ConversationDetailPage() {
   const router = useRouter();
-  const searchParams = useSearchParams(); // <-- Get search parameters
+  const searchParams = useSearchParams();
   const { logout } = useAuth();
   
   const [conversationData, setConversationData] = useState<ConversationData | null>(null);
@@ -178,7 +179,10 @@ export default function ConversationDetailPage() {
   const handleBackToConversations = () => router.push('/team-leader-dashboard/conversations');
 
   const getStatusColor = (status: string) => ({ completed: "success", "in-progress": "info", failed: "error" }[status] || "default");
+  
+  // FIXED: Schedule is now defined via import
   const getStatusIcon = (status: string) => ({ completed: <CheckCircle />, "in-progress": <Schedule />, failed: <Cancel /> }[status] || <Warning />);
+  
   const getSentimentColor = (sentiment: string) => ({ positive: "success", neutral: "info", negative: "error" }[sentiment] || "default");
 
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString("en-IN", {
