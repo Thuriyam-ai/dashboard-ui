@@ -38,7 +38,7 @@ import {
   Analytics,
   PlaylistAddCheck, // For Scorecard
   DoneAll, // For Outcomes
-  Schedule, // <-- FIXED: Added Schedule import
+  Schedule, 
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
 import { getConversationDetail } from "@/data/services/conversation-service";
@@ -180,7 +180,6 @@ export default function ConversationDetailPage() {
 
   const getStatusColor = (status: string) => ({ completed: "success", "in-progress": "info", failed: "error" }[status] || "default");
   
-  // FIXED: Schedule is now defined via import
   const getStatusIcon = (status: string) => ({ completed: <CheckCircle />, "in-progress": <Schedule />, failed: <Cancel /> }[status] || <Warning />);
   
   const getSentimentColor = (sentiment: string) => ({ positive: "success", neutral: "info", negative: "error" }[sentiment] || "default");
@@ -215,8 +214,8 @@ export default function ConversationDetailPage() {
   const scorecardParams = Object.values(detail.scorecard) as ScorecardParameterAnalysis[];
   const outcomeFields = Object.values(detail.outcome);
   
-  // Calculate total possible score for the scorecard visualization
-  const totalPossibleScore = scorecardParams.length * 10; // Arbitrary max of 10 per param
+  // FIXED: Calculation using max_score from API data
+  const totalPossibleScore = scorecardParams.reduce((sum, param) => sum + param.max_score, 0);
   const totalAchievedScore = scorecardParams.reduce((sum, param) => sum + param.score, 0);
   const scorecardPercentage = totalPossibleScore > 0 ? (totalAchievedScore / totalPossibleScore) * 100 : 0;
   
@@ -376,15 +375,17 @@ export default function ConversationDetailPage() {
                   <Typography variant="h5" fontWeight={600} gutterBottom sx={{ mb: 3 }}>Agent Performance Scorecard</Typography>
                   <Card variant="outlined">
                     <CardContent>
-                      <Typography variant="h6" color="text.secondary" gutterBottom>Total QC Score: {detail.qualityScore}</Typography>
-                      <LinearProgress variant="determinate" value={detail.qualityScore} sx={{ mt: 1, height: 10, borderRadius: 4, mb: 3 }} color={detail.qualityScore >= 80 ? "success" : "error"} />
+                      <Typography variant="h6" color="text.secondary" gutterBottom>Total QC Score: {detail.qualityScore} / {Math.round(scorecardPercentage)}% Adherence</Typography>
+                      {/* Using the total scorecard percentage for the main progress bar based on detailed scores */}
+                      <LinearProgress variant="determinate" value={scorecardPercentage} sx={{ mt: 1, height: 10, borderRadius: 4, mb: 3 }} color={scorecardPercentage >= 80 ? "success" : "error"} />
                       
+                      {/* FIXED: Using lg={4} to ensure uniform 3-column layout, and using param.max_score */}
                       <Grid container spacing={3} alignItems="stretch">
                         {scorecardParams.length > 0 ? (
                           scorecardParams.map((param, index) => {
-                            // Max score is not explicitly returned here, assuming a max of 10 for visual ratio unless we have a separate goal API call
-                            const maxScore = 10; 
+                            const maxScore = param.max_score; // Use max_score from API response
                             const scoreColor = getScoreColor(param.score, maxScore);
+                            const adherence = maxScore > 0 ? (param.score / maxScore) * 100 : 0;
 
                             return (
                               <Grid item xs={12} md={6} lg={4} key={index}>
@@ -397,7 +398,7 @@ export default function ConversationDetailPage() {
                                     <Typography variant="body2" sx={{ mt: 1, mb: 1, fontStyle: 'italic' }}>{param.explanation}</Typography>
                                     
                                     <Box sx={{ mt: 2 }}>
-                                      <Typography variant="caption" fontWeight={600}>Rule Analysis:</Typography>
+                                      <Typography variant="caption" fontWeight={600}>Rule Analysis ({Math.round(adherence)}% Adherence):</Typography>
                                       {param.sub_rule_analysis.map((rule, idx) => (
                                         <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', mt: 0.5, fontSize: '0.75rem' }}>
                                           {rule.status === 'Pass' ? 

@@ -11,6 +11,7 @@ interface MongoDate {
 export interface ScorecardParameterAnalysis {
   parameter: string;
   score: number;
+  max_score: number;
   explanation: string;
   sub_rule_analysis: Array<{
     rule: string;
