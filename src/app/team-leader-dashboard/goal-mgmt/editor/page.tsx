@@ -80,8 +80,9 @@ function GoalEditorContent() {
             populateFormState(activeData);
           }
         } else if (cloneId) { // Clone Mode
-          const versionData = await getGoalVersion(cloneId, 'draft');
+          const versionData = await getGoalVersion(cloneId, 'active');
           populateFormState(versionData);
+          setGoalName(`${versionData.name} (Clone)`);
         } else { // Create Mode
           setInsights([
             { name: "Sentiment Analysis", is_enabled: true, display_order: 1 },
