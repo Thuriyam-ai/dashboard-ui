@@ -1,3 +1,5 @@
+// src/app/team-leader-dashboard/campaign-mgmt/editor/page.tsx
+
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
@@ -6,8 +8,8 @@ import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leade
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
   Box, Container, Typography, AppBar, Toolbar, IconButton, Button, Avatar, Card,
-  CardContent, Chip, TextField, FormControl, InputLabel, Select, Grid, Alert,
-  AlertTitle, Divider, MenuItem, CircularProgress,
+  CardContent, TextField, FormControl, InputLabel, Select, Grid, Alert,
+  MenuItem, CircularProgress, FormHelperText,
 } from "@mui/material";
 import { Save, ArrowBack, Psychology, Group } from "@mui/icons-material";
 import { getCampaignById, createCampaign, updateCampaign } from "@/data/services/campaign-service";
@@ -17,68 +19,59 @@ import { ActiveGoalSummary } from "@/types/api/goal";
 import { TeamSummary } from "@/types/api/team";
 import { CampaignCreate, CampaignUpdate } from "@/types/api/campaign";
 
-// Helper to format an ISO date-time string to a YYYY-MM-DD string for date inputs
 const formatDateForInput = (isoDate: string | null | undefined): string => {
   if (!isoDate) return "";
   return isoDate.split('T')[0];
 };
 
+interface FormErrors {
+  campaignName?: string;
+  startDate?: string;
+  endDate?: string;
+  selectedGoalId?: string;
+  selectedTeamId?: string;
+}
+
 function CampaignEditorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Component State
   const [isEditing, setIsEditing] = useState(false);
   const [campaignId, setCampaignId] = useState<string | null>(null);
   const [pageTitle, setPageTitle] = useState("Create New Campaign");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
 
-  // Form State
   const [campaignName, setCampaignName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedGoalId, setSelectedGoalId] = useState("");
   const [selectedTeamId, setSelectedTeamId] = useState("");
 
-  // Dropdown Data State
   const [availableGoals, setAvailableGoals] = useState<ActiveGoalSummary[]>([]);
   const [availableTeams, setAvailableTeams] = useState<TeamSummary[]>([]);
 
   useEffect(() => {
     const id = searchParams.get('id');
-    const cloneId = searchParams.get('clone');
-
     const initialize = async () => {
       try {
-        // Fetch dropdown data first
         const [goalsData, teamsData] = await Promise.all([getActiveGoalsSummary(), getAllTeams()]);
         setAvailableGoals(goalsData);
         setAvailableTeams(teamsData);
-
         if (id) {
           setIsEditing(true);
           setCampaignId(id);
           setPageTitle("Edit Campaign");
           await loadCampaignData(id);
-        } else if (cloneId) {
-          setIsEditing(false);
-          setCampaignId(null);
-          setPageTitle("Create New Campaign (Cloned)");
-          await loadCampaignData(cloneId);
-        } else {
-          setIsEditing(false);
-          setCampaignId(null);
         }
       } catch (err) {
-        setError("Failed to load necessary data. Please try again.");
-        console.error(err);
+        setApiError("Failed to load necessary data. Please try again.");
       } finally {
         setIsLoading(false);
       }
     };
-
     initialize();
   }, [searchParams]);
 
@@ -90,55 +83,77 @@ function CampaignEditorContent() {
     setSelectedGoalId(data.goal_id);
     setSelectedTeamId(data.team_id);
   };
+  
+  const validateForm = (): boolean => {
+    const errors: FormErrors = {};
+    if (!campaignName.trim()) errors.campaignName = "Campaign name is required.";
+    if (!selectedGoalId) errors.selectedGoalId = "A goal must be selected.";
+    if (!selectedTeamId) errors.selectedTeamId = "A team must be assigned.";
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize to the start of today
+    
+    const start = startDate ? new Date(startDate) : null;
+    const end = endDate ? new Date(endDate) : null;
 
-  const handleBack = () => router.push('/team-leader-dashboard/campaign-mgmt');
+    if (!isEditing && start && start < today) {
+        errors.startDate = "Start date cannot be in the past.";
+    }
+
+    if (start && end && end < start) {
+        errors.endDate = "End date must be on or after the start date.";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleSave = async () => {
+    setApiError(null);
+    if (!validateForm()) {
+      return;
+    }
+    
     setIsSaving(true);
-    setError(null);
-
-    // Convert dates back to ISO strings for the API
     const starts_at = startDate ? new Date(startDate).toISOString() : null;
     const ends_at = endDate ? new Date(endDate).toISOString() : null;
 
     try {
       if (isEditing && campaignId) {
-        const payload: CampaignUpdate = { name: campaignName, team_id: selectedTeamId, starts_at, ends_at, business_objective: "TBD", status: "UPCOMING" };
+        const payload: CampaignUpdate = { starts_at, ends_at }; // Per API spec for update
         await updateCampaign(campaignId, payload);
       } else {
-        const payload: CampaignCreate = { name: campaignName, goal_id: selectedGoalId, team_id: selectedTeamId, starts_at, ends_at, business_objective: "TBD", status: "UPCOMING", organization_id: "org-1" };
+        const payload: CampaignCreate = { 
+          name: campaignName, 
+          goal_id: selectedGoalId, 
+          team_id: selectedTeamId, 
+          starts_at, 
+          ends_at, 
+          business_objective: "TBD", 
+          status: "UPCOMING", 
+          organization_id: "org-1" // This should be dynamic in a real app
+        };
         await createCampaign(payload);
       }
-      handleBack();
-    } catch (err) {
-      setError("Failed to save the campaign. Please check the fields and try again.");
-      console.error(err);
+      router.push('/team-leader-dashboard/campaign-mgmt');
+    } catch (err: any) {
+      // Display backend validation error
+      const message = err.response?.data?.detail || "Failed to save the campaign. An unknown error occurred.";
+      setApiError(message);
     } finally {
       setIsSaving(false);
     }
   };
   
-  const selectedGoalData = availableGoals.find(goal => goal.goal_name === selectedGoalId);
-  const selectedTeamData = availableTeams.find(team => team.id === selectedTeamId);
-
-  if (isLoading) {
-    return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><CircularProgress /></Box>;
-  }
-
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
       <TeamLeaderSidebar activeItem="campaign-mgmt" />
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginLeft: '280px' }}>
-        <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
+        <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary' }}>
           <Toolbar>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1 }}>
-              <IconButton onClick={handleBack}><ArrowBack /></IconButton>
-              <Box>
-                <Typography variant="h6" fontWeight={600}>{pageTitle}</Typography>
-                <Typography variant="body2" color="text.secondary">{campaignName || 'Untitled Campaign'}</Typography>
-              </Box>
-            </Box>
-            <Button variant="contained" startIcon={isSaving ? <CircularProgress size={20} color="inherit" /> : <Save />} onClick={handleSave} disabled={isSaving} sx={{ ml: 2 }}>
+            <IconButton onClick={() => router.push('/team-leader-dashboard/campaign-mgmt')}><ArrowBack /></IconButton>
+            <Typography variant="h6" sx={{ ml: 2, flexGrow: 1 }}>{pageTitle}</Typography>
+            <Button variant="contained" startIcon={isSaving ? <CircularProgress size={20} color="inherit" /> : <Save />} onClick={handleSave} disabled={isSaving}>
               {isSaving ? 'Saving...' : 'Save Campaign'}
             </Button>
           </Toolbar>
@@ -146,55 +161,61 @@ function CampaignEditorContent() {
 
         <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3 }}>
           <Breadcrumbs />
-          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+          {apiError && <Alert severity="error" sx={{ mb: 2 }}>{apiError}</Alert>}
+          
           <Card>
             <CardContent sx={{ p: 4 }}>
               <Typography variant="h5" fontWeight={600} gutterBottom>Campaign Configuration</Typography>
-              <Grid container spacing={3} sx={{mt: 1}}>
+              <Grid container spacing={4} sx={{ mt: 1 }}>
                 <Grid item xs={12} md={6}>
-                  <TextField fullWidth label="Campaign Name" value={campaignName} onChange={(e) => setCampaignName(e.target.value)} placeholder="e.g., Q1 Loan Qualification Drive" sx={{ mb: 3 }} helperText="A unique, human-readable name for this campaign" required/>
-                  <Box sx={{ mb: 3 }}>
+                  <FormControl fullWidth sx={{ mb: 3 }}>
+                    <TextField 
+                      label="Campaign Name" 
+                      value={campaignName} 
+                      onChange={(e) => setCampaignName(e.target.value)} 
+                      required 
+                      disabled={isEditing} // Field disabled on edit
+                      error={!!formErrors.campaignName}
+                      helperText={formErrors.campaignName || "A unique, human-readable name for this campaign"}
+                    />
+                  </FormControl>
+                  <Box>
                     <Typography variant="body1" color="text.secondary" gutterBottom>Campaign Duration</Typography>
                     <Grid container spacing={2}>
-                      <Grid item xs={6}><TextField label="Start Date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} InputLabelProps={{ shrink: true }} fullWidth/></Grid>
-                      <Grid item xs={6}><TextField label="End Date" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} InputLabelProps={{ shrink: true }} fullWidth/></Grid>
+                      <Grid item xs={6}>
+                         <TextField label="Start Date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} InputLabelProps={{ shrink: true }} fullWidth error={!!formErrors.startDate} helperText={formErrors.startDate}/>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextField label="End Date" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} InputLabelProps={{ shrink: true }} fullWidth error={!!formErrors.endDate} helperText={formErrors.endDate}/>
+                      </Grid>
                     </Grid>
                   </Box>
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <FormControl fullWidth sx={{ mb: 3 }} required>
+                  <FormControl fullWidth sx={{ mb: 3 }} required error={!!formErrors.selectedGoalId}>
                     <InputLabel>Goal Selection</InputLabel>
                     <Select value={selectedGoalId} onChange={(e) => setSelectedGoalId(e.target.value)} label="Goal Selection" disabled={isEditing}>
                       {availableGoals.map((goal) => (
-                        <MenuItem key={goal.goal_name} value={goal.goal_id}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Psychology sx={{ fontSize: 16 }} /><Typography variant="body2">{goal.goal_name} (v{goal.active_version_no})</Typography></Box>
+                        <MenuItem key={goal.goal_id} value={goal.goal_id}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Psychology sx={{ fontSize: 16 }} />{goal.goal_name} (v{goal.active_version_no})</Box>
                         </MenuItem>
                       ))}
                     </Select>
+                    {formErrors.selectedGoalId && <FormHelperText>{formErrors.selectedGoalId}</FormHelperText>}
                   </FormControl>
-                  <FormControl fullWidth sx={{ mb: 3 }} required>
+                  <FormControl fullWidth required error={!!formErrors.selectedTeamId}>
                     <InputLabel>Team Assignment</InputLabel>
-                    <Select value={selectedTeamId} onChange={(e) => setSelectedTeamId(e.target.value)} label="Team Assignment">
+                    <Select value={selectedTeamId} onChange={(e) => setSelectedTeamId(e.target.value)} label="Team Assignment" disabled={isEditing}>
                       {availableTeams.map((team) => (
                         <MenuItem key={team.id} value={team.id}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Group sx={{ fontSize: 16 }} /><Typography variant="body2">{team.name}</Typography></Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Group sx={{ fontSize: 16 }} />{team.name}</Box>
                         </MenuItem>
                       ))}
                     </Select>
+                     {formErrors.selectedTeamId && <FormHelperText>{formErrors.selectedTeamId}</FormHelperText>}
                   </FormControl>
                 </Grid>
               </Grid>
-
-              {selectedGoalData && (
-                <>
-                  <Divider sx={{ my: 3 }} />
-                  <Typography variant="h6" gutterBottom>Selected Goal Information</Typography>
-                  <Alert severity="info" sx={{ mb: 3 }}>
-                    <AlertTitle>Goal Details: {selectedGoalData.goal_name}</AlertTitle>
-                    This goal will serve as the playbook for this campaign. All conversations will follow the interaction blueprint and quality parameters defined in this goal version.
-                  </Alert>
-                </>
-              )}
             </CardContent>
           </Card>
         </Container>

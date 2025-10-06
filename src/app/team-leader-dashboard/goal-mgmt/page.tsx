@@ -1,5 +1,3 @@
-// src/app/team-leader-dashboard/goal-mgmt/page.tsx
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -10,6 +8,7 @@ import {
   Box, Container, Typography, AppBar, Toolbar, IconButton, Button,
   Avatar, Card, CardContent, Chip, Grid, Dialog, DialogTitle,
   DialogContent, DialogActions, Alert, AlertTitle, CircularProgress,
+  Tooltip, // <-- 1. Import Tooltip
 } from "@mui/material";
 import {
   BookmarkBorder, MoreVert, Logout, Add, Edit, ContentCopy,
@@ -96,7 +95,8 @@ export default function GoalManagementPage() {
     return (
       <Grid container spacing={2}>
         {goals.map((goal) => (
-          <Grid size={{xs:12}} key={goal.goal_id}>
+          // <-- 2. FIXED Grid prop from `size` to `item`
+          <Grid item xs={12} key={goal.goal_id}>
             <Card sx={{ transition: 'all 0.2s ease-in-out', '&:hover': { transform: 'translateY(-4px)', boxShadow: 4 } }}>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
@@ -147,9 +147,23 @@ export default function GoalManagementPage() {
                     <Button size="small" startIcon={<CheckCircle />} onClick={() => handlePublish(goal.goal_id)} disabled={!goal.draft_version_no}>
                       Publish Draft
                     </Button>
-                    <Button size="small" startIcon={<ContentCopy />} onClick={() => handleCloneGoal(goal.goal_id)} variant="outlined">
-                      Clone
-                    </Button>
+
+                    {/* --- 3. UPDATED CLONE BUTTON LOGIC --- */}
+                    <Tooltip title={!goal.published_version_no ? "A goal must have a published version to be cloned." : ""}>
+                      {/* Tooltip requires a wrapper around disabled elements */}
+                      <span>
+                        <Button
+                          size="small"
+                          startIcon={<ContentCopy />}
+                          onClick={() => handleCloneGoal(goal.goal_id)}
+                          variant="outlined"
+                          disabled={!goal.published_version_no}
+                        >
+                          Clone
+                        </Button>
+                      </span>
+                    </Tooltip>
+                    
                     <Button size="small" startIcon={<Delete />} onClick={() => handleDeleteGoal(goal)} color="error" variant="outlined">
                       Delete
                     </Button>
@@ -169,7 +183,7 @@ export default function GoalManagementPage() {
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginLeft: '280px' }}>
         <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
           <Toolbar>
-            <Box sx={{ flexGrow: 1 }}><Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>team-leader-dashboard.localhost:3000</Typography></Box>
+            <Box sx={{ flexGrow: 1 }}><Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>team-leader-dashboard/goal-mgmt</Typography></Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <IconButton size="small" sx={{ color: 'text.secondary' }}><BookmarkBorder /></IconButton>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 2 }}><Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '0.875rem' }}>W</Avatar><Typography variant="body2" fontWeight={500}>Work</Typography></Box>

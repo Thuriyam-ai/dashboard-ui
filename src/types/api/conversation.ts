@@ -1,3 +1,5 @@
+// src/types/api/conversation.ts
+
 /**
  * Represents the MongoDB $date structure
  */
@@ -22,6 +24,7 @@ export interface ScorecardParameterAnalysis {
 
 /**
  * Represents the full Scorecard object, which is a dictionary of ScorecardParameterAnalysis.
+ * Uses an index signature to accommodate dynamic parameter names.
  */
 export interface ConversationScorecard {
   [key: string]: ScorecardParameterAnalysis;
@@ -44,13 +47,30 @@ export interface ConversationOutcome {
 }
 
 /**
- * Represents a conversation object returned from the backend API.
+ * Represents a conversation object returned from the backend API for a list view.
+ * Note: This might differ slightly from the full detail response.
  */
 export interface ConversationResponse {
-  _id: { $oid: string }; // Added
   conversation_id: string;
   agent_id: string;
-  employer_user_id: string; // Used as Customer ID
+  employer_user_id: string;
+  campaign_id: string;
+  team_id: string;
+  length_in_sec: number;
+  call_timestamp: string; // List view uses a simple string
+  avyukta_status: string | null;
+  lamh_disposition: string;
+  QC_score: number;
+}
+
+/**
+ * Represents the full, detailed conversation object returned from GET /api/v1/conversations/{id}
+ */
+export interface ConversationDetailResponse {
+  _id: { $oid: string };
+  conversation_id: string;
+  agent_id: string;
+  employer_user_id: string;
   campaign_id: string;
   team_id: string;
   goal_id: string;
@@ -64,19 +84,18 @@ export interface ConversationResponse {
   comments: string | null;
   out_transcription_url: string | null;
 
-  // Corrected type to handle MongoDB $date structure
   call_timestamp: MongoDate | string; 
   lamh_created_at: MongoDate | string;
   created_at: MongoDate | string;
   updated_at: MongoDate | string;
-  deleted_at: MongoDate | null; // Added
+  deleted_at: MongoDate | null;
   
-  lamh_disposition: string; // Added/Corrected
+  lamh_disposition: string;
   QC_score: number;
   
-  created_by: string; // Added
-  updated_by: string; // Added
-  deleted_by: string; // Added
+  created_by: string;
+  updated_by: string;
+  deleted_by: string;
 
   logging_comments: any | null; 
   actions: any | null;
@@ -88,9 +107,6 @@ export interface ConversationResponse {
   } | null;
 }
 
-export type ConversationDetailResponse = ConversationResponse;
-
-// Placeholder for List API structure (unchanged)
 export interface ListConversationsParams {
   campaignId?: string | null;
   teamId?: string | null;
