@@ -1067,7 +1067,7 @@ export default function ConversationDetailPage() {
                                       <Box sx={{ flexGrow: 1 }}>
                                         <TextField
                                           label="Reviewer Outcome"
-                                          fullWidth
+                                          size="small"
                                           variant="filled"
                                           value={
                                             outcomeReviews[field.attribute_name]
