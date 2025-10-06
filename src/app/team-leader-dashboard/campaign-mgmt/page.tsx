@@ -155,7 +155,7 @@ export default function CampaignManagementPage() {
                 <Typography variant="h6" color="text.secondary">Create and manage conversation campaigns for your teams</Typography>
               </Box>
               <Button variant="contained" startIcon={<Add />} onClick={handleCreateCampaign} sx={{ px: 3, py: 1.5, fontSize: '1rem', fontWeight: 600 }}>
-                Create New Campaign
+                Create new campaign
               </Button>
             </Box>
           </Box>
@@ -216,7 +216,7 @@ export default function CampaignManagementPage() {
               <Campaign sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
               <Typography variant="h5" gutterBottom>No Campaigns Created Yet</Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>Create your first campaign to start managing conversation objectives for your teams.</Typography>
-              <Button variant="contained" startIcon={<Add />} onClick={handleCreateCampaign} size="large">Create Your First Campaign</Button>
+              <Button variant="contained" startIcon={<Add />} onClick={handleCreateCampaign} size="large">Create your first campaign</Button>
             </Box>
           )}
         </Container>
@@ -230,7 +230,7 @@ export default function CampaignManagementPage() {
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-            <Button onClick={confirmDelete} color="error" variant="contained">Delete Campaign</Button>
+            <Button onClick={confirmDelete} color="error" variant="contained">Delete campaign</Button>
           </DialogActions>
         </Dialog>
       </Box>

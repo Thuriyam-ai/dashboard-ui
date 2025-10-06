@@ -150,7 +150,7 @@ export default function ConversationDetailPage() {
         {/* Top Bar */}
         <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
           <Toolbar>
-            <Button startIcon={<ArrowBack />} onClick={handleBackToConversations} sx={{ mr: 2 }}>Back to Conversations</Button>
+            <Button startIcon={<ArrowBack />} onClick={handleBackToConversations} sx={{ mr: 2 }}>Back to conversations</Button>
             <Box sx={{ flexGrow: 1 }}><Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>conversation-detail.localhost:3001</Typography></Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <IconButton size="small" sx={{ color: 'text.secondary' }}><BookmarkBorder /></IconButton>

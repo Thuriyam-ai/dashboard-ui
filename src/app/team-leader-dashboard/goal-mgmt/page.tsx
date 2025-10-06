@@ -89,7 +89,7 @@ export default function GoalManagementPage() {
         <Box sx={{ textAlign: 'center', py: 8 }}>
           <Assessment sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
           <Typography variant="h5" gutterBottom>No Goals Created Yet</Typography>
-          <Button variant="contained" startIcon={<Add />} onClick={handleCreateGoal} size="large">Create Your First Goal</Button>
+          <Button variant="contained" startIcon={<Add />} onClick={handleCreateGoal} size="large">Create your first goal</Button>
         </Box>
       );
     }
@@ -145,7 +145,7 @@ export default function GoalManagementPage() {
                       Edit
                     </Button>
                     <Button size="small" startIcon={<CheckCircle />} onClick={() => handlePublish(goal.goal_id)} disabled={!goal.draft_version_no}>
-                      Publish Draft
+                      Publish draft
                     </Button>
                     <Button size="small" startIcon={<ContentCopy />} onClick={() => handleCloneGoal(goal.goal_id)} variant="outlined">
                       Clone
@@ -187,7 +187,7 @@ export default function GoalManagementPage() {
                 <Typography color="text.secondary">Create and manage conversation goals for your teams</Typography>
               </Box>
               <Button variant="contained" startIcon={<Add />} onClick={handleCreateGoal} sx={{ px: 2, py: 1 }}>
-                Create New Goal
+                Create new goal
               </Button>
             </Box>
           </Box>
@@ -203,7 +203,7 @@ export default function GoalManagementPage() {
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-            <Button onClick={confirmDelete} color="error" variant="contained">Archive Goal</Button>
+            <Button onClick={confirmDelete} color="error" variant="contained">Archive goal</Button>
           </DialogActions>
         </Dialog>
       </Box>

@@ -139,7 +139,7 @@ function CampaignEditorContent() {
               </Box>
             </Box>
             <Button variant="contained" startIcon={isSaving ? <CircularProgress size={20} color="inherit" /> : <Save />} onClick={handleSave} disabled={isSaving} sx={{ ml: 2 }}>
-              {isSaving ? 'Saving...' : 'Save Campaign'}
+              {isSaving ? 'Saving...' : 'Save campaign'}
             </Button>
           </Toolbar>
         </AppBar>
