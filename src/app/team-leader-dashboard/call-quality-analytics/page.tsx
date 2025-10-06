@@ -284,7 +284,6 @@ export default function CallQualityAnalyticsPage() {
                         </MenuItem>
                       ))}
                     </Select>
-                    {loadingCampaigns && <CircularProgress size={24} sx={{ position: 'absolute', top: '50%', right: 40, marginTop: '-12px' }} />}
                   </FormControl>
                   {campaignError && <Typography color="error" variant="caption">{campaignError}</Typography>}
                 </Grid>

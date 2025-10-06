@@ -267,7 +267,6 @@ export default function ConversationsPage() {
                     <MenuItem value="all">All Campaigns</MenuItem>
                     {campaigns.map((campaign) => (<MenuItem key={campaign.id} value={campaign.id}>{campaign.name}</MenuItem>))}
                   </Select>
-                  {loadingCampaigns && <CircularProgress size={24} sx={{ position: 'absolute', top: '50%', right: 40, marginTop: '-12px' }} />}
                 </FormControl>
 
                 <FormControl sx={{ minWidth: 150 }} disabled={loadingTeams}>
@@ -276,7 +275,6 @@ export default function ConversationsPage() {
                     <MenuItem value="all">All Teams</MenuItem>
                     {teams.map((team) => (<MenuItem key={team.id} value={team.id}>{team.name}</MenuItem>))}
                   </Select>
-                  {loadingTeams && <CircularProgress size={24} sx={{ position: 'absolute', top: '50%', right: 40, marginTop: '-12px' }} />}
                 </FormControl>
 
                 <Button variant="outlined" startIcon={<Refresh />} onClick={() => { setSearchTerm(""); setCampaignFilter("all"); setTeamFilter("all"); }}>Reset Filters</Button>
