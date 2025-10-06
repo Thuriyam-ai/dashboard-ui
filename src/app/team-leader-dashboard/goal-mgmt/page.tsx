@@ -120,20 +120,7 @@ export default function GoalManagementPage() {
                     </Box>
                   </Box>
 
-                  <Box sx={{ display: 'flex', gap: 3, flex: '1 1 300px', justifyContent: 'space-around' }}>
-                    <Box sx={{ textAlign: 'center' }}>
-                      <Typography variant="h6" fontWeight={700} color="primary">{goal.conversations.toLocaleString()}</Typography>
-                      <Typography variant="caption" color="text.secondary">Conversations</Typography>
-                    </Box>
-                    <Box sx={{ textAlign: 'center' }}>
-                      <Typography variant="h6" fontWeight={700} color="success.main">{goal.avg_score.toFixed(1)}%</Typography>
-                      <Typography variant="caption" color="text.secondary">Avg Score</Typography>
-                    </Box>
-                    <Box sx={{ textAlign: 'center' }}>
-                      <Typography variant="h6" fontWeight={700} color="info.main">{goal.completion_score.toFixed(1)}%</Typography>
-                      <Typography variant="caption" color="text.secondary">Completion</Typography>
-                    </Box>
-                  </Box>
+                  
 
                   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     <Button 
