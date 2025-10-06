@@ -44,14 +44,20 @@ import {
   DoneAll,
   Schedule,
   Save,
+  Edit,
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
-import { getConversationDetail } from "@/data/services/conversation-service";
+import {
+  getConversationDetail,
+  submitScorecardReview,
+  submitOutcomeReview,
+} from "@/data/services/conversation-service";
 import {
   ConversationDetailResponse,
   ConversationScorecard,
   ConversationOutcome,
   ScorecardParameterAnalysis,
+  OutcomeFieldAnalysis,
 } from "@/types/api/conversation";
 
 // --- Types & Mocks ---
@@ -91,11 +97,11 @@ interface ConversationData {
 type TabValue = "conversation" | "scorecard" | "outcomes";
 
 type ScorecardReviewState = {
-  [parameter: string]: { score: string; reason: string };
+  [paramId: string]: { score: string; reason: string };
 };
 
 type OutcomeReviewState = {
-  [attribute_name: string]: { value: string; reason: string };
+  [attributeId: string]: { value: any; reason: string };
 };
 
 const mapToUI = (
@@ -151,10 +157,12 @@ export default function ConversationDetailPage() {
     useState<ScorecardReviewState>({});
   const [outcomeReviews, setOutcomeReviews] = useState<OutcomeReviewState>({});
 
-  // --- UPDATED STATE FOR INDIVIDUAL ITEM SAVING ---
   const [savingItemId, setSavingItemId] = useState<string | null>(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    "success" | "error"
+  >("success");
 
   const conversationId = searchParams.get("id");
 
@@ -175,18 +183,23 @@ export default function ConversationDetailPage() {
         setConversationData({ detail: mappedData });
 
         const initialScorecardReviews: ScorecardReviewState = {};
-        Object.values(mappedData.scorecard).forEach((param) => {
-          initialScorecardReviews[param.parameter] = { score: "", reason: "" };
-        });
+        for (const [id, paramData] of Object.entries(mappedData.scorecard)) {
+          initialScorecardReviews[id] = {
+            score:
+              paramData.review_score?.toString() ??
+              paramData.score.toString(),
+            reason: paramData.reason_for_update ?? "",
+          };
+        }
         setScorecardReviews(initialScorecardReviews);
 
         const initialOutcomeReviews: OutcomeReviewState = {};
-        Object.values(mappedData.outcome).forEach((field) => {
-          initialOutcomeReviews[field.attribute_name] = {
-            value: "",
-            reason: "",
+        for (const [id, outcomeData] of Object.entries(mappedData.outcome)) {
+          initialOutcomeReviews[id] = {
+            value: outcomeData.reviewer_value ?? "",
+            reason: outcomeData.reviewer_reason ?? "",
           };
-        });
+        }
         setOutcomeReviews(initialOutcomeReviews);
       } catch (err) {
         setError(
@@ -201,54 +214,123 @@ export default function ConversationDetailPage() {
   }, [conversationId]);
 
   const handleScorecardReviewChange = (
-    parameter: string,
+    parameterId: string,
     field: "score" | "reason",
     value: string
   ) => {
     setScorecardReviews((prev) => ({
       ...prev,
-      [parameter]: { ...prev[parameter], [field]: value },
+      [parameterId]: { ...prev[parameterId], [field]: value },
     }));
   };
 
   const handleOutcomeReviewChange = (
-    attribute_name: string,
+    attributeId: string,
     field: "value" | "reason",
-    value: string
+    value: any
   ) => {
     setOutcomeReviews((prev) => ({
       ...prev,
-      [attribute_name]: { ...prev[attribute_name], [field]: value },
+      [attributeId]: { ...prev[attributeId], [field]: value },
     }));
   };
 
-  // --- NEW HANDLERS FOR INDIVIDUAL SAVES ---
-  const handleSaveScorecardItem = (parameter: string) => {
-    setSavingItemId(parameter);
-    console.log(
-      `Saving review for parameter: "${parameter}"`,
-      scorecardReviews[parameter]
-    );
-
-    setTimeout(() => {
-      setSavingItemId(null);
-      setSnackbarMessage(`Review for "${parameter}" saved successfully!`);
+  const handleSaveScorecardItem = async (
+    parameterId: string,
+    maxScore: number
+  ) => {
+    if (!conversationId) {
+      setSnackbarMessage("Error: Conversation ID is missing.");
+      setSnackbarSeverity("error");
       setSnackbarOpen(true);
-    }, 1500);
+      return;
+    }
+
+    const review = scorecardReviews[parameterId];
+    const scoreValue = parseInt(review.score, 10);
+
+    if (
+      !review.score ||
+      isNaN(scoreValue) ||
+      scoreValue < 0 ||
+      scoreValue > maxScore
+    ) {
+      setSnackbarMessage(
+        `Please enter a valid score between 0 and ${maxScore}.`
+      );
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+      return;
+    }
+    if (!review.reason.trim()) {
+      setSnackbarMessage("A reason is required to submit the review.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+      return;
+    }
+
+    setSavingItemId(parameterId);
+    try {
+      const payload = {
+        review_score: scoreValue,
+        reason_for_update: review.reason,
+      };
+      await submitScorecardReview(conversationId, parameterId, payload);
+      setSnackbarMessage(`Review for "${parameterId}" saved successfully!`);
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "An unknown error occurred.";
+      setSnackbarMessage(errorMessage);
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    } finally {
+      setSavingItemId(null);
+    }
   };
 
-  const handleSaveOutcomeItem = (attribute: string) => {
-    setSavingItemId(attribute);
-    console.log(
-      `Saving review for outcome: "${attribute}"`,
-      outcomeReviews[attribute]
-    );
-
-    setTimeout(() => {
-      setSavingItemId(null);
-      setSnackbarMessage(`Review for "${attribute}" saved successfully!`);
+  const handleSaveOutcomeItem = async (attributeId: string) => {
+    if (!conversationId) {
+      setSnackbarMessage("Error: Conversation ID is missing.");
+      setSnackbarSeverity("error");
       setSnackbarOpen(true);
-    }, 1500);
+      return;
+    }
+
+    const review = outcomeReviews[attributeId];
+    if (review.value === null || review.value === "") {
+      setSnackbarMessage("The reviewer value cannot be empty.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+      return;
+    }
+    if (!review.reason.trim()) {
+      setSnackbarMessage("A reason is required to submit the review.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+      return;
+    }
+
+    setSavingItemId(attributeId);
+    try {
+      const payload = {
+        reviewer_value: review.value,
+        reviewer_reason: review.reason,
+      };
+      await submitOutcomeReview(conversationId, attributeId, payload);
+      setSnackbarMessage(`Review for "${attributeId}" saved successfully!`);
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "An unknown error occurred.";
+      setSnackbarMessage(errorMessage);
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    } finally {
+      setSavingItemId(null);
+    }
   };
 
   const handleSnackbarClose = (
@@ -316,18 +398,23 @@ export default function ConversationDetailPage() {
   }
 
   const { detail } = conversationData;
-  const scorecardParams = Object.values(
+  const scorecardEntries = Object.entries(
     detail.scorecard
-  ) as ScorecardParameterAnalysis[];
-  const outcomeFields = Object.values(detail.outcome);
-  const totalPossibleScore = scorecardParams.reduce(
-    (sum, param) => sum + param.max_score,
+  ) as [string, ScorecardParameterAnalysis][];
+  const outcomeEntries = Object.entries(
+    detail.outcome
+  ) as [string, OutcomeFieldAnalysis][];
+
+  const totalPossibleScore = scorecardEntries.reduce(
+    (sum, [, paramData]) => sum + paramData.max_score,
     0
   );
-  const totalAchievedScore = scorecardParams.reduce(
-    (sum, param) => sum + param.score,
+  const totalAchievedScore = scorecardEntries.reduce(
+    (sum, [, paramData]) =>
+      sum + (paramData.review_score ?? paramData.score),
     0
   );
+
   const scorecardPercentage =
     totalPossibleScore > 0
       ? (totalAchievedScore / totalPossibleScore) * 100
@@ -794,8 +881,9 @@ export default function ConversationDetailPage() {
                         color="text.secondary"
                         gutterBottom
                       >
-                        Total QC Score: {detail.qualityScore} /{" "}
-                        {Math.round(scorecardPercentage)}% Adherence
+                        Total QC Score: {totalAchievedScore} /{" "}
+                        {totalPossibleScore} ({Math.round(scorecardPercentage)}
+                        % Adherence)
                       </Typography>
                       <LinearProgress
                         variant="determinate"
@@ -804,21 +892,26 @@ export default function ConversationDetailPage() {
                         color={scorecardPercentage >= 80 ? "success" : "error"}
                       />
                       <Grid container spacing={3} alignItems="stretch">
-                        {scorecardParams.map((param, index) => {
-                          const maxScore = param.max_score;
+                        {scorecardEntries.map(([parameterId, paramData]) => {
+                          const maxScore = paramData.max_score;
+                          const displayScore =
+                            paramData.score ?? paramData.score;
                           const scoreColor = getScoreColor(
-                            param.score,
+                            displayScore,
                             maxScore
                           );
-                          const isSavingThis = savingItemId === param.parameter;
+                          const isSavingThis = savingItemId === parameterId;
+                          const wasReviewed = paramData.review_score !== null;
+
                           return (
-                            <Grid item xs={12} md={6} lg={4} key={index}>
+                            <Grid item xs={12} md={6} lg={4} key={parameterId}>
                               <Card
                                 variant="elevation"
                                 sx={{
                                   height: "100%",
                                   display: "flex",
                                   flexDirection: "column",
+                                  width: "72vw"
                                 }}
                               >
                                 <CardContent
@@ -839,28 +932,33 @@ export default function ConversationDetailPage() {
                                       variant="subtitle1"
                                       fontWeight={600}
                                     >
-                                      {param.parameter}
+                                      {paramData.parameter}
                                     </Typography>
                                     <Chip
-                                      label={`Score: ${param.score}/${maxScore}`}
+                                      label={`Score: ${displayScore}/${maxScore}`}
+                                      icon={wasReviewed ? <Edit /> : undefined}
                                       color={scoreColor as any}
                                       size="small"
+                                      variant={
+                                        wasReviewed ? "filled" : "outlined"
+                                      }
                                     />
                                   </Box>
                                   <Typography
                                     variant="body2"
                                     sx={{ mt: 1, mb: 1, fontStyle: "italic" }}
                                   >
-                                    {param.explanation}
+                                    {paramData.explanation}
                                   </Typography>
                                   <Box sx={{ mt: 2, mb: 2 }}>
                                     <Typography
                                       variant="caption"
                                       fontWeight={600}
+                                      fontSize={"0.875rem"}
                                     >
                                       Rule Analysis:
                                     </Typography>
-                                    {param.sub_rule_analysis.map(
+                                    {paramData.sub_rule_analysis.map(
                                       (rule, idx) => (
                                         <Box
                                           key={idx}
@@ -895,7 +993,10 @@ export default function ConversationDetailPage() {
                                           <Box>
                                             <Typography
                                               variant="caption"
-                                              sx={{ fontWeight: 500 }}
+                                              sx={{ 
+                                                fontWeight: 500,
+                                                fontSize: "0.85rem"
+                                              }}
                                             >
                                               {rule.rule}
                                             </Typography>
@@ -903,8 +1004,9 @@ export default function ConversationDetailPage() {
                                               variant="caption"
                                               color="text.secondary"
                                               display="block"
+                                              fontSize={"0.85rem"}
                                             >
-                                              **Reason:** {rule.reason}
+                                              <i>Reason:</i> {rule.reason}
                                             </Typography>
                                           </Box>
                                         </Box>
@@ -912,7 +1014,10 @@ export default function ConversationDetailPage() {
                                     )}
                                   </Box>
                                   <Divider sx={{ my: 2 }}>
-                                    <Chip label="Manual Review" size="small" />
+                                    <Chip
+                                      label="Manual Review"
+                                      size="small"
+                                    />
                                   </Divider>
                                   <Box sx={{ flexGrow: 1 }}>
                                     <TextField
@@ -920,12 +1025,12 @@ export default function ConversationDetailPage() {
                                       type="number"
                                       size="small"
                                       value={
-                                        scorecardReviews[param.parameter]
-                                          ?.score || ""
+                                        scorecardReviews[parameterId]?.score ||
+                                        ""
                                       }
                                       onChange={(e) =>
                                         handleScorecardReviewChange(
-                                          param.parameter,
+                                          parameterId,
                                           "score",
                                           e.target.value
                                         )
@@ -947,12 +1052,12 @@ export default function ConversationDetailPage() {
                                       size="small"
                                       fullWidth
                                       value={
-                                        scorecardReviews[param.parameter]
+                                        scorecardReviews[parameterId]
                                           ?.reason || ""
                                       }
                                       onChange={(e) =>
                                         handleScorecardReviewChange(
-                                          param.parameter,
+                                          parameterId,
                                           "reason",
                                           e.target.value
                                         )
@@ -981,10 +1086,15 @@ export default function ConversationDetailPage() {
                                         )
                                       }
                                       onClick={() =>
-                                        handleSaveScorecardItem(param.parameter)
+                                        handleSaveScorecardItem(
+                                          parameterId,
+                                          maxScore
+                                        )
                                       }
                                     >
-                                      {isSavingThis ? "Saving..." : "Save"}
+                                      {isSavingThis
+                                        ? "Saving..."
+                                        : "Save"}
                                     </Button>
                                   </Box>
                                 </CardContent>
@@ -1011,7 +1121,8 @@ export default function ConversationDetailPage() {
                   <Card variant="outlined">
                     <CardContent>
                       <Typography variant="h6" gutterBottom>
-                        Disposition: <b>{detail.disposition.toUpperCase()}</b>
+                        Disposition:{" "}
+                        <b>{detail.disposition.toUpperCase()}</b>
                       </Typography>
                       <Typography
                         variant="body1"
@@ -1021,132 +1132,152 @@ export default function ConversationDetailPage() {
                         The final disposition from the conversation data.
                       </Typography>
                       <Box sx={{ mt: 4 }}>
-                        <Typography variant="h6" fontWeight={600} gutterBottom>
+                        <Typography
+                          variant="h6"
+                          fontWeight={600}
+                          gutterBottom
+                        >
                           Outcome Fields Extracted
                         </Typography>
-                        {outcomeFields.length > 0 ? (
+                        {outcomeEntries.length > 0 ? (
                           <Grid container spacing={3}>
-                            {outcomeFields.map((field, index) => {
-                              let displayValue = String(
-                                field.extracted_value ?? "N/A"
-                              );
-                              if (typeof field.extracted_value === "boolean") {
-                                displayValue = field.extracted_value
-                                  ? "Yes"
-                                  : "No";
-                              }
-                              const isSavingThis =
-                                savingItemId === field.attribute_name;
+                            {outcomeEntries.map(
+                              ([attributeId, outcomeData]) => {
+                                let displayValue = String(
+                                  outcomeData.extracted_value ?? "N/A"
+                                );
+                                if (
+                                  typeof outcomeData.extracted_value ===
+                                  "boolean"
+                                ) {
+                                  displayValue = outcomeData.extracted_value
+                                    ? "Yes"
+                                    : "No";
+                                }
+                                const isSavingThis = savingItemId === attributeId;
 
-                              return (
-                                <Grid item xs={12} sm={12} md={6} key={index}>
-                                  {/* The outer MUI Grid is kept for overall page responsiveness */}
-                                  <div className={styles.outcomeCard}>
-                                    <h4 className={styles.outcomeHeader}>
-                                      Extracted: {field.attribute_name}
-                                    </h4>
-
-                                    {/* --- AI Extracted Data --- */}
-                                    <div className={styles.dataGrid}>
-                                      <div className={styles.dataColumn}>
-                                        <label className={styles.fieldLabel}>
-                                          Extracted Value
-                                        </label>
-                                        <p className={styles.extractedValue}>
-                                          {displayValue}
-                                        </p>
-                                      </div>
-                                      <div className={styles.dataColumn}>
-                                        <label className={styles.fieldLabel}>
-                                          AI Reasoning
-                                        </label>
-                                        <p className={styles.extractedValue}>
-                                          {field.reasoning}
-                                        </p>
-                                      </div>
-                                    </div>
-
-                                    <hr className={styles.divider} />
-
-                                    {/* --- Reviewer Input Section --- */}
-                                    <div className={styles.dataGrid}>
-                                      <div className={styles.dataColumn}>
-                                        <div className={styles.fieldGroup}>
+                                return (
+                                  <Grid
+                                    item
+                                    xs={12}
+                                    sm={12}
+                                    md={6}
+                                    key={attributeId}
+                                  >
+                                    <div className={styles.outcomeCard}>
+                                      <h4 className={styles.outcomeHeader}>
+                                        Extracted: {outcomeData.attribute_name}
+                                      </h4>
+                                      <div className={styles.dataGrid}>
+                                        <div className={styles.dataColumn}>
                                           <label
                                             className={styles.fieldLabel}
-                                            htmlFor={`reviewer-outcome-${index}`}
                                           >
-                                            Reviewer Outcome
+                                            Extracted Value
                                           </label>
-                                          <input
-                                            id={`reviewer-outcome-${index}`}
-                                            type="text"
-                                            className={styles.textInput}
-                                            value={
-                                              outcomeReviews[
-                                                field.attribute_name
-                                              ]?.value || ""
+                                          <p
+                                            className={
+                                              styles.extractedValue
                                             }
-                                            onChange={(e) =>
-                                              handleOutcomeReviewChange(
-                                                field.attribute_name,
-                                                "value",
-                                                e.target.value
-                                              )
-                                            }
-                                            placeholder="Enter correct value..."
-                                          />
+                                          >
+                                            {displayValue}
+                                          </p>
                                         </div>
-                                      </div>
-                                      <div className={styles.dataColumn}>
-                                        <div className={styles.fieldGroup}>
+                                        <div className={styles.dataColumn}>
                                           <label
                                             className={styles.fieldLabel}
-                                            htmlFor={`reviewer-reason-${index}`}
                                           >
-                                            Reason for Change
+                                            AI Reasoning
                                           </label>
-                                          <textarea
-                                            id={`reviewer-reason-${index}`}
-                                            className={styles.textAreaInput}
-                                            value={
-                                              outcomeReviews[
-                                                field.attribute_name
-                                              ]?.reason || ""
+                                          <p
+                                            className={
+                                              styles.extractedValue
                                             }
-                                            onChange={(e) =>
-                                              handleOutcomeReviewChange(
-                                                field.attribute_name,
-                                                "reason",
-                                                e.target.value
-                                              )
-                                            }
-                                            placeholder="Explain the reason for change..."
-                                          />
+                                          >
+                                            {outcomeData.reasoning}
+                                          </p>
                                         </div>
                                       </div>
-                                    </div>
-
-                                    {/* --- Action Button --- */}
-                                    <div className={styles.actionsContainer}>
-                                      <button
-                                        className={styles.saveButton}
-                                        disabled={isSavingThis}
-                                        onClick={() =>
-                                          handleSaveOutcomeItem(
-                                            field.attribute_name
-                                          )
-                                        }
+                                      <hr className={styles.divider} />
+                                      <div className={styles.dataGrid}>
+                                        <div className={styles.dataColumn}>
+                                          <div className={styles.fieldGroup}>
+                                            <label
+                                              className={styles.fieldLabel}
+                                              htmlFor={`reviewer-outcome-${attributeId}`}
+                                            >
+                                              Reviewer Outcome
+                                            </label>
+                                            <input
+                                              id={`reviewer-outcome-${attributeId}`}
+                                              type="text"
+                                              className={styles.textInput}
+                                              value={
+                                                outcomeReviews[attributeId]?.value ||
+                                                ""
+                                              }
+                                              onChange={(e) =>
+                                                handleOutcomeReviewChange(
+                                                  attributeId,
+                                                  "value",
+                                                  e.target.value
+                                                )
+                                              }
+                                              placeholder="Enter correct value..."
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className={styles.dataColumn}>
+                                          <div className={styles.fieldGroup}>
+                                            <label
+                                              className={styles.fieldLabel}
+                                              htmlFor={`reviewer-reason-${attributeId}`}
+                                            >
+                                              Reason for Change
+                                            </label>
+                                            <textarea
+                                              id={`reviewer-reason-${attributeId}`}
+                                              className={
+                                                styles.textAreaInput
+                                              }
+                                              value={
+                                                outcomeReviews[attributeId]
+                                                  ?.reason || ""
+                                              }
+                                              onChange={(e) =>
+                                                handleOutcomeReviewChange(
+                                                  attributeId,
+                                                  "reason",
+                                                  e.target.value
+                                                )
+                                              }
+                                              placeholder="Explain the reason for change..."
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div
+                                        className={styles.actionsContainer}
                                       >
-                                        {isSavingThis
-                                          ? "Saving..."
-                                          : "Save Changes"}
-                                      </button>
+                                        <button
+                                          className={styles.saveButton}
+                                          disabled={isSavingThis}
+                                          onClick={() =>
+                                            handleSaveOutcomeItem(
+                                              attributeId
+                                            )
+                                          }
+                                        >
+                                          {isSavingThis
+                                            ? "Saving..."
+                                            : "Save Changes"}
+                                        </button>
+                                      </div>
                                     </div>
-                                  </div>
-                                </Grid>
-                              );
-                            })}
+                                  </Grid>
+                                );
+                              }
+                            )}
                           </Grid>
                         ) : (
                           <Alert severity="warning">
@@ -1155,10 +1286,16 @@ export default function ConversationDetailPage() {
                         )}
                       </Box>
                       <Box sx={{ mt: 4 }}>
-                        <Typography variant="h6" fontWeight={600} gutterBottom>
+                        <Typography
+                          variant="h6"
+                          fontWeight={600}
+                          gutterBottom
+                        >
                           Key Topics Discussed
                         </Typography>
-                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                        <Box
+                          sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}
+                        >
                           {detail.keyTopics.map((topic, index) => (
                             <Chip key={index} label={topic} />
                           ))}
@@ -1180,7 +1317,7 @@ export default function ConversationDetailPage() {
         >
           <Alert
             onClose={handleSnackbarClose}
-            severity="success"
+            severity={snackbarSeverity}
             sx={{ width: "100%" }}
           >
             {snackbarMessage}

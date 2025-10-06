@@ -1,5 +1,11 @@
 import apiClient from './api-client';
-import { ConversationDetailResponse, ConversationResponse, ListConversationsParams } from '@/types/api/conversation';
+import { 
+  ConversationDetailResponse, 
+  ConversationResponse, 
+  ListConversationsParams,
+  OutcomeReviewPayload,
+  ScorecardReviewPayload
+} from '@/types/api/conversation';
 
 /**
  * Fetches a paginated and filtered list of conversations from the API.
@@ -51,4 +57,52 @@ export const getConversationDetail = async (conversationId: string): Promise<Con
   }
 };
 
-// Removed getCampaignParametersAnalysis and getActiveGoalVersion as the data is now nested in getConversationDetail response.
+/**
+ * Submits a review for a single scorecard parameter.
+ * Corresponds to: PUT /api/v1/conversations/{id}/scorecard/{param_name}
+ * @param conversationId - The ID of the conversation.
+ * @param parameterName - The name of the scorecard parameter being reviewed.
+ * @param payload - The review data (score and reason).
+ * @returns A promise that resolves on successful submission.
+ */
+export const submitScorecardReview = async (
+  conversationId: string,
+  parameterId: string,
+  payload: ScorecardReviewPayload
+): Promise<any> => {
+  try {
+    const response = await apiClient.put(
+      `/api/v1/conversations/${conversationId}/scorecard/${parameterId}`,
+      payload
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to submit scorecard review for parameter: ${parameterId}`, error);
+    throw new Error(`Could not submit scorecard review for "${parameterId}". Please try again.`);
+  }
+};
+
+/**
+ * Submits a review for a single outcome parameter.
+ * Corresponds to: PUT /api/v1/conversations/{id}/outcome/{param_name}
+ * @param conversationId - The ID of the conversation.
+ * @param attributeName - The name of the outcome attribute being reviewed.
+ * @param payload - The review data (value and reason).
+ * @returns A promise that resolves on successful submission.
+ */
+export const submitOutcomeReview = async (
+  conversationId: string,
+  attributeId: string,
+  payload: OutcomeReviewPayload
+): Promise<any> => {
+  try {
+    const response = await apiClient.put(
+      `/api/v1/conversations/${conversationId}/outcome/${attributeId}`,
+      payload
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to submit outcome review for attribute: ${attributeId}`, error);
+    throw new Error(`Could not submit outcome review for "${attributeId}". Please try again.`);
+  }
+};

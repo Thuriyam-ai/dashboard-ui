@@ -20,6 +20,8 @@ export interface ScorecardParameterAnalysis {
     status: 'Pass' | 'Fail';
     reason: string;
   }>;
+  review_score: number | null;
+  reason_for_update: string;
 }
 
 /**
@@ -37,6 +39,8 @@ export interface OutcomeFieldAnalysis {
   attribute_name: string;
   extracted_value: string | number | boolean | null;
   reasoning: string;
+  reviewer_value: string | number | boolean | null;
+  reviewer_reason: string;
 }
 
 /**
@@ -112,4 +116,22 @@ export interface ListConversationsParams {
   teamId?: string | null;
   skip?: number;
   limit?: number;
+}
+
+/**
+ * Payload for submitting a scorecard parameter review.
+ * Corresponds to: PUT /api/v1/conversations/{id}/scorecard/{param_name}
+ */
+export interface ScorecardReviewPayload {
+  review_score: number;
+  reason_for_update: string;
+}
+
+/**
+ * Payload for submitting an outcome parameter review.
+ * Corresponds to: PUT /api/v1/conversations/{id}/outcome/{param_name}
+ */
+export interface OutcomeReviewPayload {
+  reviewer_value: any; // Can be string, number, boolean, etc.
+  reviewer_reason: string;
 }
