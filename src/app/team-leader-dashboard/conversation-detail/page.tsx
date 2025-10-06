@@ -915,7 +915,7 @@ export default function ConversationDetailPage() {
                                   </Divider>
                                   <Box sx={{ flexGrow: 1 }}>
                                     <TextField
-                                      label="Reviewer Score"
+                                      label="Score"
                                       type="number"
                                       size="small"
                                       value={
@@ -1010,7 +1010,7 @@ export default function ConversationDetailPage() {
                   <Card variant="outlined">
                     <CardContent>
                       <Typography variant="h6" gutterBottom>
-                        Disposition: **{detail.disposition}**
+                        Disposition: <b>{detail.disposition.toUpperCase()}</b>
                       </Typography>
                       <Typography
                         variant="body1"
@@ -1059,7 +1059,7 @@ export default function ConversationDetailPage() {
                                         value={displayValue}
                                         InputProps={{ readOnly: true }}
                                         sx={{ mb: 2 }}
-                                        helperText={`**Reasoning:** ${field.reasoning}`}
+                                        helperText={`Reasoning: ${field.reasoning}`}
                                         multiline
                                         rows={2}
                                       />
