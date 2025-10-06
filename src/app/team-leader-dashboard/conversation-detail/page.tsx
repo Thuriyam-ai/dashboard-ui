@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
+import styles from "./ConversationDetailPage.module.css";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
   Box,
@@ -1029,110 +1030,120 @@ export default function ConversationDetailPage() {
                               let displayValue = String(
                                 field.extracted_value ?? "N/A"
                               );
-                              if (typeof field.extracted_value === "boolean")
+                              if (typeof field.extracted_value === "boolean") {
                                 displayValue = field.extracted_value
                                   ? "Yes"
                                   : "No";
+                              }
                               const isSavingThis =
                                 savingItemId === field.attribute_name;
+
                               return (
-                                <Grid item xs={12} sm={6} md={4} key={index}>
-                                  <Card
-                                    variant="outlined"
-                                    sx={{
-                                      height: "100%",
-                                      display: "flex",
-                                      flexDirection: "column",
-                                    }}
-                                  >
-                                    <CardContent
-                                      sx={{
-                                        flexGrow: 1,
-                                        display: "flex",
-                                        flexDirection: "column",
-                                      }}
-                                    >
-                                      <TextField
-                                        fullWidth
-                                        label={`Extracted: ${field.attribute_name}`}
-                                        variant="outlined"
-                                        value={displayValue}
-                                        InputProps={{ readOnly: true }}
-                                        sx={{ mb: 2 }}
-                                        helperText={`Reasoning: ${field.reasoning}`}
-                                        multiline
-                                        rows={2}
-                                      />
-                                      <Divider sx={{ my: 1 }} />
-                                      <Box sx={{ flexGrow: 1 }}>
-                                        <TextField
-                                          label="Reviewer Outcome"
-                                          size="small"
-                                          variant="filled"
-                                          value={
-                                            outcomeReviews[field.attribute_name]
-                                              ?.value || ""
-                                          }
-                                          onChange={(e) =>
-                                            handleOutcomeReviewChange(
-                                              field.attribute_name,
-                                              "value",
-                                              e.target.value
-                                            )
-                                          }
-                                          sx={{ mt: 2, mb: 2 }}
-                                        />
-                                        <TextField
-                                          label="Reason for Change"
-                                          fullWidth
-                                          variant="filled"
-                                          multiline
-                                          rows={2}
-                                          value={
-                                            outcomeReviews[field.attribute_name]
-                                              ?.reason || ""
-                                          }
-                                          onChange={(e) =>
-                                            handleOutcomeReviewChange(
-                                              field.attribute_name,
-                                              "reason",
-                                              e.target.value
-                                            )
-                                          }
-                                        />
-                                      </Box>
-                                      <Box
-                                        sx={{
-                                          mt: 2,
-                                          display: "flex",
-                                          justifyContent: "flex-end",
-                                        }}
+                                <Grid item xs={12} sm={12} md={6} key={index}>
+                                  {/* The outer MUI Grid is kept for overall page responsiveness */}
+                                  <div className={styles.outcomeCard}>
+                                    <h4 className={styles.outcomeHeader}>
+                                      Extracted: {field.attribute_name}
+                                    </h4>
+
+                                    {/* --- AI Extracted Data --- */}
+                                    <div className={styles.dataGrid}>
+                                      <div className={styles.dataColumn}>
+                                        <label className={styles.fieldLabel}>
+                                          Extracted Value
+                                        </label>
+                                        <p className={styles.extractedValue}>
+                                          {displayValue}
+                                        </p>
+                                      </div>
+                                      <div className={styles.dataColumn}>
+                                        <label className={styles.fieldLabel}>
+                                          AI Reasoning
+                                        </label>
+                                        <p className={styles.extractedValue}>
+                                          {field.reasoning}
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    <hr className={styles.divider} />
+
+                                    {/* --- Reviewer Input Section --- */}
+                                    <div className={styles.dataGrid}>
+                                      <div className={styles.dataColumn}>
+                                        <div className={styles.fieldGroup}>
+                                          <label
+                                            className={styles.fieldLabel}
+                                            htmlFor={`reviewer-outcome-${index}`}
+                                          >
+                                            Reviewer Outcome
+                                          </label>
+                                          <input
+                                            id={`reviewer-outcome-${index}`}
+                                            type="text"
+                                            className={styles.textInput}
+                                            value={
+                                              outcomeReviews[
+                                                field.attribute_name
+                                              ]?.value || ""
+                                            }
+                                            onChange={(e) =>
+                                              handleOutcomeReviewChange(
+                                                field.attribute_name,
+                                                "value",
+                                                e.target.value
+                                              )
+                                            }
+                                            placeholder="Enter correct value..."
+                                          />
+                                        </div>
+                                      </div>
+                                      <div className={styles.dataColumn}>
+                                        <div className={styles.fieldGroup}>
+                                          <label
+                                            className={styles.fieldLabel}
+                                            htmlFor={`reviewer-reason-${index}`}
+                                          >
+                                            Reason for Change
+                                          </label>
+                                          <textarea
+                                            id={`reviewer-reason-${index}`}
+                                            className={styles.textAreaInput}
+                                            value={
+                                              outcomeReviews[
+                                                field.attribute_name
+                                              ]?.reason || ""
+                                            }
+                                            onChange={(e) =>
+                                              handleOutcomeReviewChange(
+                                                field.attribute_name,
+                                                "reason",
+                                                e.target.value
+                                              )
+                                            }
+                                            placeholder="Explain the reason for change..."
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* --- Action Button --- */}
+                                    <div className={styles.actionsContainer}>
+                                      <button
+                                        className={styles.saveButton}
+                                        disabled={isSavingThis}
+                                        onClick={() =>
+                                          handleSaveOutcomeItem(
+                                            field.attribute_name
+                                          )
+                                        }
                                       >
-                                        <Button
-                                          variant="contained"
-                                          size="small"
-                                          disabled={isSavingThis}
-                                          startIcon={
-                                            isSavingThis ? (
-                                              <CircularProgress
-                                                size={16}
-                                                color="inherit"
-                                              />
-                                            ) : (
-                                              <Save />
-                                            )
-                                          }
-                                          onClick={() =>
-                                            handleSaveOutcomeItem(
-                                              field.attribute_name
-                                            )
-                                          }
-                                        >
-                                          {isSavingThis ? "Saving..." : "Save"}
-                                        </Button>
-                                      </Box>
-                                    </CardContent>
-                                  </Card>
+                                        {isSavingThis
+                                          ? "Saving..."
+                                          : "Save Changes"}
+                                      </button>
+                                    </div>
+                                  </div>
                                 </Grid>
                               );
                             })}

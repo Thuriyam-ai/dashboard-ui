@@ -1,0 +1,115 @@
+/* ConversationDetailPage.module.css */
+
+.outcomeCard {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 24px;
+  background-color: #ffffff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #daeaf7;
+}
+
+.outcomeHeader {
+  font-size: 1.25rem; /* Larger font size */
+  font-weight: 600;
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+
+.dataGrid {
+  display: flex;
+  gap: 24px; /* Space between columns */
+  width: 100%;
+}
+
+.dataColumn {
+  flex: 1; /* Each column takes up equal space */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fieldGroup {
+  margin-bottom: 16px;
+}
+
+.fieldLabel {
+  display: block;
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+}
+
+.extractedValue {
+  background-color: #f5f5f5;
+  padding: 12px;
+  border-radius: 4px;
+  min-height: 40px;
+  font-size: 0.9rem;
+  color: #333;
+  word-wrap: break-word;
+}
+
+.textInput,
+.textAreaInput {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  box-sizing: border-box; /* Ensures padding doesn't affect width */
+  transition: border-color 0.2s;
+}
+
+.textInput:focus,
+.textAreaInput:focus {
+  outline: none;
+  border-color: #1976d2; /* A primary color to indicate focus */
+}
+
+.textAreaInput {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.actionsContainer {
+  margin-top: auto; /* Pushes the button to the bottom */
+  padding-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.saveButton {
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #1976d2; /* Primary button color */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s;
+}
+
+.saveButton:hover:not(:disabled) {
+  background-color: #1565c0;
+}
+
+.saveButton:disabled {
+  background-color: #a0a0a0;
+  cursor: not-allowed;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #383838;
+  margin: 24px 0;
+}
