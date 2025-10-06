@@ -97,7 +97,7 @@ export default function GoalManagementPage() {
         {goals.map((goal) => (
           // <-- 2. FIXED Grid prop from `size` to `item`
           <Grid item xs={12} key={goal.goal_id}>
-            <Card sx={{ transition: 'all 0.2s ease-in-out', '&:hover': { transform: 'translateY(-4px)', boxShadow: 4 } }}>
+            <Card sx={{ transition: 'all 0.2s ease-in-out', '&:hover': { transform: 'translateY(-4px)', boxShadow: 4},width:"75vw" }}>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
                   <Box sx={{ flex: '1 1 50%', minWidth: 300 }}>
