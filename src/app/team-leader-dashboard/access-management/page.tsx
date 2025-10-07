@@ -158,9 +158,6 @@ export default function AccessManagementPage() {
     <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
       <TeamLeaderSidebar 
         activeItem="access-management"
-        drawerWidth={DRAWER_WIDTH}
-        mobileOpen={mobileOpen}
-        onDrawerToggle={handleDrawerToggle}
       />
 
       <Box 
@@ -304,12 +301,12 @@ export default function AccessManagementPage() {
                               onChange={handleSelectAll}
                             />
                           </TableCell>
-                          <TableCell sx={{ fontWeight: 600 }}>USER</TableCell>
-                          <TableCell sx={{ fontWeight: 600 }}>ROLE</TableCell>
-                          <TableCell sx={{ fontWeight: 600 }}>TEAM</TableCell>
-                          <TableCell sx={{ fontWeight: 600 }}>STATUS</TableCell>
-                          <TableCell sx={{ fontWeight: 600 }}>LAST ACTIVE</TableCell>
-                          <TableCell sx={{ fontWeight: 600 }}>ACTIONS</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>User</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Role</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Team</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Last active</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Actions</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
