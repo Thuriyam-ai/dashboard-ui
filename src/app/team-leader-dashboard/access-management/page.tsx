@@ -116,16 +116,56 @@ const mockUsers = [
     lastActive: "3 hours ago",
     avatar: "VS",
   },
-  {
-    id: 6,
-    name: "Anita Reddy",
-    email: "anita.reddy@company.com",
-    role: "Manager",
-    team: "Operations",
-    status: "Active",
-    lastActive: "1 hour ago",
-    avatar: "AR",
-  },
+    {
+      id: 6,
+      name: "Anita Reddy",
+      email: "anita.reddy@company.com",
+      role: "Manager",
+      team: "Operations",
+      status: "Active",
+      lastActive: "1 hour ago",
+      avatar: "AR",
+    },
+    {
+      id: 7,
+      name: "Suresh Verma",
+      email: "suresh.verma@company.com",
+      role: "Developer",
+      team: "Engineering",
+      status: "Active",
+      lastActive: "4 hours ago",
+      avatar: "SV",
+    },
+    {
+      id: 8,
+      name: "Meera Joshi",
+      email: "meera.joshi@company.com",
+      role: "Developer",
+      team: "Engineering",
+      status: "Active",
+      lastActive: "2 hours ago",
+      avatar: "MJ",
+    },
+    {
+      id: 9,
+      name: "Ravi Agarwal",
+      email: "ravi.agarwal@company.com",
+      role: "Developer",
+      team: "Engineering",
+      status: "Active",
+      lastActive: "1 hour ago",
+      avatar: "RA",
+    },
+    {
+      id: 10,
+      name: "Kavita Singh",
+      email: "kavita.singh@company.com",
+      role: "Developer",
+      team: "Engineering",
+      status: "Active",
+      lastActive: "30 minutes ago",
+      avatar: "KS",
+    },
 ];
 
 // Mock team data
@@ -723,7 +763,7 @@ export default function AccessManagementPage() {
                     <CardContent>
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                         <Typography variant="h6" fontWeight={600}>
-                          Team Members
+                          Team Members ({mockUsers.filter(user => user.team === selectedTeam.name).length})
                         </Typography>
                         <Button
                           variant="contained"
@@ -734,55 +774,68 @@ export default function AccessManagementPage() {
                         </Button>
                       </Box>
                       
-                      {/* Members List */}
-                      <List>
-                        {getPaginatedMembers().map((member) => (
-                          <ListItem key={member.id} sx={{ px: 0, py: 2 }}>
-                            <ListItemIcon>
-                              <Avatar sx={{ bgcolor: 'primary.main', fontSize: '1rem', width: 40, height: 40 }}>
-                                {member.avatar}
-                              </Avatar>
-                            </ListItemIcon>
-                            <ListItemText
-                              primary={
-                                <Typography variant="h6" fontWeight={600}>
-                                  {member.name}
-                                </Typography>
-                              }
-                              secondary={
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
-                                  <Chip 
-                                    label={member.role} 
-                                    color={getRoleColor(member.role)}
-                                    variant="outlined"
-                                  />
-                                  <Typography variant="body2" color="text.secondary">
-                                    {member.email}
+                      {/* Members List Container with Fixed Height */}
+                      <Box sx={{ 
+                        maxHeight: '400px', 
+                        overflow: 'auto',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        borderRadius: 1,
+                        mb: 2
+                      }}>
+                        <List sx={{ p: 0 }}>
+                          {getPaginatedMembers().map((member) => (
+                            <ListItem key={member.id} sx={{ px: 2, py: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+                              <ListItemIcon>
+                                <Avatar sx={{ bgcolor: 'primary.main', fontSize: '0.875rem', width: 36, height: 36 }}>
+                                  {member.avatar}
+                                </Avatar>
+                              </ListItemIcon>
+                              <ListItemText
+                                primary={
+                                  <Typography variant="subtitle1" fontWeight={600}>
+                                    {member.name}
                                   </Typography>
-                                  <Chip 
-                                    label={member.status} 
-                                    color={getStatusColor(member.status)}
-                                    size="small"
-                                  />
-                                </Box>
-                              }
-                            />
-                            <IconButton size="large" color="error">
-                              <Delete />
-                            </IconButton>
-                          </ListItem>
-                        ))}
-                      </List>
+                                }
+                                secondary={
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 0.5 }}>
+                                    <Chip 
+                                      label={member.role} 
+                                      color={getRoleColor(member.role)}
+                                      variant="outlined"
+                                      size="small"
+                                    />
+                                    <Typography variant="caption" color="text.secondary">
+                                      {member.email}
+                                    </Typography>
+                                    <Chip 
+                                      label={member.status} 
+                                      color={getStatusColor(member.status)}
+                                      size="small"
+                                    />
+                                  </Box>
+                                }
+                              />
+                              <IconButton size="small" color="error">
+                                <Delete fontSize="small" />
+                              </IconButton>
+                            </ListItem>
+                          ))}
+                        </List>
+                      </Box>
 
                       {/* Pagination */}
                       {getTotalPages() > 1 && (
-                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            Page {currentPage} of {getTotalPages()}
+                          </Typography>
                           <Pagination
                             count={getTotalPages()}
                             page={currentPage}
                             onChange={handlePageChange}
                             color="primary"
-                            size="large"
+                            size="small"
                           />
                         </Box>
                       )}
