@@ -166,6 +166,36 @@ const mockUsers = [
       lastActive: "30 minutes ago",
       avatar: "KS",
     },
+    {
+      id: 11,
+      name: "Deepak Mehta",
+      email: "deepak.mehta@company.com",
+      role: "Developer",
+      team: "Engineering",
+      status: "Active",
+      lastActive: "1 hour ago",
+      avatar: "DM",
+    },
+    {
+      id: 12,
+      name: "Sunita Agarwal",
+      email: "sunita.agarwal@company.com",
+      role: "Developer",
+      team: "Engineering",
+      status: "Active",
+      lastActive: "45 minutes ago",
+      avatar: "SA",
+    },
+    {
+      id: 13,
+      name: "Rohit Gupta",
+      email: "rohit.gupta@company.com",
+      role: "Developer",
+      team: "Engineering",
+      status: "Active",
+      lastActive: "2 hours ago",
+      avatar: "RG",
+    },
 ];
 
 // Mock team data
@@ -174,7 +204,7 @@ const mockTeams = [
     id: 1,
     name: "Engineering",
     description: "Core development team",
-    members: 8,
+    members: 12,
     lastActive: "2 hours ago",
     created: "2024-01-01",
   },
@@ -769,20 +799,35 @@ export default function AccessManagementPage() {
                         </List>
                       </Box>
 
-                      {/* Pagination - Always show for debugging */}
-                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2, mt: 2 }}>
+                      {/* Pagination Controls */}
+                      <Box sx={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center', 
+                        mt: 2,
+                        p: 2,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        borderRadius: 1,
+                        bgcolor: 'grey.50'
+                      }}>
                         <Typography variant="body2" color="text.secondary">
-                          Page {currentPage} of {getTotalPages()} (Total: {mockUsers.filter(user => user.team === selectedTeam.name).length} members)
+                          Showing {((currentPage - 1) * membersPerPage) + 1}-{Math.min(currentPage * membersPerPage, mockUsers.filter(user => user.team === selectedTeam.name).length)} of {mockUsers.filter(user => user.team === selectedTeam.name).length} members
                         </Typography>
-                        {getTotalPages() > 1 && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            Page {currentPage} of {getTotalPages()}
+                          </Typography>
                           <Pagination
                             count={getTotalPages()}
                             page={currentPage}
                             onChange={handlePageChange}
                             color="primary"
                             size="small"
+                            showFirstButton
+                            showLastButton
                           />
-                        )}
+                        </Box>
                       </Box>
                     </CardContent>
                   </Card>
