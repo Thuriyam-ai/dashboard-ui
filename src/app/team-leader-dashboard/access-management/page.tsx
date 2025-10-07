@@ -31,12 +31,15 @@ import {
   Tab,
   useTheme,
   useMediaQuery,
-  Drawer,
+  Modal,
+  Backdrop,
+  Fade,
   Divider,
   List,
   ListItem,
   ListItemText,
   ListItemIcon,
+  Pagination,
 } from "@mui/material";
 import {
   Search,
@@ -168,6 +171,8 @@ export default function AccessManagementPage() {
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [teamManagementOpen, setTeamManagementOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const membersPerPage = 5;
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -201,6 +206,25 @@ export default function AccessManagementPage() {
   const handleCloseTeamManagement = () => {
     setTeamManagementOpen(false);
     setSelectedTeam(null);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setCurrentPage(value);
+  };
+
+  const getPaginatedMembers = () => {
+    if (!selectedTeam) return [];
+    const teamMembers = mockUsers.filter(user => user.team === selectedTeam.name);
+    const startIndex = (currentPage - 1) * membersPerPage;
+    const endIndex = startIndex + membersPerPage;
+    return teamMembers.slice(startIndex, endIndex);
+  };
+
+  const getTotalPages = () => {
+    if (!selectedTeam) return 0;
+    const teamMembers = mockUsers.filter(user => user.team === selectedTeam.name);
+    return Math.ceil(teamMembers.length / membersPerPage);
   };
 
   const handleSaveTeam = () => {
@@ -561,185 +585,234 @@ export default function AccessManagementPage() {
         </Container>
       </Box>
 
-      {/* Team Management Drawer */}
-      <Drawer
-        anchor="right"
+      {/* Team Management Modal */}
+      <Modal
         open={teamManagementOpen}
         onClose={handleCloseTeamManagement}
-        sx={{
-          '& .MuiDrawer-paper': {
-            width: 500,
-            padding: 3,
-            height: '100vh',
-            overflow: 'hidden',
-          },
-        }}
-        ModalProps={{
-          keepMounted: true,
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
         }}
       >
-        <Box sx={{
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden'
-        }}>
-          {/* Header */}
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-            <Typography variant="h5" fontWeight={700}>
-              Manage Team
-            </Typography>
-            <IconButton onClick={handleCloseTeamManagement}>
-              <Close />
-            </IconButton>
-          </Box>
-
-          {/* Scrollable Content */}
+        <Fade in={teamManagementOpen}>
           <Box sx={{
-            flex: 1,
-            overflow: 'auto',
-            minHeight: 0,
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: { xs: '95%', sm: '90%', md: '80%', lg: '70%' },
+            maxWidth: '1200px',
+            maxHeight: '90vh',
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 0,
+            overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column'
           }}>
-            {selectedTeam && (
-              <>
-                {/* Team Information */}
-                <Card sx={{ mb: 3 }}>
-                  <CardContent>
-                    <Typography variant="h6" fontWeight={600} gutterBottom>
-                      Team Information
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                      <Business sx={{ color: 'primary.main', fontSize: '2rem' }} />
-                      <Box>
-                        <Typography variant="h6" fontWeight={600} color="primary.main">
-                          {selectedTeam.name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {selectedTeam.description}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                      <TextField
-                        label="Team Name"
-                        value={selectedTeam.name}
-                        size="small"
-                        sx={{ flex: 1 }}
-                      />
-                    </Box>
-                    <TextField
-                      label="Description"
-                      value={selectedTeam.description}
-                      multiline
-                      rows={2}
-                      fullWidth
-                    />
-                  </CardContent>
-                </Card>
+            {/* Header */}
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between', 
+              p: 3,
+              borderBottom: '1px solid',
+              borderColor: 'divider'
+            }}>
+              <Typography variant="h4" fontWeight={700}>
+                Manage Team
+              </Typography>
+              <IconButton onClick={handleCloseTeamManagement} size="large">
+                <Close />
+              </IconButton>
+            </Box>
 
-                {/* Team Statistics */}
-                <Card sx={{ mb: 3 }}>
-                  <CardContent>
-                    <Typography variant="h6" fontWeight={600} gutterBottom>
-                      Team Statistics
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 3 }}>
-                      <Box>
-                        <Typography variant="h4" fontWeight={700} color="primary.main">
-                          {selectedTeam.members}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Total Members
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant="h4" fontWeight={700} color="success.main">
-                          {selectedTeam.members - 1}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Active Members
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
-
-                {/* Team Members */}
-                <Card sx={{ mb: 3 }}>
-                  <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                      <Typography variant="h6" fontWeight={600}>
-                        Team Members
+            {/* Scrollable Content */}
+            <Box sx={{
+              flex: 1,
+              overflow: 'auto',
+              p: 3,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 3
+            }}>
+              {selectedTeam && (
+                <>
+                  {/* Team Information */}
+                  <Card>
+                    <CardContent>
+                      <Typography variant="h6" fontWeight={600} gutterBottom>
+                        Team Information
                       </Typography>
-                      <Button
-                        variant="outlined"
-                        startIcon={<PersonAdd />}
-                        size="small"
-                        sx={{ textTransform: 'none' }}
-                      >
-                        Add Member
-                      </Button>
-                    </Box>
-                    <List>
-                      {mockUsers.filter(user => user.team === selectedTeam.name).map((member) => (
-                        <ListItem key={member.id} sx={{ px: 0 }}>
-                          <ListItemIcon>
-                            <Avatar sx={{ bgcolor: 'primary.main', fontSize: '0.875rem' }}>
-                              {member.avatar}
-                            </Avatar>
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={member.name}
-                            secondary={
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                                <Chip 
-                                  label={member.role} 
-                                  size="small" 
-                                  color={getRoleColor(member.role)}
-                                  variant="outlined"
-                                />
-                                <Typography variant="caption" color="text.secondary">
-                                  {member.email}
-                                </Typography>
-                              </Box>
-                            }
-                          />
-                          <IconButton size="small" color="error">
-                            <Delete fontSize="small" />
-                          </IconButton>
-                        </ListItem>
-                      ))}
-                    </List>
-                  </CardContent>
-                </Card>
-              </>
-            )}
-          </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                        <Business sx={{ color: 'primary.main', fontSize: '3rem' }} />
+                        <Box>
+                          <Typography variant="h5" fontWeight={600} color="primary.main">
+                            {selectedTeam.name}
+                          </Typography>
+                          <Typography variant="body1" color="text.secondary">
+                            {selectedTeam.description}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                        <TextField
+                          label="Team Name"
+                          value={selectedTeam.name}
+                          sx={{ flex: 1 }}
+                        />
+                      </Box>
+                      <TextField
+                        label="Description"
+                        value={selectedTeam.description}
+                        multiline
+                        rows={3}
+                        fullWidth
+                      />
+                    </CardContent>
+                  </Card>
 
-          {/* Action Buttons */}
-          <Box sx={{ display: 'flex', gap: 2, mt: 3, flexShrink: 0 }}>
-            <Button
-              variant="outlined"
-              fullWidth
-              onClick={handleCloseTeamManagement}
-              sx={{ textTransform: 'none' }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              fullWidth
-              onClick={handleSaveTeam}
-              startIcon={<Save />}
-              sx={{ textTransform: 'none' }}
-            >
-              Save Changes
-            </Button>
+                  {/* Team Statistics */}
+                  <Card>
+                    <CardContent>
+                      <Typography variant="h6" fontWeight={600} gutterBottom>
+                        Team Statistics
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 4 }}>
+                        <Box>
+                          <Typography variant="h3" fontWeight={700} color="primary.main">
+                            {selectedTeam.members}
+                          </Typography>
+                          <Typography variant="body1" color="text.secondary">
+                            Total Members
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="h3" fontWeight={700} color="success.main">
+                            {selectedTeam.members - 1}
+                          </Typography>
+                          <Typography variant="body1" color="text.secondary">
+                            Active Members
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="h3" fontWeight={700} color="info.main">
+                            {getTotalPages()}
+                          </Typography>
+                          <Typography variant="body1" color="text.secondary">
+                            Pages
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </CardContent>
+                  </Card>
+
+                  {/* Team Members */}
+                  <Card>
+                    <CardContent>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                        <Typography variant="h6" fontWeight={600}>
+                          Team Members
+                        </Typography>
+                        <Button
+                          variant="contained"
+                          startIcon={<PersonAdd />}
+                          sx={{ textTransform: 'none' }}
+                        >
+                          Add Member
+                        </Button>
+                      </Box>
+                      
+                      {/* Members List */}
+                      <List>
+                        {getPaginatedMembers().map((member) => (
+                          <ListItem key={member.id} sx={{ px: 0, py: 2 }}>
+                            <ListItemIcon>
+                              <Avatar sx={{ bgcolor: 'primary.main', fontSize: '1rem', width: 40, height: 40 }}>
+                                {member.avatar}
+                              </Avatar>
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={
+                                <Typography variant="h6" fontWeight={600}>
+                                  {member.name}
+                                </Typography>
+                              }
+                              secondary={
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
+                                  <Chip 
+                                    label={member.role} 
+                                    color={getRoleColor(member.role)}
+                                    variant="outlined"
+                                  />
+                                  <Typography variant="body2" color="text.secondary">
+                                    {member.email}
+                                  </Typography>
+                                  <Chip 
+                                    label={member.status} 
+                                    color={getStatusColor(member.status)}
+                                    size="small"
+                                  />
+                                </Box>
+                              }
+                            />
+                            <IconButton size="large" color="error">
+                              <Delete />
+                            </IconButton>
+                          </ListItem>
+                        ))}
+                      </List>
+
+                      {/* Pagination */}
+                      {getTotalPages() > 1 && (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                          <Pagination
+                            count={getTotalPages()}
+                            page={currentPage}
+                            onChange={handlePageChange}
+                            color="primary"
+                            size="large"
+                          />
+                        </Box>
+                      )}
+                    </CardContent>
+                  </Card>
+                </>
+              )}
+            </Box>
+
+            {/* Action Buttons */}
+            <Box sx={{ 
+              display: 'flex', 
+              gap: 2, 
+              p: 3,
+              borderTop: '1px solid',
+              borderColor: 'divider',
+              flexShrink: 0
+            }}>
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={handleCloseTeamManagement}
+                sx={{ textTransform: 'none', py: 1.5 }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={handleSaveTeam}
+                startIcon={<Save />}
+                sx={{ textTransform: 'none', py: 1.5 }}
+              >
+                Save Changes
+              </Button>
+            </Box>
           </Box>
-        </Box>
-      </Drawer>
+        </Fade>
+      </Modal>
     </Box>
   );
 }
