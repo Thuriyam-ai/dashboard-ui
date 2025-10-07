@@ -88,11 +88,6 @@ interface ConversationDetailsProps {
   onBack: () => void;
 }
 
-const GradientCard = styled(Card)(({ theme }) => ({
-  borderTop: `4px solid ${theme.palette.primary.main}`,
-  boxShadow: theme.shadows[1],
-}));
-
 const GradientAvatar = styled(Avatar)(({ theme }) => ({
   background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
   boxShadow: theme.shadows[3],
@@ -330,12 +325,12 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
 
       {/* Main Content */}
       <Container maxWidth="xl" sx={{ py: 3 }}>
-        <Grid container spacing={3}>
+        <Box sx={{ display: 'flex', gap: 3, flexDirection: 'row', flexWrap: 'nowrap' }}>
           {/* Left Column */}
-          <Grid item xs={12} lg={5}>
+          <Box sx={{ flex: '0 0 41.67%', minWidth: 0, maxWidth: '41.67%' }}>
             <Stack spacing={3}>
               {/* Audio Player */}
-              <GradientCard>
+              <Card sx={{ borderTop: 4, borderColor: 'primary.main' }}>
                 <CardContent>
                   <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
                     <Stack direction="row" spacing={2} alignItems="center">
@@ -399,7 +394,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                     />
                   </Paper>
                 </CardContent>
-              </GradientCard>
+              </Card>
 
               {/* Transcript */}
               <Card sx={{ borderTop: 4, borderColor: 'success.main' }}>
@@ -493,10 +488,10 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                 </CardContent>
               </Card>
             </Stack>
-          </Grid>
+          </Box>
 
           {/* Right Column */}
-          <Grid item xs={12} lg={7}>
+          <Box sx={{ flex: '0 0 58.33%', minWidth: 0, maxWidth: '58.33%' }}>
             <Card sx={{ borderTop: 4, borderColor: 'secondary.main' }}>
               <CardContent>
                 <Tabs
@@ -515,7 +510,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                 {activeAnalysisTab === 0 && (
                   <Stack spacing={3}>
                     {/* Score Card */}
-                    <Paper sx={{ bgcolor: 'secondary.50', p: 3 }}>
+                    <Paper sx={{ bgcolor: 'secondary.50', p: 3, borderTop: 4, borderColor: 'secondary.main' }}>
                       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
                         <Stack direction="row" spacing={2} alignItems="center">
                           <Avatar sx={{ bgcolor: 'secondary.main' }}>
@@ -544,7 +539,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                       </Stack>
 
                       <Grid container spacing={2} textAlign="center">
-                        <Grid item xs={4}>
+                        <Grid xs={4}>
                           {savedHumanScore !== null ? (
                             <Stack direction="row" spacing={2} justifyContent="center" mb={1}>
                               <Box textAlign="center">
@@ -591,7 +586,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                             Agent Score
                           </Typography>
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid xs={4}>
                           <Typography variant="h6" fontWeight="600">
                             {conversation.rating || 'N/A'}
                           </Typography>
@@ -599,7 +594,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                             Customer Rating
                           </Typography>
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid xs={4}>
                           <Typography variant="h6" fontWeight="600" color="success.main">
                             {conversation.status}
                           </Typography>
@@ -612,8 +607,8 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
 
                     {/* Metrics Grid */}
                     <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                        <Paper sx={{ bgcolor: 'grey.50', p: 2 }}>
+                      <Grid xs={6}>
+                        <Paper sx={{ bgcolor: 'grey.50', p: 2, borderTop: 3, borderColor: 'info.main' }}>
                           <Stack direction="row" spacing={1} alignItems="center" mb={1}>
                             <Person fontSize="small" color="action" />
                             <Typography variant="body2" fontWeight="500">
@@ -625,8 +620,8 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                           </Typography>
                         </Paper>
                       </Grid>
-                      <Grid item xs={6}>
-                        <Paper sx={{ bgcolor: 'grey.50', p: 2 }}>
+                      <Grid xs={6}>
+                        <Paper sx={{ bgcolor: 'grey.50', p: 2, borderTop: 3, borderColor: 'warning.main' }}>
                           <Stack direction="row" spacing={1} alignItems="center" mb={1}>
                             <Timer fontSize="small" color="action" />
                             <Typography variant="body2" fontWeight="500">
@@ -638,8 +633,8 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                           </Typography>
                         </Paper>
                       </Grid>
-                      <Grid item xs={6}>
-                        <Paper sx={{ bgcolor: 'grey.50', p: 2 }}>
+                      <Grid xs={6}>
+                        <Paper sx={{ bgcolor: 'grey.50', p: 2, borderTop: 3, borderColor: 'error.main' }}>
                           <Stack direction="row" spacing={1} alignItems="center" mb={1}>
                             <Mic fontSize="small" color="action" />
                             <Typography variant="body2" fontWeight="500">
@@ -651,8 +646,8 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                           </Typography>
                         </Paper>
                       </Grid>
-                      <Grid item xs={6}>
-                        <Paper sx={{ bgcolor: 'grey.50', p: 2 }}>
+                      <Grid xs={6}>
+                        <Paper sx={{ bgcolor: 'grey.50', p: 2, borderTop: 3, borderColor: 'success.main' }}>
                           <Stack direction="row" spacing={1} alignItems="center" mb={1}>
                             <Message fontSize="small" color="action" />
                             <Typography variant="body2" fontWeight="500">
@@ -667,7 +662,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                     </Grid>
 
                     {/* Agent Performance */}
-                    <Paper sx={{ bgcolor: 'primary.50', p: 3 }}>
+                    <Paper sx={{ bgcolor: 'primary.50', p: 3, borderTop: 4, borderColor: 'primary.main' }}>
                       <Stack direction="row" spacing={2} alignItems="center" mb={2}>
                         <Avatar sx={{ bgcolor: 'primary.main' }}>
                           <ShowChart />
@@ -717,7 +712,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
 
                 {/* AI Insights Tab */}
                 {activeAnalysisTab === 1 && (
-                  <Paper sx={{ bgcolor: 'success.50', p: 3 }}>
+                  <Paper sx={{ bgcolor: 'success.50', p: 3, borderTop: 4, borderColor: 'success.main' }}>
                     <Stack direction="row" spacing={2} alignItems="center" mb={3}>
                       <Avatar sx={{ bgcolor: 'success.main' }}>
                         <CenterFocusStrong />
@@ -748,7 +743,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                           Sentiment Analysis
                         </Typography>
                         <Grid container spacing={2} textAlign="center">
-                          <Grid item xs={4}>
+                          <Grid xs={4}>
                             <Typography variant="h6" fontWeight="bold" color="success.main">
                               6
                             </Typography>
@@ -756,7 +751,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                               Positive
                             </Typography>
                           </Grid>
-                          <Grid item xs={4}>
+                          <Grid xs={4}>
                             <Typography variant="h6" fontWeight="bold" color="warning.main">
                               4
                             </Typography>
@@ -764,7 +759,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                               Neutral
                             </Typography>
                           </Grid>
-                          <Grid item xs={4}>
+                          <Grid xs={4}>
                             <Typography variant="h6" fontWeight="bold" color="error.main">
                               0
                             </Typography>
@@ -780,7 +775,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
 
                 {/* Snippets Tab */}
                 {activeAnalysisTab === 2 && (
-                  <Paper sx={{ bgcolor: 'warning.50', p: 3 }}>
+                  <Paper sx={{ bgcolor: 'warning.50', p: 3, borderTop: 4, borderColor: 'warning.main' }}>
                     <Stack direction="row" spacing={2} alignItems="center" mb={3}>
                       <Avatar sx={{ bgcolor: 'warning.main' }}>
                         <Description />
@@ -825,7 +820,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
 
                 {/* Topics Tab */}
                 {activeAnalysisTab === 3 && (
-                  <Paper sx={{ bgcolor: 'secondary.50', p: 3 }}>
+                  <Paper sx={{ bgcolor: 'secondary.50', p: 3, borderTop: 4, borderColor: 'info.main' }}>
                     <Stack direction="row" spacing={2} alignItems="center" mb={3}>
                       <Avatar sx={{ bgcolor: 'secondary.main' }}>
                         <BarChart />
@@ -879,7 +874,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
 
                 {/* Audit Tab */}
                 {activeAnalysisTab === 4 && (
-                  <Paper sx={{ bgcolor: 'error.50', p: 3 }}>
+                  <Paper sx={{ bgcolor: 'error.50', p: 3, borderTop: 4, borderColor: 'error.main' }}>
                     <Stack direction="row" spacing={2} alignItems="center" mb={3}>
                       <Avatar sx={{ bgcolor: 'error.main' }}>
                         <CheckCircle />
@@ -905,52 +900,52 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
 
                       <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
                         <Grid container spacing={2} alignItems="center">
-                          <Grid item>
+                          <Grid>
                             <Stack direction="row" spacing={1} alignItems="center">
                               <CalendarToday fontSize="small" color="warning" />
                               <Typography variant="body2">Pending Review</Typography>
                             </Stack>
                           </Grid>
-                          <Grid item>
+                          <Grid>
                             <Divider orientation="vertical" flexItem />
                           </Grid>
-                          <Grid item>
+                          <Grid>
                             <Stack direction="row" spacing={1} alignItems="center">
                               <Star fontSize="small" color="primary" />
                               <Typography variant="body2">{conversation.score}/100</Typography>
                             </Stack>
                           </Grid>
-                          <Grid item>
+                          <Grid>
                             <Divider orientation="vertical" flexItem />
                           </Grid>
-                          <Grid item>
+                          <Grid>
                             <Stack direction="row" spacing={1} alignItems="center">
                               <CalendarToday fontSize="small" color="action" />
                               <Typography variant="body2">Never</Typography>
                             </Stack>
                           </Grid>
-                          <Grid item>
+                          <Grid>
                             <Divider orientation="vertical" flexItem />
                           </Grid>
-                          <Grid item>
+                          <Grid>
                             <Stack direction="row" spacing={1} alignItems="center">
                               <Message fontSize="small" color="secondary" />
                               <Typography variant="body2">{conversation.type}</Typography>
                             </Stack>
                           </Grid>
-                          <Grid item>
+                          <Grid>
                             <Divider orientation="vertical" flexItem />
                           </Grid>
-                          <Grid item>
+                          <Grid>
                             <Stack direction="row" spacing={1} alignItems="center">
                               <Timer fontSize="small" color="success" />
                               <Typography variant="body2">{conversation.duration}</Typography>
                             </Stack>
                           </Grid>
-                          <Grid item>
+                          <Grid>
                             <Divider orientation="vertical" flexItem />
                           </Grid>
-                          <Grid item>
+                          <Grid>
                             <Stack direction="row" spacing={1} alignItems="center">
                               <Person fontSize="small" color="primary" />
                               <Typography variant="body2">{conversation.agent}</Typography>
@@ -977,8 +972,8 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                 )}
               </CardContent>
             </Card>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
 
         {/* Post Call Summary */}
         <Card sx={{ borderTop: 4, borderColor: 'success.main', mt: 3 }}>
@@ -1003,7 +998,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
             </Stack>
 
             <Grid container spacing={3}>
-              <Grid item xs={12} md={3}>
+              <Grid xs={12} md={3}>
                 <Paper sx={{ bgcolor: 'primary.50', p: 3 }}>
                   <Typography variant="subtitle2" fontWeight="600" mb={2}>
                     <Stack direction="row" spacing={1} alignItems="center">
@@ -1076,7 +1071,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                 </Paper>
               </Grid>
 
-              <Grid item xs={12} md={3}>
+              <Grid xs={12} md={3}>
                 <Paper sx={{ bgcolor: 'success.50', p: 3 }}>
                   <Typography variant="subtitle2" fontWeight="600" mb={2}>
                     <Stack direction="row" spacing={1} alignItems="center">
@@ -1085,7 +1080,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                     </Stack>
                   </Typography>
                   <Grid container spacing={1} textAlign="center" mb={2}>
-                    <Grid item xs={4}>
+                    <Grid xs={4}>
                       <Typography variant="h5" fontWeight="bold" color="success.main">
                         6
                       </Typography>
@@ -1093,7 +1088,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                         Positive
                       </Typography>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid xs={4}>
                       <Typography variant="h5" fontWeight="bold" color="warning.main">
                         4
                       </Typography>
@@ -1101,7 +1096,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                         Neutral
                       </Typography>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid xs={4}>
                       <Typography variant="h5" fontWeight="bold" color="error.main">
                         0
                       </Typography>
@@ -1121,7 +1116,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                 </Paper>
               </Grid>
 
-              <Grid item xs={12} md={3}>
+              <Grid xs={12} md={3}>
                 <Paper sx={{ bgcolor: 'warning.50', p: 3 }}>
                   <Typography variant="subtitle2" fontWeight="600" mb={2}>
                     <Stack direction="row" spacing={1} alignItems="center">
@@ -1182,7 +1177,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                 </Paper>
               </Grid>
 
-              <Grid item xs={12} md={3}>
+              <Grid xs={12} md={3}>
                 <Paper sx={{ bgcolor: 'secondary.50', p: 3 }}>
                   <Typography variant="subtitle2" fontWeight="600" mb={2}>
                     <Stack direction="row" spacing={1} alignItems="center">
@@ -1191,7 +1186,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                     </Stack>
                   </Typography>
                   <Grid container spacing={2} mb={2}>
-                    <Grid item xs={6}>
+                    <Grid xs={6}>
                       <Paper sx={{ p: 2, bgcolor: 'white', textAlign: 'center' }}>
                         <Typography variant="h6" fontWeight="bold" color="success.main">
                           Excellent
@@ -1201,7 +1196,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                         </Typography>
                       </Paper>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid xs={6}>
                       <Paper sx={{ p: 2, bgcolor: 'white', textAlign: 'center' }}>
                         <Typography variant="h6" fontWeight="bold" color="primary.main">
                           High
