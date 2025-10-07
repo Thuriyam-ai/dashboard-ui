@@ -55,43 +55,63 @@ const DRAWER_WIDTH = 280;
 const mockUsers = [
   {
     id: 1,
-    name: "John Administrator",
-    email: "john@botconfig.com",
+    name: "Rajesh Kumar",
+    email: "rajesh.kumar@company.com",
     role: "Admin",
     team: "Engineering",
     status: "Active",
     lastActive: "2 hours ago",
-    avatar: "JA",
+    avatar: "RK",
   },
   {
     id: 2,
-    name: "Sarah Developer",
-    email: "sarah@botconfig.com",
+    name: "Priya Sharma",
+    email: "priya.sharma@company.com",
     role: "Developer",
     team: "Engineering",
     status: "Active",
     lastActive: "30 minutes ago",
-    avatar: "SD",
+    avatar: "PS",
   },
   {
     id: 3,
-    name: "Mike Manager",
-    email: "mike@botconfig.com",
+    name: "Amit Patel",
+    email: "amit.patel@company.com",
     role: "Team Lead",
     team: "Product",
     status: "Active",
     lastActive: "1 day ago",
-    avatar: "MM",
+    avatar: "AP",
   },
   {
     id: 4,
-    name: "Lisa Analyst",
-    email: "lisa@botconfig.com",
+    name: "Sneha Gupta",
+    email: "sneha.gupta@company.com",
     role: "Analyst",
     team: "Operations",
     status: "Inactive",
     lastActive: "1 week ago",
-    avatar: "LA",
+    avatar: "SG",
+  },
+  {
+    id: 5,
+    name: "Vikram Singh",
+    email: "vikram.singh@company.com",
+    role: "Developer",
+    team: "Engineering",
+    status: "Active",
+    lastActive: "3 hours ago",
+    avatar: "VS",
+  },
+  {
+    id: 6,
+    name: "Anita Reddy",
+    email: "anita.reddy@company.com",
+    role: "Manager",
+    team: "Operations",
+    status: "Active",
+    lastActive: "1 hour ago",
+    avatar: "AR",
   },
 ];
 
@@ -138,6 +158,7 @@ export default function AccessManagementPage() {
       case "Admin": return "error";
       case "Developer": return "success";
       case "Team Lead": return "info";
+      case "Manager": return "warning";
       case "Analyst": return "default";
       default: return "default";
     }
