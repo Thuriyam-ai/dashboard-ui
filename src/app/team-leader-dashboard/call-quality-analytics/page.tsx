@@ -49,6 +49,7 @@ import {
   Phone,
   Person,
   Schedule,
+  Download, // Import the Download icon
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
 import { getAllCampaigns } from "@/data/services/campaign-service";
@@ -58,6 +59,7 @@ import {
 } from "@/data/services/analytics-service";
 import { Campaign } from "@/types/api/campaign";
 import { ParameterAnalysis, AgentPerformance } from "@/types/api/analytics";
+import * as XLSX from "xlsx"; // Import the xlsx library
 
 /**
  * Call Quality Analytics page component displaying comprehensive call quality metrics
@@ -168,6 +170,35 @@ export default function CallQualityAnalyticsPage() {
       setStartDate("");
       setEndDate("");
     }
+  };
+
+  // Helper function to generate a formatted timestamp
+  const getTimestamp = () => {
+    const d = new Date();
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+  };
+
+  // Handler for exporting parameters data to Excel
+  const handleExportParameters = () => {
+    if (parameters.length === 0) return;
+
+    const fileName = `call_quality_parameters_analysis_${getTimestamp()}.xlsx`;
+    const worksheet = XLSX.utils.json_to_sheet(parameters);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Parameters Analysis");
+    XLSX.writeFile(workbook, fileName);
+  };
+
+  // Handler for exporting agent performance data to Excel
+  const handleExportAgents = () => {
+    if (agentPerformance.length === 0) return;
+
+    const fileName = `agent_performance_summary_${getTimestamp()}.xlsx`;
+    const worksheet = XLSX.utils.json_to_sheet(agentPerformance);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Agent Performance");
+    XLSX.writeFile(workbook, fileName);
   };
 
   const getScoreColor = (score: number) => {
@@ -378,9 +409,19 @@ export default function CallQualityAnalyticsPage() {
           {/* Call Quality Parameters Table - Dynamic */}
           <Card sx={{ mb: 4 }}>
             <CardContent>
-              <Typography variant="h5" fontWeight={600} gutterBottom sx={{ mb: 3 }}>
-                Call Quality Parameters Analysis
-              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Typography variant="h5" fontWeight={600}>
+                  Call Quality Parameters Analysis
+                </Typography>
+                <Button 
+                  variant="contained" 
+                  startIcon={<Download />}
+                  onClick={handleExportParameters}
+                  disabled={parameters.length === 0 || loadingParameters}
+                >
+                  Export Data
+                </Button>
+              </Box>
               <TableContainer component={Paper} variant="outlined">
                 <Table>
                   <TableHead>
@@ -476,9 +517,19 @@ export default function CallQualityAnalyticsPage() {
           {/* Agent Performance Table - Dynamic */}
           <Card>
             <CardContent>
-              <Typography variant="h5" fontWeight={600} gutterBottom sx={{ mb: 3 }}>
-                Agent Performance Summary
-              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Typography variant="h5" fontWeight={600}>
+                  Agent Performance Summary
+                </Typography>
+                <Button 
+                  variant="contained" 
+                  startIcon={<Download />}
+                  onClick={handleExportAgents}
+                  disabled={agentPerformance.length === 0 || loadingAgents}
+                >
+                  Export Data
+                </Button>
+              </Box>
               <TableContainer component={Paper} variant="outlined">
                 <Table>
                   <TableHead>
