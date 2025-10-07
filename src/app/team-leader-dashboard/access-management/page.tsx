@@ -390,12 +390,6 @@ export default function AccessManagementPage() {
                 sx={{ textTransform: 'none', fontWeight: 600 }}
               />
               <Tab 
-                icon={<Security />} 
-                label="Roles & Permissions" 
-                iconPosition="start"
-                sx={{ textTransform: 'none', fontWeight: 600 }}
-              />
-              <Tab 
                 icon={<Public />} 
                 label="Enterprise Federation" 
                 iconPosition="start"
@@ -640,16 +634,421 @@ export default function AccessManagementPage() {
             </Box>
           )}
 
-          {/* Placeholder for other tabs */}
-          {activeTab !== 0 && activeTab !== 1 && (
-            <Box sx={{ textAlign: 'center', py: 8 }}>
-              <Typography variant="h5" color="text.secondary">
-                {activeTab === 2 && "Roles & Permissions"}
-                {activeTab === 3 && "Enterprise Federation"}
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
-                This section is coming soon...
-              </Typography>
+          {/* Enterprise Federation (SSO) Tab */}
+          {activeTab === 2 && (
+            <Box>
+              {/* SSO Header */}
+              <Box sx={{ mb: 4 }}>
+                <Typography variant="h4" fontWeight={700} gutterBottom>
+                  Single Sign-On (SSO)
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  Configure enterprise identity providers for seamless authentication
+                </Typography>
+              </Box>
+
+              {/* SSO Providers Grid */}
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: 3, mb: 4 }}>
+                {/* Google SSO Card - Active */}
+                <Card sx={{ borderTop: 4, borderColor: 'success.main', position: 'relative' }}>
+                  <CardContent>
+                    <Chip 
+                      label="Active" 
+                      color="success" 
+                      size="small" 
+                      sx={{ position: 'absolute', top: 16, right: 16 }}
+                    />
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                      <Avatar 
+                        sx={{ width: 56, height: 56, bgcolor: 'white', mr: 2, border: '2px solid #e0e0e0' }}
+                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%234285F4' d='M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z'/%3E%3Cpath fill='%2334A853' d='M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z'/%3E%3Cpath fill='%23FBBC05' d='M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z'/%3E%3Cpath fill='%23EA4335' d='M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z'/%3E%3C/svg%3E"
+                      />
+                      <Box>
+                        <Typography variant="h6" fontWeight={600}>
+                          Google
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          OAuth 2.0
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Divider sx={{ my: 2 }} />
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                        Connected Users
+                      </Typography>
+                      <Typography variant="h4" fontWeight={700} color="success.main">
+                        245
+                      </Typography>
+                    </Box>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                        Last Sync
+                      </Typography>
+                      <Typography variant="body2" fontWeight={500}>
+                        2 minutes ago
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 1, mt: 3 }}>
+                      <Button 
+                        variant="outlined" 
+                        size="small" 
+                        startIcon={<Edit />}
+                        fullWidth
+                        sx={{ textTransform: 'none' }}
+                      >
+                        Configure
+                      </Button>
+                      <Button 
+                        variant="outlined" 
+                        size="small" 
+                        color="error"
+                        startIcon={<Delete />}
+                        sx={{ textTransform: 'none' }}
+                      >
+                        Disable
+                      </Button>
+                    </Box>
+                  </CardContent>
+                </Card>
+
+                {/* Microsoft Azure AD - Inactive */}
+                <Card sx={{ borderTop: 4, borderColor: 'grey.400', position: 'relative', opacity: 0.7 }}>
+                  <CardContent>
+                    <Chip 
+                      label="Inactive" 
+                      color="default" 
+                      size="small" 
+                      sx={{ position: 'absolute', top: 16, right: 16 }}
+                    />
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                      <Avatar 
+                        sx={{ width: 56, height: 56, bgcolor: '#0078D4', mr: 2 }}
+                      >
+                        <Typography variant="h6" color="white" fontWeight={700}>
+                          MS
+                        </Typography>
+                      </Avatar>
+                      <Box>
+                        <Typography variant="h6" fontWeight={600}>
+                          Microsoft Azure AD
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          SAML 2.0
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Divider sx={{ my: 2 }} />
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                        Status
+                      </Typography>
+                      <Typography variant="body2" fontWeight={500}>
+                        Not configured
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 1, mt: 3 }}>
+                      <Button 
+                        variant="contained" 
+                        size="small" 
+                        startIcon={<Add />}
+                        fullWidth
+                        sx={{ textTransform: 'none' }}
+                      >
+                        Enable
+                      </Button>
+                    </Box>
+                  </CardContent>
+                </Card>
+
+                {/* Okta - Inactive */}
+                <Card sx={{ borderTop: 4, borderColor: 'grey.400', position: 'relative', opacity: 0.7 }}>
+                  <CardContent>
+                    <Chip 
+                      label="Inactive" 
+                      color="default" 
+                      size="small" 
+                      sx={{ position: 'absolute', top: 16, right: 16 }}
+                    />
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                      <Avatar 
+                        sx={{ width: 56, height: 56, bgcolor: '#007DC1', mr: 2 }}
+                      >
+                        <Typography variant="h6" color="white" fontWeight={700}>
+                          OK
+                        </Typography>
+                      </Avatar>
+                      <Box>
+                        <Typography variant="h6" fontWeight={600}>
+                          Okta
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          SAML 2.0 / OAuth 2.0
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Divider sx={{ my: 2 }} />
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                        Status
+                      </Typography>
+                      <Typography variant="body2" fontWeight={500}>
+                        Not configured
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 1, mt: 3 }}>
+                      <Button 
+                        variant="contained" 
+                        size="small" 
+                        startIcon={<Add />}
+                        fullWidth
+                        sx={{ textTransform: 'none' }}
+                      >
+                        Enable
+                      </Button>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Box>
+
+              {/* Google SSO Configuration Details */}
+              <Card sx={{ mb: 4, borderTop: 4, borderColor: 'primary.main' }}>
+                <CardContent>
+                  <Typography variant="h5" fontWeight={700} gutterBottom>
+                    Google SSO Configuration
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                    Detailed configuration settings for Google OAuth 2.0 authentication
+                  </Typography>
+
+                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+                    {/* Left Column */}
+                    <Box>
+                      <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                        Client Credentials
+                      </Typography>
+                      <Paper sx={{ p: 2, bgcolor: 'grey.50', mb: 2 }}>
+                        <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                          Client ID
+                        </Typography>
+                        <Typography variant="body2" fontFamily="monospace" sx={{ wordBreak: 'break-all' }}>
+                          123456789012-abcdefghijklmnopqrstuvwxyz123456.apps.googleusercontent.com
+                        </Typography>
+                      </Paper>
+                      <Paper sx={{ p: 2, bgcolor: 'grey.50', mb: 2 }}>
+                        <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                          Client Secret
+                        </Typography>
+                        <Typography variant="body2" fontFamily="monospace">
+                          ••••••••••••••••••••••••
+                        </Typography>
+                      </Paper>
+                      <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
+                        <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                          Redirect URI
+                        </Typography>
+                        <Typography variant="body2" fontFamily="monospace" color="primary.main">
+                          https://app.company.com/auth/google/callback
+                        </Typography>
+                      </Paper>
+                    </Box>
+
+                    {/* Right Column */}
+                    <Box>
+                      <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                        Settings & Permissions
+                      </Typography>
+                      <List>
+                        <ListItem>
+                          <ListItemIcon>
+                            <Checkbox checked disabled />
+                          </ListItemIcon>
+                          <ListItemText 
+                            primary="Auto-provision users" 
+                            secondary="Automatically create user accounts on first login"
+                          />
+                        </ListItem>
+                        <ListItem>
+                          <ListItemIcon>
+                            <Checkbox checked disabled />
+                          </ListItemIcon>
+                          <ListItemText 
+                            primary="Sync user profiles" 
+                            secondary="Keep user information updated from Google"
+                          />
+                        </ListItem>
+                        <ListItem>
+                          <ListItemIcon>
+                            <Checkbox checked disabled />
+                          </ListItemIcon>
+                          <ListItemText 
+                            primary="Enforce SSO" 
+                            secondary="Require Google SSO for all users"
+                          />
+                        </ListItem>
+                        <ListItem>
+                          <ListItemIcon>
+                            <Checkbox disabled />
+                          </ListItemIcon>
+                          <ListItemText 
+                            primary="Just-in-time provisioning" 
+                            secondary="Create accounts dynamically during login"
+                          />
+                        </ListItem>
+                      </List>
+                    </Box>
+                  </Box>
+
+                  <Divider sx={{ my: 3 }} />
+
+                  {/* Statistics */}
+                  <Typography variant="subtitle2" fontWeight={600} gutterBottom sx={{ mb: 2 }}>
+                    Authentication Statistics (Last 30 Days)
+                  </Typography>
+                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(4, 1fr)' }, gap: 2 }}>
+                    <Paper sx={{ p: 2, textAlign: 'center', borderTop: 3, borderColor: 'success.main' }}>
+                      <Typography variant="h4" fontWeight={700} color="success.main">
+                        2,456
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Successful logins
+                      </Typography>
+                    </Paper>
+                    <Paper sx={{ p: 2, textAlign: 'center', borderTop: 3, borderColor: 'error.main' }}>
+                      <Typography variant="h4" fontWeight={700} color="error.main">
+                        12
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Failed attempts
+                      </Typography>
+                    </Paper>
+                    <Paper sx={{ p: 2, textAlign: 'center', borderTop: 3, borderColor: 'info.main' }}>
+                      <Typography variant="h4" fontWeight={700} color="info.main">
+                        245
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Active users
+                      </Typography>
+                    </Paper>
+                    <Paper sx={{ p: 2, textAlign: 'center', borderTop: 3, borderColor: 'warning.main' }}>
+                      <Typography variant="h4" fontWeight={700} color="warning.main">
+                        99.5%
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Success rate
+                      </Typography>
+                    </Paper>
+                  </Box>
+                </CardContent>
+              </Card>
+
+              {/* Domain Management */}
+              <Card sx={{ borderTop: 4, borderColor: 'secondary.main' }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                    <Box>
+                      <Typography variant="h5" fontWeight={700} gutterBottom>
+                        Allowed Domains
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Configure which domains can authenticate via Google SSO
+                      </Typography>
+                    </Box>
+                    <Button 
+                      variant="contained" 
+                      startIcon={<Add />}
+                      sx={{ textTransform: 'none' }}
+                    >
+                      Add domain
+                    </Button>
+                  </Box>
+
+                  <TableContainer component={Paper} variant="outlined">
+                    <Table>
+                      <TableHead>
+                        <TableRow sx={{ bgcolor: 'grey.50' }}>
+                          <TableCell><Typography variant="subtitle2" fontWeight={600}>Domain</Typography></TableCell>
+                          <TableCell><Typography variant="subtitle2" fontWeight={600}>Status</Typography></TableCell>
+                          <TableCell><Typography variant="subtitle2" fontWeight={600}>Users</Typography></TableCell>
+                          <TableCell><Typography variant="subtitle2" fontWeight={600}>Verified</Typography></TableCell>
+                          <TableCell><Typography variant="subtitle2" fontWeight={600}>Actions</Typography></TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        <TableRow>
+                          <TableCell>
+                            <Typography variant="body2" fontWeight={500}>
+                              @company.com
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip label="Active" color="success" size="small" />
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">245</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip label="Verified" color="success" size="small" variant="outlined" />
+                          </TableCell>
+                          <TableCell>
+                            <IconButton size="small">
+                              <Edit fontSize="small" />
+                            </IconButton>
+                            <IconButton size="small" color="error">
+                              <Delete fontSize="small" />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <Typography variant="body2" fontWeight={500}>
+                              @partners.company.com
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip label="Active" color="success" size="small" />
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">18</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip label="Verified" color="success" size="small" variant="outlined" />
+                          </TableCell>
+                          <TableCell>
+                            <IconButton size="small">
+                              <Edit fontSize="small" />
+                            </IconButton>
+                            <IconButton size="small" color="error">
+                              <Delete fontSize="small" />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <Typography variant="body2" fontWeight={500}>
+                              @contractors.company.com
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip label="Pending" color="warning" size="small" />
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">0</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip label="Unverified" color="default" size="small" variant="outlined" />
+                          </TableCell>
+                          <TableCell>
+                            <Button size="small" variant="outlined" sx={{ textTransform: 'none' }}>
+                              Verify
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </CardContent>
+              </Card>
             </Box>
           )}
         </Container>

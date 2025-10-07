@@ -71,7 +71,7 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
   const accessManagementItems = [
     {
       id: "access-management",
-      label: "Access Management",
+      label: "Users and Teams",
       icon: <Security />,
       path: "/team-leader-dashboard/access-management",
     },
@@ -277,7 +277,7 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
             ))}
           </Box>
 
-          {/* Access Management Section */}
+          {/* Users and Teams Section */}
           <Box sx={{ 
             ml: '1.25rem',
             mt: '0.5rem',
@@ -299,7 +299,7 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
                 fontSize: '0.6875rem',
               }}
             >
-              ACCESS MANAGEMENT
+              USERS AND TEAMS
             </Typography>
             {accessManagementItems.map((item) => (
               <ListItem
