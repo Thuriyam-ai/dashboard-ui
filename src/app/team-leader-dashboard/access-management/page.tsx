@@ -45,6 +45,8 @@ import {
   Business,
   Security,
   Public,
+  Add,
+  Group,
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -112,6 +114,34 @@ const mockUsers = [
     status: "Active",
     lastActive: "1 hour ago",
     avatar: "AR",
+  },
+];
+
+// Mock team data
+const mockTeams = [
+  {
+    id: 1,
+    name: "Engineering",
+    description: "Core development team",
+    members: 8,
+    lastActive: "2 hours ago",
+    created: "2024-01-01",
+  },
+  {
+    id: 2,
+    name: "Product",
+    description: "Product management and strategy",
+    members: 5,
+    lastActive: "1 day ago",
+    created: "2024-01-05",
+  },
+  {
+    id: 3,
+    name: "Operations",
+    description: "Platform operations and monitoring",
+    members: 3,
+    lastActive: "3 hours ago",
+    created: "2024-01-10",
   },
 ];
 
@@ -399,11 +429,100 @@ export default function AccessManagementPage() {
             </Box>
           )}
 
+          {/* Teams Management Content */}
+          {activeTab === 1 && (
+            <Box>
+              {/* Team Dashboard Header */}
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h4" component="h2" fontWeight={700} gutterBottom>
+                  Team Dashboard
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                  Create and manage teams within your organization
+                </Typography>
+
+                {/* Create Team Button */}
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
+                  <Button
+                    variant="contained"
+                    startIcon={<Add />}
+                    sx={{ textTransform: 'none' }}
+                  >
+                    Create Team
+                  </Button>
+                </Box>
+              </Box>
+
+              {/* Teams Table */}
+              <Card>
+                <CardContent sx={{ p: 0 }}>
+                  <TableContainer>
+                    <Table>
+                      <TableHead>
+                        <TableRow sx={{ backgroundColor: 'action.hover' }}>
+                          <TableCell sx={{ fontWeight: 600 }}>Team name</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Members</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Last active</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Created</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Actions</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {mockTeams.map((team) => (
+                          <TableRow key={team.id} hover>
+                            <TableCell>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                <Business sx={{ color: 'primary.main', fontSize: '1.25rem' }} />
+                                <Box>
+                                  <Typography variant="body2" fontWeight={600} color="primary.main">
+                                    {team.name}
+                                  </Typography>
+                                  <Typography variant="caption" color="text.secondary">
+                                    {team.description}
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            </TableCell>
+                            <TableCell>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Group sx={{ fontSize: '1rem', color: 'text.secondary' }} />
+                                <Typography variant="body2">{team.members}</Typography>
+                              </Box>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2">{team.lastActive}</Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2">{team.created}</Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Box sx={{ display: 'flex', gap: 1 }}>
+                                <Button
+                                  variant="outlined"
+                                  size="small"
+                                  sx={{ textTransform: 'none' }}
+                                >
+                                  Manage
+                                </Button>
+                                <IconButton size="small">
+                                  <MoreVert fontSize="small" />
+                                </IconButton>
+                              </Box>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </CardContent>
+              </Card>
+            </Box>
+          )}
+
           {/* Placeholder for other tabs */}
-          {activeTab !== 0 && (
+          {activeTab !== 0 && activeTab !== 1 && (
             <Box sx={{ textAlign: 'center', py: 8 }}>
               <Typography variant="h5" color="text.secondary">
-                {activeTab === 1 && "Teams Management"}
                 {activeTab === 2 && "Roles & Permissions"}
                 {activeTab === 3 && "Enterprise Federation"}
               </Typography>
