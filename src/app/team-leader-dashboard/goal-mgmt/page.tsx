@@ -8,11 +8,13 @@ import {
   Box, Container, Typography, AppBar, Toolbar, IconButton, Button,
   Avatar, Card, CardContent, Chip, Grid, Dialog, DialogTitle,
   DialogContent, DialogActions, Alert, AlertTitle, CircularProgress,
-  Tooltip, // <-- 1. Import Tooltip
+  Tooltip,
 } from "@mui/material";
 import {
   BookmarkBorder, MoreVert, Logout, Add, Edit, ContentCopy,
   Delete, PlayArrow, Pause, Assessment, Group, CheckCircle,
+  FileCopy as FileCopyIcon,
+  Check as CheckIcon, // <-- 1. Import the Check icon for feedback
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
 import { getAllGoals, publishDraftVersion, deleteGoal } from "@/data/services/goal-service";
@@ -26,6 +28,9 @@ export default function GoalManagementPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState<GoalDetailResponse | null>(null);
   const { logout } = useAuth();
+  
+  // --- 2. ADDED: State to track which ID has been copied ---
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const fetchGoals = async () => {
     try {
@@ -76,6 +81,16 @@ export default function GoalManagementPage() {
   const handleCloneGoal = (goalId: string) => router.push(`/team-leader-dashboard/goal-mgmt/editor?clone=${goalId}`);
   const handleDeleteGoal = (goal: GoalDetailResponse) => { setSelectedGoal(goal); setDeleteDialogOpen(true); };
 
+  // --- 3. UPDATED: Copy function now provides visual feedback ---
+  const handleCopyId = (id: string) => {
+    navigator.clipboard.writeText(id).then(() => {
+      setCopiedId(id); // Set the copied ID
+      setTimeout(() => setCopiedId(null), 2000); // Reset after 2 seconds
+    }).catch(err => {
+      console.error('Failed to copy ID: ', err);
+    });
+  };
+
   const renderContent = () => {
     if (isLoading) {
       return (<Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>);
@@ -95,7 +110,6 @@ export default function GoalManagementPage() {
     return (
       <Grid container spacing={2}>
         {goals.map((goal) => (
-          // <-- 2. FIXED Grid prop from `size` to `item`
           <Grid item xs={12} key={goal.goal_id}>
             <Card sx={{ transition: 'all 0.2s ease-in-out', '&:hover': { transform: 'translateY(-4px)', boxShadow: 4},width:"75vw" }}>
               <CardContent>
@@ -119,9 +133,7 @@ export default function GoalManagementPage() {
                       <Typography variant="body2" fontWeight={500}>{goal.team_name || 'N/A'}</Typography>
                     </Box>
                   </Box>
-
                   
-
                   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     <Button 
                       size="small" 
@@ -134,10 +146,7 @@ export default function GoalManagementPage() {
                     <Button size="small" startIcon={<CheckCircle />} onClick={() => handlePublish(goal.goal_id)} disabled={!goal.draft_version_no}>
                       Publish Draft
                     </Button>
-
-                    {/* --- 3. UPDATED CLONE BUTTON LOGIC --- */}
                     <Tooltip title={!goal.published_version_no ? "A goal must have a published version to be cloned." : ""}>
-                      {/* Tooltip requires a wrapper around disabled elements */}
                       <span>
                         <Button
                           size="small"
@@ -150,7 +159,18 @@ export default function GoalManagementPage() {
                         </Button>
                       </span>
                     </Tooltip>
-                    
+
+                    {/* --- 4. ADDED: New button with conditional feedback --- */}
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color={copiedId === goal.goal_id ? "success" : "primary"}
+                      startIcon={copiedId === goal.goal_id ? <CheckIcon /> : <FileCopyIcon />}
+                      onClick={() => handleCopyId(goal.goal_id)}
+                    >
+                      {copiedId === goal.goal_id ? "Copied" : "Copy ID"}
+                    </Button>
+
                     <Button size="small" startIcon={<Delete />} onClick={() => handleDeleteGoal(goal)} color="error" variant="outlined">
                       Delete
                     </Button>

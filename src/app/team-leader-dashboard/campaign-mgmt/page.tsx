@@ -13,13 +13,14 @@ import {
 import {
   BookmarkBorder, MoreVert, Logout, Add, Edit, ContentCopy, Delete, PlayArrow,
   Pause, CheckCircle, Schedule, Campaign, Group, CalendarToday,
+  FileCopy as FileCopyIcon, // <-- 1. Import the icon for copying
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
 import { getAllCampaigns, deleteCampaign } from "@/data/services/campaign-service";
 import { Campaign as CampaignType } from "@/types/api/campaign";
 
-// Actions Menu Component (no changes needed)
-const ActionsMenu = ({ campaign, onEdit, onClone, onDelete }: any) => {
+// --- 2. UPDATED ActionsMenu to accept an `onCopy` handler ---
+const ActionsMenu = ({ campaign, onEdit, onClone, onDelete, onCopy }: any) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -38,6 +39,11 @@ const ActionsMenu = ({ campaign, onEdit, onClone, onDelete }: any) => {
           <ListItemIcon><ContentCopy fontSize="small" /></ListItemIcon>
           <ListItemText>Clone</ListItemText>
         </MenuItem>
+        {/* --- ADDED "Copy ID" MenuItem --- */}
+        <MenuItem onClick={() => { onCopy(campaign.id); handleClose(); }}>
+          <ListItemIcon><FileCopyIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>Copy ID</ListItemText>
+        </MenuItem>
         <MenuItem onClick={() => { onDelete(campaign); handleClose(); }} sx={{ color: 'error.main' }}>
           <ListItemIcon><Delete fontSize="small" color="error" /></ListItemIcon>
           <ListItemText>Delete</ListItemText>
@@ -51,16 +57,13 @@ export default function CampaignManagementPage() {
   const router = useRouter();
   const { logout } = useAuth();
   
-  // State for API data
   const [campaigns, setCampaigns] = useState<CampaignType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // State for UI interactions
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<CampaignType | null>(null);
 
-  // Fetch campaigns on component mount
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
@@ -80,6 +83,16 @@ export default function CampaignManagementPage() {
   const handleEditCampaign = (campaignId: string) => router.push(`/team-leader-dashboard/campaign-mgmt/editor?id=${campaignId}`);
   const handleCloneCampaign = (campaignId: string) => router.push(`/team-leader-dashboard/campaign-mgmt/editor?clone=${campaignId}`);
 
+  // --- 3. ADDED: Handler function to copy the campaign ID ---
+  const handleCopyId = (campaignId: string) => {
+    navigator.clipboard.writeText(campaignId).then(() => {
+      alert(`Campaign ID copied to clipboard: ${campaignId}`);
+    }).catch(err => {
+      console.error('Failed to copy campaign ID: ', err);
+      alert('Could not copy ID.');
+    });
+  };
+
   const handleDeleteCampaign = (campaign: CampaignType) => {
     setSelectedCampaign(campaign);
     setDeleteDialogOpen(true);
@@ -93,7 +106,6 @@ export default function CampaignManagementPage() {
       setDeleteDialogOpen(false);
       setSelectedCampaign(null);
     } catch (err) {
-      // In a real app, you might show a toast notification here
       console.error("Failed to delete campaign", err);
     }
   };
@@ -123,7 +135,7 @@ export default function CampaignManagementPage() {
   };
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return '';
+    if (!dateString) return '–'; // Use an en-dash for missing dates
     return new Date(dateString).toLocaleDateString('en-CA'); // 'en-CA' gives YYYY-MM-DD format
   };
 
@@ -132,7 +144,6 @@ export default function CampaignManagementPage() {
       <TeamLeaderSidebar activeItem="campaign-mgmt" />
 
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginLeft: '280px' }}>
-        {/* Top Bar */}
         <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
           <Toolbar>
             <Box sx={{ flexGrow: 1 }}><Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>team-leader-dashboard.localhost:3000</Typography></Box>
@@ -145,7 +156,6 @@ export default function CampaignManagementPage() {
           </Toolbar>
         </AppBar>
 
-        {/* Main Content */}
         <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3 }}>
           <Breadcrumbs />
           <Box sx={{ mb: 4 }}>
@@ -160,7 +170,6 @@ export default function CampaignManagementPage() {
             </Box>
           </Box>
 
-          {/* Campaigns Table */}
           <Card>
             <TableContainer component={Paper} variant="outlined">
               <Table sx={{ minWidth: 650 }} aria-label="campaigns table">
@@ -168,7 +177,7 @@ export default function CampaignManagementPage() {
                   <TableRow sx={{ backgroundColor: 'action.hover' }}>
                     <TableCell sx={{ fontWeight: 600, width: '25%' }}>Campaign Name</TableCell>
                     <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                    <TableCell sx={{ fontWeight: 600, width: '20%' }}>Goal Version</TableCell>
+                    <TableCell sx={{ fontWeight: 600, width: '20%' }}>Goal</TableCell>
                     <TableCell sx={{ fontWeight: 600 }}>Assigned Team</TableCell>
                     <TableCell sx={{ fontWeight: 600 }}>Duration</TableCell>
                     <TableCell sx={{ fontWeight: 600 }}>Metrics</TableCell>
@@ -201,7 +210,14 @@ export default function CampaignManagementPage() {
                         </Box>
                       </TableCell>
                       <TableCell align="right">
-                        <ActionsMenu campaign={campaign} onEdit={handleEditCampaign} onClone={handleCloneCampaign} onDelete={handleDeleteCampaign} />
+                        {/* --- 4. Pass the `handleCopyId` function to the ActionsMenu --- */}
+                        <ActionsMenu 
+                          campaign={campaign} 
+                          onEdit={handleEditCampaign} 
+                          onClone={handleCloneCampaign} 
+                          onDelete={handleDeleteCampaign}
+                          onCopy={handleCopyId}
+                        />
                       </TableCell>
                     </TableRow>
                   ))}
@@ -210,7 +226,6 @@ export default function CampaignManagementPage() {
             </TableContainer>
           </Card>
 
-          {/* Empty State */}
           {!isLoading && !error && campaigns.length === 0 && (
             <Box sx={{ textAlign: 'center', py: 8, mt: 2 }}>
               <Campaign sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
@@ -221,7 +236,6 @@ export default function CampaignManagementPage() {
           )}
         </Container>
 
-        {/* Delete Confirmation Dialog */}
         <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="sm" fullWidth>
           <DialogTitle>Delete Campaign</DialogTitle>
           <DialogContent>

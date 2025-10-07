@@ -42,7 +42,7 @@ import {
   Logout,
   Search,
   Message,
-  Schedule, // <-- Imported Schedule
+  Schedule,
   TrendingUp,
   CheckCircle,
   Cancel,
@@ -59,13 +59,10 @@ import { listConversations } from "@/data/services/conversation-service";
 import { Campaign } from "@/types/api/campaign";
 import { TeamSummary } from "@/types/api/team";
 import { ConversationResponse } from "@/types/api/conversation";
+import * as XLSX from "xlsx";
 
-// Define a constant for the sidebar width to reuse it
 const DRAWER_WIDTH = 280;
 
-/**
- * Conversations page component for Team Leader Dashboard
- */
 export default function ConversationsPage() {
   const router = useRouter();
   const { logout } = useAuth();
@@ -78,12 +75,10 @@ export default function ConversationsPage() {
     setMobileOpen(!mobileOpen);
   };
 
-  // State for filters
   const [searchTerm, setSearchTerm] = useState("");
   const [campaignFilter, setCampaignFilter] = useState("all");
   const [teamFilter, setTeamFilter] = useState("all");
 
-  // State for dropdown data
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loadingCampaigns, setLoadingCampaigns] = useState<boolean>(true);
   const [campaignError, setCampaignError] = useState<string | null>(null);
@@ -92,12 +87,12 @@ export default function ConversationsPage() {
   const [loadingTeams, setLoadingTeams] = useState<boolean>(true);
   const [teamError, setTeamError] = useState<string | null>(null);
 
-  // State for conversation data
   const [conversations, setConversations] = useState<ConversationResponse[]>([]);
   const [loadingConversations, setLoadingConversations] = useState<boolean>(true);
   const [conversationError, setConversationError] = useState<string | null>(null);
 
-  // Fetch data for filters (campaigns and teams)
+  const [isExporting, setIsExporting] = useState(false);
+
   useEffect(() => {
     const fetchFilterData = async () => {
       try {
@@ -121,7 +116,6 @@ export default function ConversationsPage() {
     fetchFilterData();
   }, []);
 
-  // Fetch conversations when filters change
   useEffect(() => {
     const fetchConversations = async () => {
       setLoadingConversations(true);
@@ -143,6 +137,52 @@ export default function ConversationsPage() {
   }, [campaignFilter, teamFilter]);
 
   const teamMap = useMemo(() => new Map(teams.map(team => [team.id, team.name])), [teams]);
+
+  // --- UPDATED EXPORT HANDLER ---
+  const handleExportData = () => {
+    if (filteredConversations.length === 0) {
+      alert("No data to export.");
+      return;
+    }
+    setIsExporting(true);
+
+    setTimeout(() => {
+      try {
+        // 1. Process data: keep level-1 keys, stringify any nested objects/arrays
+        const exportData = filteredConversations.map(conv => {
+          const row: { [key: string]: any } = {};
+          for (const key in conv) {
+            if (Object.prototype.hasOwnProperty.call(conv, key)) {
+              const value = (conv as any)[key];
+              if (typeof value === 'object' && value !== null) {
+                // If the value is a nested object or an array, convert it to a JSON string
+                row[key] = JSON.stringify(value, null, 2); // Using null, 2 for pretty printing
+              } else {
+                // Otherwise, keep the primitive value as is
+                row[key] = value;
+              }
+            }
+          }
+          return row;
+        });
+
+        // 2. Create a single worksheet from the processed data
+        const worksheet = XLSX.utils.json_to_sheet(exportData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Conversations");
+        
+        // 3. Trigger the file download
+        const today = new Date().toISOString().split('T')[0];
+        XLSX.writeFile(workbook, `conversations_export_${today}.xlsx`);
+
+      } catch (error) {
+        console.error("Failed to export data:", error);
+        alert("An error occurred while exporting the data.");
+      } finally {
+        setIsExporting(false);
+      }
+    }, 100);
+  };
 
   const getStatusColor = (status: string | null) => {
     switch (status?.toUpperCase()) {
@@ -169,16 +209,13 @@ export default function ConversationsPage() {
   };
 
   const formatDate = (dateString: string) => {
-    // Helper to handle potential MongoDate format
     let date;
     try {
         date = new Date(dateString.includes('$date') ? JSON.parse(dateString).$date : dateString);
     } catch {
         date = new Date(dateString);
     }
-
     if (isNaN(date.getTime())) return '-';
-    
     return date.toLocaleDateString("en-IN", {
       day: "numeric", month: "short", year: "numeric",
     });
@@ -278,7 +315,16 @@ export default function ConversationsPage() {
                 </FormControl>
 
                 <Button variant="outlined" startIcon={<Refresh />} onClick={() => { setSearchTerm(""); setCampaignFilter("all"); setTeamFilter("all"); }}>Reset Filters</Button>
-                <Button variant="contained" startIcon={<Download />} sx={{ ml: 'auto' }}>Export Data</Button>
+                
+                <Button 
+                  variant="contained" 
+                  startIcon={isExporting ? <CircularProgress size={20} color="inherit" /> : <Download />} 
+                  sx={{ ml: 'auto' }}
+                  onClick={handleExportData}
+                  disabled={isExporting || filteredConversations.length === 0}
+                >
+                  {isExporting ? 'Exporting...' : 'Export Data'}
+                </Button>
               </Box>
             </CardContent>
           </Card>
@@ -327,7 +373,6 @@ export default function ConversationsPage() {
                     ) : (
                       filteredConversations.map((conv) => {
                         const qualityScore = conv.QC_score;
-                        // Correctly extract the date for display
                         const callDate = typeof conv.call_timestamp === 'string' ? conv.call_timestamp : conv.call_timestamp?.$date || new Date().toISOString();
                         
                         return (
