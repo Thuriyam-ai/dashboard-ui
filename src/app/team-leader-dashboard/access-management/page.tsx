@@ -658,14 +658,14 @@ export default function AccessManagementPage() {
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'space-between', 
-              p: 3,
+              p: 2,
               borderBottom: '1px solid',
               borderColor: 'divider'
             }}>
-              <Typography variant="h4" fontWeight={700}>
+              <Typography variant="h5" fontWeight={700}>
                 Manage Team
               </Typography>
-              <IconButton onClick={handleCloseTeamManagement} size="large">
+              <IconButton onClick={handleCloseTeamManagement}>
                 <Close />
               </IconButton>
             </Box>
@@ -684,18 +684,23 @@ export default function AccessManagementPage() {
               {selectedTeam && (
                 <>
                   {/* Team Information */}
-                  <Card>
-                    <CardContent>
-                      <Typography variant="h6" fontWeight={600} gutterBottom>
+                  <Card sx={{ 
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    boxShadow: 2,
+                    mb: 3
+                  }}>
+                    <CardContent sx={{ p: 2 }}>
+                      <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ mb: 1.5 }}>
                         Team Information
                       </Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                        <Business sx={{ color: 'primary.main', fontSize: '3rem' }} />
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+                        <Business sx={{ color: 'primary.main', fontSize: '2rem' }} />
                         <Box>
-                          <Typography variant="h5" fontWeight={600} color="primary.main">
+                          <Typography variant="h6" fontWeight={600} color="primary.main">
                             {selectedTeam.name}
                           </Typography>
-                          <Typography variant="body1" color="text.secondary">
+                          <Typography variant="body2" color="text.secondary">
                             {selectedTeam.description}
                           </Typography>
                         </Box>
@@ -724,33 +729,38 @@ export default function AccessManagementPage() {
                   </Card>
 
                   {/* Team Statistics */}
-                  <Card>
-                    <CardContent>
-                      <Typography variant="h6" fontWeight={600} gutterBottom>
+                  <Card sx={{ 
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    boxShadow: 2,
+                    mb: 3
+                  }}>
+                    <CardContent sx={{ p: 2 }}>
+                      <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ mb: 1.5 }}>
                         Team Statistics
                       </Typography>
-                      <Box sx={{ display: 'flex', gap: 4 }}>
+                      <Box sx={{ display: 'flex', gap: 3 }}>
                         <Box>
-                          <Typography variant="h3" fontWeight={700} color="primary.main">
+                          <Typography variant="h4" fontWeight={700} color="primary.main">
                             {selectedTeam.members}
                           </Typography>
-                          <Typography variant="body1" color="text.secondary">
+                          <Typography variant="body2" color="text.secondary">
                             Total Members
                           </Typography>
                         </Box>
                         <Box>
-                          <Typography variant="h3" fontWeight={700} color="success.main">
+                          <Typography variant="h4" fontWeight={700} color="success.main">
                             {selectedTeam.members - 1}
                           </Typography>
-                          <Typography variant="body1" color="text.secondary">
+                          <Typography variant="body2" color="text.secondary">
                             Active Members
                           </Typography>
                         </Box>
                         <Box>
-                          <Typography variant="h3" fontWeight={700} color="info.main">
+                          <Typography variant="h4" fontWeight={700} color="info.main">
                             {getTotalPages()}
                           </Typography>
-                          <Typography variant="body1" color="text.secondary">
+                          <Typography variant="body2" color="text.secondary">
                             Pages
                           </Typography>
                         </Box>
@@ -759,15 +769,21 @@ export default function AccessManagementPage() {
                   </Card>
 
                   {/* Team Members */}
-                  <Card>
-                    <CardContent>
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-                        <Typography variant="h6" fontWeight={600}>
+                  <Card sx={{ 
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    boxShadow: 2,
+                    mb: 3
+                  }}>
+                    <CardContent sx={{ p: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                        <Typography variant="subtitle1" fontWeight={600}>
                           Team Members ({mockUsers.filter(user => user.team === selectedTeam.name).length})
                         </Typography>
                         <Button
                           variant="contained"
                           startIcon={<PersonAdd />}
+                          size="small"
                           sx={{ textTransform: 'none' }}
                         >
                           Add Member
@@ -793,19 +809,19 @@ export default function AccessManagementPage() {
                               </ListItemIcon>
                               <ListItemText
                                 primary={
-                                  <Typography variant="subtitle1" fontWeight={600}>
+                                  <Typography variant="body2" fontWeight={600}>
                                     {member.name}
                                   </Typography>
                                 }
                                 secondary={
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 0.5 }}>
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
                                     <Chip 
                                       label={member.role} 
                                       color={getRoleColor(member.role)}
                                       variant="outlined"
                                       size="small"
                                     />
-                                    <Typography variant="caption" color="text.secondary">
+                                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
                                       {member.email}
                                     </Typography>
                                     <Chip 
@@ -824,12 +840,12 @@ export default function AccessManagementPage() {
                         </List>
                       </Box>
 
-                      {/* Pagination */}
-                      {getTotalPages() > 1 && (
-                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
-                          <Typography variant="body2" color="text.secondary">
-                            Page {currentPage} of {getTotalPages()}
-                          </Typography>
+                      {/* Pagination - Always show for debugging */}
+                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2, mt: 2 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          Page {currentPage} of {getTotalPages()} (Total: {mockUsers.filter(user => user.team === selectedTeam.name).length} members)
+                        </Typography>
+                        {getTotalPages() > 1 && (
                           <Pagination
                             count={getTotalPages()}
                             page={currentPage}
@@ -837,8 +853,8 @@ export default function AccessManagementPage() {
                             color="primary"
                             size="small"
                           />
-                        </Box>
-                      )}
+                        )}
+                      </Box>
                     </CardContent>
                   </Card>
                 </>
@@ -849,7 +865,7 @@ export default function AccessManagementPage() {
             <Box sx={{ 
               display: 'flex', 
               gap: 2, 
-              p: 3,
+              p: 2,
               borderTop: '1px solid',
               borderColor: 'divider',
               flexShrink: 0
@@ -858,7 +874,7 @@ export default function AccessManagementPage() {
                 variant="outlined"
                 fullWidth
                 onClick={handleCloseTeamManagement}
-                sx={{ textTransform: 'none', py: 1.5 }}
+                sx={{ textTransform: 'none', py: 1 }}
               >
                 Cancel
               </Button>
@@ -867,7 +883,7 @@ export default function AccessManagementPage() {
                 fullWidth
                 onClick={handleSaveTeam}
                 startIcon={<Save />}
-                sx={{ textTransform: 'none', py: 1.5 }}
+                sx={{ textTransform: 'none', py: 1 }}
               >
                 Save Changes
               </Button>
