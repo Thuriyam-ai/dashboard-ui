@@ -212,7 +212,7 @@ export default function AccessManagementPage() {
   const [teamManagementOpen, setTeamManagementOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const membersPerPage = 5;
+  const membersPerPage = 10;
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -683,7 +683,7 @@ export default function AccessManagementPage() {
             }}>
               {selectedTeam && (
                 <>
-                  {/* Team Information */}
+                  {/* Team Members */}
                   <Card sx={{ 
                     border: '1px solid',
                     borderColor: 'divider',
@@ -691,11 +691,9 @@ export default function AccessManagementPage() {
                     mb: 3
                   }}>
                     <CardContent sx={{ p: 2 }}>
-                      <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ mb: 1.5 }}>
-                        Team Information
-                      </Typography>
+                      {/* Team Header */}
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                        <Business sx={{ color: 'primary.main', fontSize: '2rem' }} />
+                        <Business sx={{ color: 'primary.main', fontSize: '1.5rem' }} />
                         <Box>
                           <Typography variant="h6" fontWeight={600} color="primary.main">
                             {selectedTeam.name}
@@ -705,77 +703,8 @@ export default function AccessManagementPage() {
                           </Typography>
                         </Box>
                       </Box>
-                      <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                        <TextField
-                          label="Team Name"
-                          value={selectedTeam.name}
-                          sx={{ flex: 1 }}
-                        />
-                      </Box>
-                      <TextField
-                        label="Description"
-                        value={selectedTeam.description}
-                        multiline
-                        rows={3}
-                        fullWidth
-                        sx={{
-                          '& .MuiInputBase-root': {
-                            overflow: 'auto',
-                            maxHeight: '120px'
-                          }
-                        }}
-                      />
-                    </CardContent>
-                  </Card>
-
-                  {/* Team Statistics */}
-                  <Card sx={{ 
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    boxShadow: 2,
-                    mb: 3
-                  }}>
-                    <CardContent sx={{ p: 2 }}>
-                      <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ mb: 1.5 }}>
-                        Team Statistics
-                      </Typography>
-                      <Box sx={{ display: 'flex', gap: 3 }}>
-                        <Box>
-                          <Typography variant="h4" fontWeight={700} color="primary.main">
-                            {selectedTeam.members}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Total Members
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Typography variant="h4" fontWeight={700} color="success.main">
-                            {selectedTeam.members - 1}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Active Members
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Typography variant="h4" fontWeight={700} color="info.main">
-                            {getTotalPages()}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Pages
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </CardContent>
-                  </Card>
-
-                  {/* Team Members */}
-                  <Card sx={{ 
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    boxShadow: 2,
-                    mb: 3
-                  }}>
-                    <CardContent sx={{ p: 2 }}>
+                      
+                      {/* Members Header */}
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
                         <Typography variant="subtitle1" fontWeight={600}>
                           Team Members ({mockUsers.filter(user => user.team === selectedTeam.name).length})
@@ -792,7 +721,7 @@ export default function AccessManagementPage() {
                       
                       {/* Members List Container with Fixed Height */}
                       <Box sx={{ 
-                        maxHeight: '400px', 
+                        maxHeight: '500px', 
                         overflow: 'auto',
                         border: '1px solid',
                         borderColor: 'divider',
