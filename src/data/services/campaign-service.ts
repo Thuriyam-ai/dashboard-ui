@@ -7,10 +7,51 @@ interface GetAllCampaignsParams {
   limit?: number;
 }
 
+// Sample campaign data for development/demo purposes
+const SAMPLE_CAMPAIGNS: Campaign[] = [
+  {
+    campaign_id: "camp_001",
+    campaign_name: "Customer Support Campaign",
+    description: "Handling customer support inquiries and issues",
+    status: "ACTIVE",
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-15T00:00:00Z"
+  },
+  {
+    campaign_id: "camp_002", 
+    campaign_name: "Sales Outreach Campaign",
+    description: "Proactive sales outreach to potential customers",
+    status: "ACTIVE",
+    created_at: "2024-01-05T00:00:00Z",
+    updated_at: "2024-01-15T00:00:00Z"
+  },
+  {
+    campaign_id: "camp_003",
+    campaign_name: "Technical Support Campaign", 
+    description: "Technical support and troubleshooting assistance",
+    status: "ACTIVE",
+    created_at: "2024-01-10T00:00:00Z",
+    updated_at: "2024-01-15T00:00:00Z"
+  }
+];
+
 /**
  * Fetches a paginated list of all campaigns.
  */
 export const getAllCampaigns = async ({ skip = 0, limit = 100 }: GetAllCampaignsParams = {}): Promise<Campaign[]> => {
+  // For development/demo purposes, return sample data
+  console.log('Using sample campaign data for development');
+  
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 300));
+  
+  // Apply pagination
+  const startIndex = skip;
+  const endIndex = startIndex + limit;
+  return SAMPLE_CAMPAIGNS.slice(startIndex, endIndex);
+
+  // Original API call code (commented out for development)
+  /*
   try {
     const response = await apiClient.get<Campaign[]>('/api/v1/campaigns/', {
       params: { skip, limit },
@@ -20,6 +61,7 @@ export const getAllCampaigns = async ({ skip = 0, limit = 100 }: GetAllCampaigns
     console.error('Failed to fetch campaigns:', error);
     throw new Error('Could not fetch campaigns.');
   }
+  */
 };
 
 /**

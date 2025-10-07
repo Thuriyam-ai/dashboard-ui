@@ -88,7 +88,7 @@ export default function GoalManagementPage() {
         <Box sx={{ textAlign: 'center', py: 8 }}>
           <Assessment sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
           <Typography variant="h5" gutterBottom>No Goals Created Yet</Typography>
-          <Button variant="contained" startIcon={<Add />} onClick={handleCreateGoal} size="large">Create Your First Goal</Button>
+          <Button variant="contained" startIcon={<Add />} onClick={handleCreateGoal} size="large">Create your first goal</Button>
         </Box>
       );
     }

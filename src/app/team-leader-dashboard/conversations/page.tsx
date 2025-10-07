@@ -277,8 +277,8 @@ export default function ConversationsPage() {
                   </Select>
                 </FormControl>
 
-                <Button variant="outlined" startIcon={<Refresh />} onClick={() => { setSearchTerm(""); setCampaignFilter("all"); setTeamFilter("all"); }}>Reset Filters</Button>
-                <Button variant="contained" startIcon={<Download />} sx={{ ml: 'auto' }}>Export Data</Button>
+                <Button variant="outlined" startIcon={<Refresh />} onClick={() => { setSearchTerm(""); setCampaignFilter("all"); setTeamFilter("all"); }}>Reset filters</Button>
+                <Button variant="contained" startIcon={<Download />} sx={{ ml: 'auto' }}>Export data</Button>
               </Box>
             </CardContent>
           </Card>

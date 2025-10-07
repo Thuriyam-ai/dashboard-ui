@@ -242,7 +242,7 @@ function GoalEditorContent() {
                 <Box sx={{ p: 3 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                     <Typography variant="h5" fontWeight={600}>Structured Data Capture (Outcome Fields)</Typography>
-                    <Button variant="outlined" startIcon={<Add />} onClick={addDataField}>Add Field</Button>
+                    <Button variant="outlined" startIcon={<Add />} onClick={addDataField}>Add field</Button>
                   </Box>
                   <TableContainer component={Paper} variant="outlined">
                     <Table>
@@ -314,7 +314,7 @@ function GoalEditorContent() {
                               <MuiIconButton color="error" onClick={() => removeDisposition(disp.id)}><Delete /></MuiIconButton>
                             </Box>
                           ))}
-                          <Button size="small" startIcon={<Add />} onClick={addDisposition} variant="outlined" sx={{alignSelf: 'flex-start'}}>Add Disposition</Button>
+                          <Button size="small" startIcon={<Add />} onClick={addDisposition} variant="outlined" sx={{alignSelf: 'flex-start'}}>Add disposition</Button>
                         </Stack>
                       </CardContent></Card>
                     </Grid>
@@ -325,7 +325,7 @@ function GoalEditorContent() {
                 <Box sx={{ p: 3 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                     <Box><Typography variant="h5" fontWeight={600}>Quality Scorecard</Typography><Typography variant="body2" color="text.secondary">Total Score: {totalScore} points</Typography></Box>
-                    <Button variant="outlined" startIcon={<Add />} onClick={addQualityParameter}>Add Parameter</Button>
+                    <Button variant="outlined" startIcon={<Add />} onClick={addQualityParameter}>Add parameter</Button>
                   </Box>
                   <TableContainer component={Paper} variant="outlined">
                     <Table>

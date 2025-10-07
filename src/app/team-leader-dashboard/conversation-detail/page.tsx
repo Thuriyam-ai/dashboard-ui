@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
 import styles from "./ConversationDetailPage.module.css";
-import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
   Box,
   Container,
@@ -28,7 +27,14 @@ import {
   Divider,
   InputAdornment,
   Snackbar,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Drawer,
+  Slider,
 } from "@mui/material";
+import { Close } from "@mui/icons-material";
 import {
   BookmarkBorder,
   MoreVert,
@@ -45,6 +51,20 @@ import {
   Schedule,
   Save,
   Edit,
+  Share,
+  Download,
+  Phone,
+  Description,
+  Person,
+  AccessTime,
+  Mic,
+  Folder,
+  Star,
+  TrendingUp,
+  VolumeUp,
+  Fullscreen,
+  PlayArrow,
+  Pause,
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
 import {
@@ -60,1270 +80,901 @@ import {
   OutcomeFieldAnalysis,
 } from "@/types/api/conversation";
 
-// --- Types & Mocks ---
+// Define a constant for the sidebar width to reuse it
+const DRAWER_WIDTH = 280;
 
-const extractDate = (date: { $date: string } | string | undefined): string => {
-  if (typeof date === "object" && date && "$date" in date) return date.$date;
-  return (date as string) || new Date().toISOString();
-};
+type TabValue = "ai-stats" | "reviewer";
 
-interface UIEnhancedConversationDetail {
-  id: string;
-  agentName: string;
-  customerName: string;
-  duration: string;
-  date: string;
-  status: "completed" | "in-progress" | "failed" | string;
-  qualityScore: number;
-  talkToListenRatio: number;
-  campaign: string;
-  team: string;
-  disposition: string;
-  btaScore: number;
-  lcaScore: number;
-  sentiment: "positive" | "neutral" | "negative";
-  fillerWords: number;
-  interruptions: number;
-  keyTopics: string[];
-  audioUrl: string;
-  scorecard: ConversationScorecard;
-  outcome: ConversationOutcome;
-}
-
-interface ConversationData {
-  detail: UIEnhancedConversationDetail;
-}
-
-type TabValue = "conversation" | "scorecard" | "outcomes";
-
-type ScorecardReviewState = {
-  [paramId: string]: { score: string; reason: string };
-};
-
-type OutcomeReviewState = {
-  [attributeId: string]: { value: any; reason: string };
-};
-
-const mapToUI = (
-  apiData: ConversationDetailResponse
-): UIEnhancedConversationDetail => {
-  const scorecard = apiData.analytics_data?.scorecard || {};
-  const outcome = apiData.analytics_data?.outcome || {};
-  const callTimestamp = extractDate(apiData.call_timestamp);
-
-  return {
-    id: apiData.conversation_id,
-    agentName: "Kavya Reddy",
-    customerName: "Rajesh Kumar",
-    duration: `${Math.floor(apiData.length_in_sec / 60)}:${(
-      apiData.length_in_sec % 60
-    )
-      .toString()
-      .padStart(2, "0")}`,
-    date: callTimestamp,
-    status: (apiData.avyukta_status || "completed").toLowerCase() as any,
-    qualityScore: apiData.QC_score,
-    talkToListenRatio: 0.58,
-    campaign: "Customer Support",
-    team: "Technical Support",
-    disposition: apiData.lamh_disposition,
-    btaScore: 88,
-    lcaScore: 85,
-    sentiment: "positive",
-    fillerWords: 3,
-    interruptions: 1,
-    keyTopics: ["Account Access", "Password Reset", "Security Settings"],
-    audioUrl: apiData.recording_url,
-    scorecard: scorecard,
-    outcome: outcome,
-  };
-};
-
-/**
- * Team Leader Conversation Detail page component
- */
 export default function ConversationDetailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { logout } = useAuth();
 
-  const [conversationData, setConversationData] =
-    useState<ConversationData | null>(null);
+  const conversationId = searchParams.get("id") || "conv_001";
+  const [conversation, setConversation] = useState<ConversationDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<TabValue>("conversation");
+  const [activeTab, setActiveTab] = useState<TabValue>("ai-stats");
+  const [sidedrawOpen, setSidedrawOpen] = useState(false);
+  const [scoringCriteria, setScoringCriteria] = useState({
+    callOpening: 0,
+    effectiveQuestioning: 0,
+    interruptions: 0,
+    offTopicConversation: 0,
+    dispositionSelection: 0,
+    callFlow: 0,
+    falsePromises: 0,
+    callDisconnection: 0
+  });
 
-  const [scorecardReviews, setScorecardReviews] =
-    useState<ScorecardReviewState>({});
-  const [outcomeReviews, setOutcomeReviews] = useState<OutcomeReviewState>({});
+  const [scoringReasons, setScoringReasons] = useState({
+    callOpening: '',
+    effectiveQuestioning: '',
+    interruptions: '',
+    offTopicConversation: '',
+    dispositionSelection: '',
+    callFlow: '',
+    falsePromises: '',
+    callDisconnection: ''
+  });
 
-  const [savingItemId, setSavingItemId] = useState<string | null>(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<
-    "success" | "error"
-  >("success");
+  // Audio player state
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(180); // 3 minutes in seconds
+  const [volume, setVolume] = useState(80);
 
-  const conversationId = searchParams.get("id");
-
+  // Fetch conversation details
   useEffect(() => {
-    if (!conversationId) {
-      setLoading(false);
-      setError("Conversation ID is missing from the URL.");
-      return;
-    }
-
-    const fetchAllDetails = async () => {
-      setLoading(true);
-      setError(null);
-
+    const fetchConversation = async () => {
       try {
-        const detailResponse = await getConversationDetail(conversationId);
-        const mappedData = mapToUI(detailResponse);
-        setConversationData({ detail: mappedData });
-
-        const initialScorecardReviews: ScorecardReviewState = {};
-        for (const [id, paramData] of Object.entries(mappedData.scorecard)) {
-          initialScorecardReviews[id] = {
-            score:
-              paramData.review_score?.toString() ??
-              paramData.score.toString(),
-            reason: paramData.reason_for_update ?? "",
-          };
-        }
-        setScorecardReviews(initialScorecardReviews);
-
-        const initialOutcomeReviews: OutcomeReviewState = {};
-        for (const [id, outcomeData] of Object.entries(mappedData.outcome)) {
-          initialOutcomeReviews[id] = {
-            value: outcomeData.reviewer_value ?? "",
-            reason: outcomeData.reviewer_reason ?? "",
-          };
-        }
-        setOutcomeReviews(initialOutcomeReviews);
+        setLoading(true);
+        const data = await getConversationDetail(conversationId);
+        setConversation(data);
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "An unknown error occurred."
-        );
+        console.error("Failed to fetch conversation:", err);
+        setError("Failed to load conversation details");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAllDetails();
+    fetchConversation();
   }, [conversationId]);
 
-  const handleScorecardReviewChange = (
-    parameterId: string,
-    field: "score" | "reason",
-    value: string
-  ) => {
-    setScorecardReviews((prev) => ({
-      ...prev,
-      [parameterId]: { ...prev[parameterId], [field]: value },
-    }));
-  };
-
-  const handleOutcomeReviewChange = (
-    attributeId: string,
-    field: "value" | "reason",
-    value: any
-  ) => {
-    setOutcomeReviews((prev) => ({
-      ...prev,
-      [attributeId]: { ...prev[attributeId], [field]: value },
-    }));
-  };
-
-  const handleSaveScorecardItem = async (
-    parameterId: string,
-    maxScore: number
-  ) => {
-    if (!conversationId) {
-      setSnackbarMessage("Error: Conversation ID is missing.");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-      return;
-    }
-
-    const review = scorecardReviews[parameterId];
-    const scoreValue = parseInt(review.score, 10);
-
-    if (
-      !review.score ||
-      isNaN(scoreValue) ||
-      scoreValue < 0 ||
-      scoreValue > maxScore
-    ) {
-      setSnackbarMessage(
-        `Please enter a valid score between 0 and ${maxScore}.`
-      );
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-      return;
-    }
-    if (!review.reason.trim()) {
-      setSnackbarMessage("A reason is required to submit the review.");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-      return;
-    }
-
-    setSavingItemId(parameterId);
-    try {
-      const payload = {
-        review_score: scoreValue,
-        reason_for_update: review.reason,
-      };
-      await submitScorecardReview(conversationId, parameterId, payload);
-      setSnackbarMessage(`Review for "${parameterId}" saved successfully!`);
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "An unknown error occurred.";
-      setSnackbarMessage(errorMessage);
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-    } finally {
-      setSavingItemId(null);
-    }
-  };
-
-  const handleSaveOutcomeItem = async (attributeId: string) => {
-    if (!conversationId) {
-      setSnackbarMessage("Error: Conversation ID is missing.");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-      return;
-    }
-
-    const review = outcomeReviews[attributeId];
-    if (review.value === null || review.value === "") {
-      setSnackbarMessage("The reviewer value cannot be empty.");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-      return;
-    }
-    if (!review.reason.trim()) {
-      setSnackbarMessage("A reason is required to submit the review.");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-      return;
-    }
-
-    setSavingItemId(attributeId);
-    try {
-      const payload = {
-        reviewer_value: review.value,
-        reviewer_reason: review.reason,
-      };
-      await submitOutcomeReview(conversationId, attributeId, payload);
-      setSnackbarMessage(`Review for "${attributeId}" saved successfully!`);
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "An unknown error occurred.";
-      setSnackbarMessage(errorMessage);
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-    } finally {
-      setSavingItemId(null);
-    }
-  };
-
-  const handleSnackbarClose = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") return;
-    setSnackbarOpen(false);
-  };
-
-  const handleTabChange = (event: React.SyntheticEvent, newValue: TabValue) =>
-    setActiveTab(newValue);
-  const handleBackToConversations = () =>
+  const handleBackToConversations = () => {
     router.push("/team-leader-dashboard/conversations");
-  const getStatusColor = (status: string) =>
-    ({ completed: "success", "in-progress": "info", failed: "error" }[status] ||
-    "default");
-  const getStatusIcon = (status: string) =>
-    ({
-      completed: <CheckCircle />,
-      "in-progress": <Schedule />,
-      failed: <Cancel />,
-    }[status] || <Warning />);
-  const getSentimentColor = (sentiment: string) =>
-    ({ positive: "success", neutral: "info", negative: "error" }[sentiment] ||
-    "default");
-  const formatDate = (dateString: string) =>
-    new Date(dateString).toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  };
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: TabValue) => {
+    setActiveTab(newValue);
+  };
+
+  const handleScoreConversation = () => {
+    console.log('Opening sidedraw...');
+    setSidedrawOpen(true);
+  };
+
+  const handleCloseSidedraw = () => {
+    setSidedrawOpen(false);
+  };
+
+  const handleSaveScores = () => {
+    // Save scoring logic here
+    console.log('Saving scores:', scoringCriteria);
+    setSidedrawOpen(false);
+  };
+
+  const handleScoringChange = (criteria: string, value: number) => {
+    setScoringCriteria(prev => ({
+      ...prev,
+      [criteria]: value
+    }));
+  };
+
+  const handleReasonChange = (key: string, value: string) => {
+    setScoringReasons(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   if (loading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
-        }}
-      >
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
         <CircularProgress />
-        <Typography sx={{ ml: 2 }}>Loading conversation details...</Typography>
       </Box>
     );
   }
 
-  if (error || !conversationData) {
+  if (error || !conversation) {
     return (
-      <Container maxWidth="xl" sx={{ py: 3 }}>
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
         <Alert severity="error">
-          <AlertTitle>Error Loading Conversation</AlertTitle>
-          {error ||
-            `Conversation details could not be loaded for ID: ${conversationId}.`}
-          <Button onClick={handleBackToConversations} sx={{ ml: 2 }}>
-            Go Back
-          </Button>
+          <AlertTitle>Error</AlertTitle>
+          {error || "Conversation not found"}
         </Alert>
-      </Container>
+      </Box>
     );
   }
 
-  const { detail } = conversationData;
-  const scorecardEntries = Object.entries(
-    detail.scorecard
-  ) as [string, ScorecardParameterAnalysis][];
-  const outcomeEntries = Object.entries(
-    detail.outcome
-  ) as [string, OutcomeFieldAnalysis][];
-
-  const totalPossibleScore = scorecardEntries.reduce(
-    (sum, [, paramData]) => sum + paramData.max_score,
-    0
-  );
-  const totalAchievedScore = scorecardEntries.reduce(
-    (sum, [, paramData]) =>
-      sum + (paramData.review_score ?? paramData.score),
-    0
-  );
-
-  const scorecardPercentage =
-    totalPossibleScore > 0
-      ? (totalAchievedScore / totalPossibleScore) * 100
-      : 0;
-
-  const getScoreColor = (score: number, max: number) => {
-    const percentage = max > 0 ? (score / max) * 100 : 0;
-    if (percentage >= 80) return "success";
-    if (percentage >= 50) return "warning";
-    return "error";
-  };
-
   return (
-    <Box
-      sx={{
-        display: "flex",
-        minHeight: "100vh",
-        backgroundColor: "background.default",
-      }}
-    >
-      <TeamLeaderSidebar activeItem="conversations" />
+    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
+      <TeamLeaderSidebar />
+      
       <Box
+        component="main"
         sx={{
           flexGrow: 1,
-          display: "flex",
-          flexDirection: "column",
-          marginLeft: "280px",
+          p: 3,
+          width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
+          maxWidth: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
+          ml: { sm: `${DRAWER_WIDTH}px` },
+          overflow: 'hidden',
+          boxSizing: 'border-box'
         }}
       >
-        <AppBar
-          position="static"
-          elevation={1}
-          sx={{
-            backgroundColor: "background.paper",
-            color: "text.primary",
-            borderBottom: "1px solid",
-            borderColor: "divider",
-          }}
-        >
-          <Toolbar>
-            <Button
-              startIcon={<ArrowBack />}
-              onClick={handleBackToConversations}
-              sx={{ mr: 2 }}
-            >
-              Back to Conversations
-            </Button>
-            <Box sx={{ flexGrow: 1 }}>
-              <Typography
-                variant="body2"
-                sx={{ fontFamily: "monospace", color: "text.secondary" }}
-              >
-                conversation-detail.localhost:3001
-              </Typography>
-            </Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <IconButton size="small" sx={{ color: "text.secondary" }}>
-                <BookmarkBorder />
-              </IconButton>
-              <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1, mr: 2 }}
-              >
-                <Avatar
-                  sx={{
-                    width: 32,
-                    height: 32,
-                    bgcolor: "primary.main",
-                    fontSize: "0.875rem",
-                  }}
-                >
-                  W
-                </Avatar>
-                <Typography variant="body2" fontWeight={500}>
-                  Work
-                </Typography>
-              </Box>
-              <IconButton size="small" sx={{ color: "text.secondary" }}>
-                <MoreVert />
-              </IconButton>
+        {/* Top Navigation Bar */}
+        <Box sx={{ mb: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Button
-                variant="contained"
-                color="error"
-                size="small"
-                startIcon={<Logout />}
-                sx={{ ml: 1 }}
-                onClick={logout}
+                startIcon={<ArrowBack />}
+                onClick={handleBackToConversations}
+                sx={{ 
+                  color: 'primary.main',
+                  textTransform: 'none'
+                }}
               >
-                Logout
+                Back to Conversations
               </Button>
             </Box>
-          </Toolbar>
-        </AppBar>
-        <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3 }}>
-          <Breadcrumbs />
-          <Box sx={{ mb: 4 }}>
-            <Typography
-              variant="h3"
-              component="h1"
-              fontWeight={700}
-              gutterBottom
-            >
-              Conversation Analysis: {detail.id}
-            </Typography>
-            <Typography variant="h6" color="text.secondary" gutterBottom>
-              {detail.agentName} ↔ {detail.customerName}
-            </Typography>
-            <Box sx={{ display: "flex", gap: 2, alignItems: "center", mt: 2 }}>
-              <Chip
-                icon={getStatusIcon(detail.status)}
-                label={
-                  detail.status.charAt(0).toUpperCase() + detail.status.slice(1)
-                }
-                color={getStatusColor(detail.status) as any}
-                size="small"
-              />
-              <Chip label={detail.team} size="small" variant="outlined" />
-              <Chip label={detail.campaign} size="small" variant="outlined" />
-              <Typography variant="body2" color="text.secondary">
-                {formatDate(detail.date)} • {detail.duration}
-              </Typography>
+            
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <IconButton>
+                <Share />
+              </IconButton>
+              <IconButton>
+                <BookmarkBorder />
+              </IconButton>
+              <IconButton>
+                <MoreVert />
+              </IconButton>
             </Box>
           </Box>
 
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={3}>
-              <Card>
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Box>
-                      <Typography color="text.secondary" gutterBottom>
-                        Overall Quality Score
-                      </Typography>
-                      <Typography variant="h4" fontWeight={700} color="primary">
-                        {detail.qualityScore}
-                      </Typography>
-                    </Box>
-                    <Assessment sx={{ fontSize: 40, color: "primary.main" }} />
-                  </Box>
-                  <LinearProgress
-                    variant="determinate"
-                    value={detail.qualityScore}
-                    sx={{ mt: 1, height: 8, borderRadius: 4 }}
-                    color={detail.qualityScore >= 80 ? "success" : "warning"}
-                  />
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Card>
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Box>
-                      <Typography color="text.secondary" gutterBottom>
-                        LCA Score
-                      </Typography>
-                      <Typography
-                        variant="h4"
-                        fontWeight={700}
-                        color="warning.main"
-                      >
-                        {detail.lcaScore}
-                      </Typography>
-                    </Box>
-                    <Analytics sx={{ fontSize: 40, color: "warning.main" }} />
-                  </Box>
-                  <LinearProgress
-                    variant="determinate"
-                    value={detail.lcaScore}
-                    sx={{ mt: 1, height: 8, borderRadius: 4 }}
-                    color={detail.lcaScore >= 80 ? "success" : "warning"}
-                  />
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Card>
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Box>
-                      <Typography color="text.secondary" gutterBottom>
-                        Sentiment
-                      </Typography>
-                      <Typography
-                        variant="h4"
-                        fontWeight={700}
-                        color={`${getSentimentColor(detail.sentiment)}.main`}
-                      >
-                        {detail.sentiment.charAt(0).toUpperCase() +
-                          detail.sentiment.slice(1)}
-                      </Typography>
-                    </Box>
-                    <Chat
-                      sx={{
-                        fontSize: 40,
-                        color: `${getSentimentColor(detail.sentiment)}.main`,
-                      }}
-                    />
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Card>
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Box>
-                      <Typography color="text.secondary" gutterBottom>
-                        Disposition
-                      </Typography>
-                      <Typography variant="h4" fontWeight={700}>
-                        {detail.disposition}
-                      </Typography>
-                    </Box>
-                    <DoneAll sx={{ fontSize: 40, color: "success.main" }} />
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Conversation Playback & Transcript
+          {/* Title and Call Info */}
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
+              Voice Call to Ankush M
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                {conversation.conversation_id}
               </Typography>
-              <Box
-                sx={{
-                  p: 2,
-                  border: 1,
-                  borderColor: "divider",
-                  borderRadius: 1,
-                  backgroundColor: "action.hover",
-                }}
-              >
-                <audio controls style={{ width: "100%" }}>
-                  <source src={detail.audioUrl} type="audio/mpeg" />
-                  Your browser does not support the audio element.
-                </audio>
-              </Box>
-              <Card variant="outlined" sx={{ mt: 2 }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                2024-01-15 at 4:30 PM
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Main Content - Two Column Layout */}
+        <Box sx={{ 
+          display: 'flex', 
+          gap: 3, 
+          minHeight: 'calc(100vh - 200px)', 
+          width: '100%', 
+          maxWidth: '100%',
+          overflow: 'hidden',
+          boxSizing: 'border-box',
+          pr: 2  // Add right padding to prevent edge clipping
+        }}>
+          {/* Left Panel - Audio Player and Transcript */}
+          <Box sx={{ 
+            flex: '0 0 calc(41.67% - 12px)', 
+            minWidth: 0,
+            maxWidth: 'calc(41.67% - 12px)',
+            overflow: 'hidden',
+            boxSizing: 'border-box'
+          }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              
+              {/* Audio Player Card */}
+              <Card sx={{ borderRadius: 2, borderTop: '4px solid #1976d2' }}>
                 <CardContent>
-                  <Box sx={{ height: 200, overflow: "auto" }}>
-                    <Box sx={{ mb: 2 }}>
-                      <Chip
-                        label={`Agent: ${detail.agentName}`}
-                        size="small"
-                        color="primary"
-                        sx={{ mr: 1 }}
-                      />
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        component="span"
-                      >
-                        00:00 - 00:15
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Phone sx={{ color: 'primary.main' }} />
+                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        Audio Player
                       </Typography>
                     </Box>
-                    <Typography variant="body2" sx={{ mb: 2 }}>
-                      "Hello Mr. Kumar, thank you for calling..."
-                    </Typography>
-                    <Box sx={{ mb: 2 }}>
-                      <Chip
-                        label={`Customer: ${detail.customerName}`}
-                        size="small"
-                        color="secondary"
-                        sx={{ mr: 1 }}
-                      />
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        component="span"
+                    <IconButton>
+                      <Download />
+                    </IconButton>
+                </Box>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
+                    Conversation Recording
+                  </Typography>
+
+                  {/* Audio Controls */}
+                  <Box sx={{ backgroundColor: '#1a1a1a', borderRadius: 2, p: 2, mb: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                      <IconButton 
+                        sx={{ color: 'white' }}
+                        onClick={() => setIsPlaying(!isPlaying)}
                       >
-                        00:15 - 00:45
+                        {isPlaying ? <Pause /> : <PlayArrow />}
+                      </IconButton>
+                      
+                      <Typography variant="body2" sx={{ color: 'white', minWidth: '40px' }}>
+                        {formatTime(currentTime)}
+                      </Typography>
+                      
+                      <Box sx={{ flexGrow: 1, mx: 2 }}>
+                        <LinearProgress 
+                          variant="determinate" 
+                          value={(currentTime / duration) * 100}
+                          sx={{ 
+                            height: 4, 
+                            borderRadius: 2,
+                            backgroundColor: 'rgba(255,255,255,0.3)',
+                            '& .MuiLinearProgress-bar': {
+                              backgroundColor: '#1976d2'
+                            }
+                          }}
+                        />
+                </Box>
+                      
+                      <Typography variant="body2" sx={{ color: 'white', minWidth: '40px' }}>
+                        /{formatDuration(duration)}
                       </Typography>
                     </Box>
-                    <Typography variant="body2" sx={{ mb: 2 }}>
-                      "Hi Kavya, I'm having trouble logging in..."
-                    </Typography>
-                    <Box sx={{ mb: 2 }}>
-                      <Chip
-                        label={`Agent: ${detail.agentName}`}
-                        size="small"
-                        color="primary"
-                        sx={{ mr: 1 }}
-                      />
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        component="span"
-                      >
-                        00:45 - 01:20
-                      </Typography>
+
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <VolumeUp sx={{ color: 'white' }} />
+                      <Box sx={{ flexGrow: 1 }}>
+                        <LinearProgress 
+                          variant="determinate" 
+                          value={volume}
+                          sx={{ 
+                            height: 4, 
+                            borderRadius: 2,
+                            backgroundColor: 'rgba(255,255,255,0.3)',
+                            '& .MuiLinearProgress-bar': {
+                              backgroundColor: '#1976d2'
+                            }
+                          }}
+                        />
+                      </Box>
+                      <IconButton sx={{ color: 'white' }}>
+                        <Fullscreen />
+                      </IconButton>
                     </Box>
-                    <Typography variant="body2">
-                      "I understand your frustration..."
-                    </Typography>
                   </Box>
                 </CardContent>
               </Card>
-            </CardContent>
-          </Card>
 
-          <Card sx={{ mb: 3 }}>
-            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+              {/* Transcript Card */}
+              <Card sx={{ borderRadius: 2, borderTop: '4px solid #2e7d32' }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Description sx={{ color: 'primary.main' }} />
+                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        Transcript
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <FormControl size="small" sx={{ minWidth: 150 }}>
+                        <Select value="all" displayEmpty>
+                          <MenuItem value="all">All Sentiments</MenuItem>
+                          <MenuItem value="positive">Positive</MenuItem>
+                          <MenuItem value="neutral">Neutral</MenuItem>
+                          <MenuItem value="negative">Negative</MenuItem>
+                        </Select>
+                      </FormControl>
+                      <IconButton>
+                        <Download />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
+                    Conversation Text
+                  </Typography>
+
+                  {/* Transcript Content */}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                      <Typography variant="body2" sx={{ color: 'text.secondary', minWidth: '50px' }}>
+                        0:00
+                      </Typography>
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            Lalit Bal (Agent)
+                          </Typography>
+                          <Chip label="neutral" size="small" color="default" />
+                        </Box>
+                        <Typography variant="body2">
+                          Hello! This is Testbot from Creditmann. I wanted to talk to you about a loan offer that might interest you. Would you like to receive the details via SMS?
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                      <Typography variant="body2" sx={{ color: 'text.secondary', minWidth: '50px' }}>
+                        0:11
+                      </Typography>
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            Customer (Customer)
+                          </Typography>
+                          <Chip label="positive" size="small" color="success" />
+                        </Box>
+                        <Typography variant="body2">
+                          Yes, I would be interested in hearing more about the loan offer.
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                      <Typography variant="body2" sx={{ color: 'text.secondary', minWidth: '50px' }}>
+                        0:18
+                      </Typography>
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            Lalit Bal (Agent)
+                          </Typography>
+                          <Chip label="positive" size="small" color="success" />
+                        </Box>
+                        <Typography variant="body2">
+                          Great! I'll send you the details via SMS. Can you confirm your mobile number?
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                      <Typography variant="body2" sx={{ color: 'text.secondary', minWidth: '50px' }}>
+                        0:25
+                      </Typography>
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            Customer (Customer)
+                          </Typography>
+                          <Chip label="neutral" size="small" color="default" />
+                        </Box>
+                        <Typography variant="body2">
+                          Yes, it's +919482540097
+                    </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Box>
+                </Box>
+
+          {/* Right Panel - Analytics and Stats */}
+          <Box sx={{ 
+            flex: '0 0 calc(58.33% - 12px)', 
+            minWidth: 0,
+            maxWidth: 'calc(58.33% - 12px)',
+            overflow: 'hidden',
+            maxHeight: 'calc(100vh - 200px)',  // Prevent vertical overflow
+            boxSizing: 'border-box'
+          }}>
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: 3,
+              height: '100%'
+            }}>
+              
+              {/* Tabs */}
+            <Box sx={{ 
+              borderBottom: 1, 
+              borderColor: 'divider',
+              flexShrink: 0,  // Prevent tabs from shrinking
+              '& .MuiTab-root': {
+                textTransform: 'none',
+                fontWeight: 600,
+                minHeight: 48,
+              }
+            }}>
               <Tabs value={activeTab} onChange={handleTabChange}>
-                <Tab
-                  icon={<Chat />}
-                  label="Conversation Analysis"
-                  value="conversation"
-                  iconPosition="start"
-                />
-                <Tab
-                  icon={<PlaylistAddCheck />}
-                  label="Scorecard"
-                  value="scorecard"
-                  iconPosition="start"
-                />
-                <Tab
-                  icon={<DoneAll />}
-                  label="Outcomes"
-                  value="outcomes"
-                  iconPosition="start"
-                />
+                  <Tab label="Score" value="ai-stats" />
+                  <Tab label="Reviewer Score" value="reviewer" />
               </Tabs>
             </Box>
-            <CardContent sx={{ p: 0 }}>
-              {activeTab === "conversation" && (
-                <Box sx={{ p: 3 }}>
-                  <Typography
-                    variant="h5"
-                    fontWeight={600}
-                    gutterBottom
-                    sx={{ mb: 3 }}
-                  >
-                    Call Analysis Details
-                  </Typography>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                      <Typography variant="h6" gutterBottom>
-                        Speaker Timeline
-                      </Typography>
-                      <Card variant="outlined">
-                        <CardContent>
-                          <Box
-                            sx={{
-                              height: 150,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
+
+              {/* Tab Content Container */}
+              <Box sx={{ 
+                flexGrow: 1, 
+                overflow: 'hidden',
+                minHeight: 0  // Allow shrinking
+              }}>
+                {/* AI Stats Tab Content */}
+                {activeTab === "ai-stats" && (
+                <Box sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  gap: 2,
+                  height: '100%',
+                  overflow: 'hidden'
+                }}>
+                  {/* Score Widget - Large */}
+                  <Box>
+                    <Card sx={{ 
+                      borderRadius: 2, 
+                      borderTop: '4px solid #ff9800',
+                      height: 300,  // Fixed square height
+                      width: '100%',
+                      maxWidth: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      overflow: 'hidden',
+                      boxSizing: 'border-box'
+                    }}>
+                      <CardContent sx={{ 
+                        flexGrow: 1, 
+                        display: 'flex', 
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        p: 3
+                      }}>
+                        {/* Header */}
+                        <Box sx={{ textAlign: 'center', mb: 2 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1 }}>
+                            <Star sx={{ color: 'primary.main' }} />
+                            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                              Score
+                            </Typography>
+                          </Box>
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            Overall Quality Assessment
+                          </Typography>
+                        </Box>
+
+                        {/* Main Score */}
+                        <Box sx={{ textAlign: 'center', mb: 3 }}>
+                          <Typography variant="h1" sx={{ 
+                            fontWeight: 700, 
+                            color: 'warning.main',
+                            fontSize: '4rem',
+                            lineHeight: 1
+                          }}>
+                            89
+                          </Typography>
+                        </Box>
+
+                        {/* Metrics */}
+                        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                          <Box sx={{ textAlign: 'center' }}>
+                            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>
+                              Agent Score
+                            </Typography>
+                            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                              89
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Box>
+
+                </Box>
+              )}
+
+                {/* Reviewer Tab Content */}
+                {activeTab === "reviewer" && (
+                <Box sx={{ 
+                  height: '100%',
+                  overflow: 'hidden'
+                }}>
+                    <Card sx={{ 
+                      borderRadius: 2, 
+                      borderTop: '4px solid #673ab7',
+                      minHeight: 400,
+                      maxHeight: 'calc(100vh - 400px)',  // Dynamic height based on viewport
+                      display: 'flex',
+                      flexDirection: 'column',
+                      overflow: 'hidden'
+                    }}>
+                      <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                        {/* Technical Support Quality Assessment Header */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                          <Box sx={{ 
+                            width: 40, 
+                            height: 40, 
+                            backgroundColor: '#ff9800', 
+                            borderRadius: 2, 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center' 
+                          }}>
+                            <CheckCircle sx={{ color: 'white' }} />
+                          </Box>
+                          <Box>
+                            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                              Technical Support Quality Assessment
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                              Evaluate technical troubleshooting and support effectiveness
+                            </Typography>
+                          </Box>
+                        </Box>
+
+                        {/* No Score Section */}
+                        <Box sx={{ textAlign: 'center', mb: 4, flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                          <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+                            No Score
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            This conversation has not been manually scored yet
+                          </Typography>
+                        </Box>
+
+                        {/* Conversation Details Bar */}
+                        <Box sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'space-between', 
+                          backgroundColor: '#f5f5f5', 
+                          borderRadius: 2, 
+                          p: 2, 
+                          mb: 4,
+                          flexWrap: 'wrap',
+                          gap: 2
+                        }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Schedule sx={{ color: '#ff9800' }} />
+                            <Typography variant="body2">Pending Review</Typography>
+                          </Box>
+                          <Divider orientation="vertical" flexItem />
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Star sx={{ color: '#2196f3' }} />
+                            <Typography variant="body2">89/100</Typography>
+                          </Box>
+                          <Divider orientation="vertical" flexItem />
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Schedule sx={{ color: 'text.secondary' }} />
+                            <Typography variant="body2">Never</Typography>
+                          </Box>
+                          <Divider orientation="vertical" flexItem />
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Chat sx={{ color: '#9c27b0' }} />
+                            <Typography variant="body2">Voice Call</Typography>
+                          </Box>
+                          <Divider orientation="vertical" flexItem />
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <AccessTime sx={{ color: '#4caf50' }} />
+                            <Typography variant="body2">10:15</Typography>
+                          </Box>
+                          <Divider orientation="vertical" flexItem />
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Person sx={{ color: '#2196f3' }} />
+                            <Typography variant="body2">Lalit Bal</Typography>
+                          </Box>
+                        </Box>
+
+                        {/* Score This Conversation Button */}
+                        <Box sx={{ textAlign: 'center', mb: 3 }}>
+                          <Button 
+                            variant="contained" 
+                            size="large"
+                            onClick={handleScoreConversation}
+                            sx={{ 
+                              px: 4, 
+                              py: 1.5, 
+                              fontSize: '1rem',
+                              fontWeight: 600,
+                              textTransform: 'none'
                             }}
                           >
-                            <Box sx={{ textAlign: "center" }}>
-                              <Typography
-                                variant="h4"
-                                color="primary"
-                                fontWeight={700}
-                              >
-                                {Math.round(detail.talkToListenRatio * 100)}%
-                              </Typography>
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                              >
-                                Agent Talk Ratio
-                              </Typography>
-                              <LinearProgress
-                                variant="determinate"
-                                value={detail.talkToListenRatio * 100}
-                                sx={{ mt: 1, height: 8, borderRadius: 4 }}
-                                color="primary"
-                              />
-                            </Box>
-                          </Box>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <Typography variant="h6" gutterBottom>
-                        Call Metrics
-                      </Typography>
-                      <Card variant="outlined">
-                        <CardContent>
-                          <Grid container spacing={2}>
-                            <Grid item xs={6}>
-                              <Box sx={{ textAlign: "center" }}>
-                                <Typography
-                                  variant="h5"
-                                  color="error.main"
-                                  fontWeight={700}
-                                >
-                                  {detail.interruptions}
-                                </Typography>
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                >
-                                  Interruptions
-                                </Typography>
-                              </Box>
-                            </Grid>
-                            <Grid item xs={6}>
-                              <Box sx={{ textAlign: "center" }}>
-                                <Typography
-                                  variant="h5"
-                                  color="warning.main"
-                                  fontWeight={700}
-                                >
-                                  {detail.fillerWords}
-                                </Typography>
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                >
-                                  Filler Words
-                                </Typography>
-                              </Box>
-                            </Grid>
-                          </Grid>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  </Grid>
-                </Box>
-              )}
-
-              {activeTab === "scorecard" && (
-                <Box sx={{ p: 3 }}>
-                  <Typography
-                    variant="h5"
-                    fontWeight={600}
-                    gutterBottom
-                    sx={{ mb: 3 }}
-                  >
-                    Agent Performance Scorecard
-                  </Typography>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Typography
-                        variant="h6"
-                        color="text.secondary"
-                        gutterBottom
-                      >
-                        Total QC Score: {totalAchievedScore} /{" "}
-                        {totalPossibleScore} ({Math.round(scorecardPercentage)}
-                        % Adherence)
-                      </Typography>
-                      <LinearProgress
-                        variant="determinate"
-                        value={scorecardPercentage}
-                        sx={{ mt: 1, height: 10, borderRadius: 4, mb: 3 }}
-                        color={scorecardPercentage >= 80 ? "success" : "error"}
-                      />
-                      <Grid container spacing={3} alignItems="stretch">
-                        {scorecardEntries.map(([parameterId, paramData]) => {
-                          const maxScore = paramData.max_score;
-                          const displayScore =
-                            paramData.score ?? paramData.score;
-                          const scoreColor = getScoreColor(
-                            displayScore,
-                            maxScore
-                          );
-                          const isSavingThis = savingItemId === parameterId;
-                          const wasReviewed = paramData.review_score !== null;
-
-                          return (
-                            <Grid item xs={12} md={6} lg={4} key={parameterId}>
-                              <Card
-                                variant="elevation"
-                                sx={{
-                                  height: "100%",
-                                  display: "flex",
-                                  flexDirection: "column",
-                                  width: "72vw"
-                                }}
-                              >
-                                <CardContent
-                                  sx={{
-                                    flexGrow: 1,
-                                    display: "flex",
-                                    flexDirection: "column",
-                                  }}
-                                >
-                                  <Box
-                                    sx={{
-                                      display: "flex",
-                                      justifyContent: "space-between",
-                                      alignItems: "center",
-                                    }}
-                                  >
-                                    <Typography
-                                      variant="subtitle1"
-                                      fontWeight={600}
-                                    >
-                                      {paramData.parameter}
-                                    </Typography>
-                                    <Chip
-                                      label={`Score: ${displayScore}/${maxScore}`}
-                                      icon={wasReviewed ? <Edit /> : undefined}
-                                      color={scoreColor as any}
-                                      size="small"
-                                      variant={
-                                        wasReviewed ? "filled" : "outlined"
-                                      }
-                                    />
-                                  </Box>
-                                  <Typography
-                                    variant="body2"
-                                    sx={{ mt: 1, mb: 1, fontStyle: "italic" }}
-                                  >
-                                    {paramData.explanation}
-                                  </Typography>
-                                  <Box sx={{ mt: 2, mb: 2 }}>
-                                    <Typography
-                                      variant="caption"
-                                      fontWeight={600}
-                                      fontSize={"0.875rem"}
-                                    >
-                                      Rule Analysis:
-                                    </Typography>
-                                    {paramData.sub_rule_analysis.map(
-                                      (rule, idx) => (
-                                        <Box
-                                          key={idx}
-                                          sx={{
-                                            display: "flex",
-                                            alignItems: "flex-start",
-                                            mt: 0.5,
-                                            fontSize: "0.75rem",
-                                          }}
-                                        >
-                                          {rule.status === "Pass" ? (
-                                            <CheckCircle
-                                              color="success"
-                                              sx={{
-                                                fontSize: 14,
-                                                mr: 0.5,
-                                                mt: "2px",
-                                                flexShrink: 0,
-                                              }}
-                                            />
-                                          ) : (
-                                            <Cancel
-                                              color="error"
-                                              sx={{
-                                                fontSize: 14,
-                                                mr: 0.5,
-                                                mt: "2px",
-                                                flexShrink: 0,
-                                              }}
-                                            />
-                                          )}
-                                          <Box>
-                                            <Typography
-                                              variant="caption"
-                                              sx={{ 
-                                                fontWeight: 500,
-                                                fontSize: "0.85rem"
-                                              }}
-                                            >
-                                              {rule.rule}
-                                            </Typography>
-                                            <Typography
-                                              variant="caption"
-                                              color="text.secondary"
-                                              display="block"
-                                              fontSize={"0.85rem"}
-                                            >
-                                              <i>Reason:</i> {rule.reason}
-                                            </Typography>
-                                          </Box>
-                                        </Box>
-                                      )
-                                    )}
-                                  </Box>
-                                  <Divider sx={{ my: 2 }}>
-                                    <Chip
-                                      label="Manual Review"
-                                      size="small"
-                                    />
-                                  </Divider>
-                                  <Box sx={{ flexGrow: 1 }}>
-                                    <TextField
-                                      label="Score"
-                                      type="number"
-                                      size="small"
-                                      value={
-                                        scorecardReviews[parameterId]?.score ||
-                                        ""
-                                      }
-                                      onChange={(e) =>
-                                        handleScorecardReviewChange(
-                                          parameterId,
-                                          "score",
-                                          e.target.value
-                                        )
-                                      }
-                                      InputProps={{
-                                        endAdornment: (
-                                          <InputAdornment position="end">
-                                            / {maxScore}
-                                          </InputAdornment>
-                                        ),
-                                        inputProps: { min: 0, max: maxScore },
-                                      }}
-                                      sx={{ width: 120, mb: 2 }}
-                                    />
-                                    <TextField
-                                      label="Reason for Change"
-                                      multiline
-                                      rows={2}
-                                      size="small"
-                                      fullWidth
-                                      value={
-                                        scorecardReviews[parameterId]
-                                          ?.reason || ""
-                                      }
-                                      onChange={(e) =>
-                                        handleScorecardReviewChange(
-                                          parameterId,
-                                          "reason",
-                                          e.target.value
-                                        )
-                                      }
-                                    />
-                                  </Box>
-                                  <Box
-                                    sx={{
-                                      mt: 2,
-                                      display: "flex",
-                                      justifyContent: "flex-end",
-                                    }}
-                                  >
-                                    <Button
-                                      variant="contained"
-                                      size="small"
-                                      disabled={isSavingThis}
-                                      startIcon={
-                                        isSavingThis ? (
-                                          <CircularProgress
-                                            size={16}
-                                            color="inherit"
-                                          />
-                                        ) : (
-                                          <Save />
-                                        )
-                                      }
-                                      onClick={() =>
-                                        handleSaveScorecardItem(
-                                          parameterId,
-                                          maxScore
-                                        )
-                                      }
-                                    >
-                                      {isSavingThis
-                                        ? "Saving..."
-                                        : "Save"}
-                                    </Button>
-                                  </Box>
-                                </CardContent>
-                              </Card>
-                            </Grid>
-                          );
-                        })}
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </Box>
-              )}
-
-              {activeTab === "outcomes" && (
-                <Box sx={{ p: 3 }}>
-                  <Typography
-                    variant="h5"
-                    fontWeight={600}
-                    gutterBottom
-                    sx={{ mb: 3 }}
-                  >
-                    Call Outcomes and Extracted Metadata
-                  </Typography>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Typography variant="h6" gutterBottom>
-                        Disposition:{" "}
-                        <b>{detail.disposition.toUpperCase()}</b>
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        color="text.secondary"
-                        gutterBottom
-                      >
-                        The final disposition from the conversation data.
-                      </Typography>
-                      <Box sx={{ mt: 4 }}>
-                        <Typography
-                          variant="h6"
-                          fontWeight={600}
-                          gutterBottom
-                        >
-                          Outcome Fields Extracted
-                        </Typography>
-                        {outcomeEntries.length > 0 ? (
-                          <Grid container spacing={3}>
-                            {outcomeEntries.map(
-                              ([attributeId, outcomeData]) => {
-                                let displayValue = String(
-                                  outcomeData.extracted_value ?? "N/A"
-                                );
-                                if (
-                                  typeof outcomeData.extracted_value ===
-                                  "boolean"
-                                ) {
-                                  displayValue = outcomeData.extracted_value
-                                    ? "Yes"
-                                    : "No";
-                                }
-                                const isSavingThis = savingItemId === attributeId;
-
-                                return (
-                                  <Grid
-                                    item
-                                    xs={12}
-                                    sm={12}
-                                    md={6}
-                                    key={attributeId}
-                                  >
-                                    <div className={styles.outcomeCard}>
-                                      <h4 className={styles.outcomeHeader}>
-                                        Extracted: {outcomeData.attribute_name}
-                                      </h4>
-                                      <div className={styles.dataGrid}>
-                                        <div className={styles.dataColumn}>
-                                          <label
-                                            className={styles.fieldLabel}
-                                          >
-                                            Extracted Value
-                                          </label>
-                                          <p
-                                            className={
-                                              styles.extractedValue
-                                            }
-                                          >
-                                            {displayValue}
-                                          </p>
-                                        </div>
-                                        <div className={styles.dataColumn}>
-                                          <label
-                                            className={styles.fieldLabel}
-                                          >
-                                            AI Reasoning
-                                          </label>
-                                          <p
-                                            className={
-                                              styles.extractedValue
-                                            }
-                                          >
-                                            {outcomeData.reasoning}
-                                          </p>
-                                        </div>
-                                      </div>
-                                      <hr className={styles.divider} />
-                                      <div className={styles.dataGrid}>
-                                        <div className={styles.dataColumn}>
-                                          <div className={styles.fieldGroup}>
-                                            <label
-                                              className={styles.fieldLabel}
-                                              htmlFor={`reviewer-outcome-${attributeId}`}
-                                            >
-                                              Reviewer Outcome
-                                            </label>
-                                            <input
-                                              id={`reviewer-outcome-${attributeId}`}
-                                              type="text"
-                                              className={styles.textInput}
-                                              value={
-                                                outcomeReviews[attributeId]?.value ||
-                                                ""
-                                              }
-                                              onChange={(e) =>
-                                                handleOutcomeReviewChange(
-                                                  attributeId,
-                                                  "value",
-                                                  e.target.value
-                                                )
-                                              }
-                                              placeholder="Enter correct value..."
-                                            />
-                                          </div>
-                                        </div>
-                                        <div className={styles.dataColumn}>
-                                          <div className={styles.fieldGroup}>
-                                            <label
-                                              className={styles.fieldLabel}
-                                              htmlFor={`reviewer-reason-${attributeId}`}
-                                            >
-                                              Reason for Change
-                                            </label>
-                                            <textarea
-                                              id={`reviewer-reason-${attributeId}`}
-                                              className={
-                                                styles.textAreaInput
-                                              }
-                                              value={
-                                                outcomeReviews[attributeId]
-                                                  ?.reason || ""
-                                              }
-                                              onChange={(e) =>
-                                                handleOutcomeReviewChange(
-                                                  attributeId,
-                                                  "reason",
-                                                  e.target.value
-                                                )
-                                              }
-                                              placeholder="Explain the reason for change..."
-                                            />
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div
-                                        className={styles.actionsContainer}
-                                      >
-                                        <button
-                                          className={styles.saveButton}
-                                          disabled={isSavingThis}
-                                          onClick={() =>
-                                            handleSaveOutcomeItem(
-                                              attributeId
-                                            )
-                                          }
-                                        >
-                                          {isSavingThis
-                                            ? "Saving..."
-                                            : "Save Changes"}
-                                        </button>
-                                      </div>
-                                    </div>
-                                  </Grid>
-                                );
-                              }
-                            )}
-                          </Grid>
-                        ) : (
-                          <Alert severity="warning">
-                            No specific outcome fields were extracted.
-                          </Alert>
-                        )}
-                      </Box>
-                      <Box sx={{ mt: 4 }}>
-                        <Typography
-                          variant="h6"
-                          fontWeight={600}
-                          gutterBottom
-                        >
-                          Key Topics Discussed
-                        </Typography>
-                        <Box
-                          sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}
-                        >
-                          {detail.keyTopics.map((topic, index) => (
-                            <Chip key={index} label={topic} />
-                          ))}
+                            Score this Conversation
+                          </Button>
                         </Box>
+
+                        {/* Footer Note */}
+                        <Typography variant="body2" sx={{ color: 'text.secondary', textAlign: 'center' }}>
+                          Manual scoring will be used to reconcile with AI-generated scores
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Box>
+                )}
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Auditor Scoring Sidedraw */}
+      <Drawer
+        anchor="right"
+        open={sidedrawOpen}
+        onClose={handleCloseSidedraw}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: 500,
+            padding: 3,
+            height: '100vh',
+            overflow: 'hidden',
+          },
+        }}
+        ModalProps={{
+          keepMounted: true,
+        }}
+      >
+        <Box sx={{ 
+          height: '100%', 
+          display: 'flex', 
+          flexDirection: 'column',
+          overflow: 'hidden'
+        }}>
+          {/* Header */}
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
+                Reviewer Scoring
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Manually score this conversation
+              </Typography>
+            </Box>
+            <IconButton onClick={handleCloseSidedraw}>
+              <Close />
+            </IconButton>
+          </Box>
+
+          {/* Scrollable Content Area */}
+          <Box sx={{ 
+            flex: 1, 
+            overflow: 'auto',
+            minHeight: 0,
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            {/* Quality Template */}
+            <Card sx={{ borderRadius: 2, borderTop: '4px solid #2e7d32', mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                  Quality Template
+                </Typography>
+                <FormControl fullWidth>
+                  <InputLabel>Select Template</InputLabel>
+                  <Select value="technical-support" label="Select Template">
+                    <MenuItem value="technical-support">Technical Support</MenuItem>
+                    <MenuItem value="customer-service">Customer Service</MenuItem>
+                    <MenuItem value="sales">Sales</MenuItem>
+                  </Select>
+                </FormControl>
+              </CardContent>
+            </Card>
+
+            {/* Quality Scorecard */}
+            <Card sx={{ borderRadius: 2, borderTop: '4px solid #2e7d32', mb: 3 }}>
+            <CardContent>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                Quality Scorecard
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
+                Total Score: 100 points
+              </Typography>
+
+              {/* Scoring Parameters Table */}
+              <Box sx={{ 
+                overflow: 'auto', 
+                maxHeight: '400px',
+                border: '1px solid',
+                borderColor: 'grey.200',
+                borderRadius: 1
+              }}>
+                <Box sx={{ minWidth: 500 }}>
+                  {/* Table Header */}
+                  <Box sx={{ 
+                    display: 'flex', 
+                    borderBottom: '2px solid',
+                    borderColor: 'grey.300',
+                    pb: 1,
+                    mb: 2,
+                    backgroundColor: 'grey.100'
+                  }}>
+                    <Box sx={{ flex: '0 0 200px', fontWeight: 600 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                        Parameter Name
+                      </Typography>
+                    </Box>
+                    <Box sx={{ flex: '0 0 60px', fontWeight: 600, textAlign: 'center' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                        Score
+                      </Typography>
+                    </Box>
+                    <Box sx={{ flex: 1, fontWeight: 600, textAlign: 'center' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                        Reasons
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  {/* Table Rows */}
+                  {[
+                    { key: 'callOpening', name: 'Call Opening / Adherence to Opening', maxScore: 15 },
+                    { key: 'effectiveQuestioning', name: 'Effective Questioning and Probing', maxScore: 15 },
+                    { key: 'interruptions', name: 'Interruptions (if any)', maxScore: 10 },
+                    { key: 'offTopicConversation', name: 'Unnecessary or Off-topic Conversation', maxScore: 10 },
+                    { key: 'dispositionSelection', name: 'Correct Disposition Selection', maxScore: 15 },
+                    { key: 'callFlow', name: 'Proper Call Flow / Sequence Following', maxScore: 15 },
+                    { key: 'falsePromises', name: 'No False or Misleading Promises Made', maxScore: 10 },
+                    { key: 'callDisconnection', name: 'Proper Call Disconnection / Call Closure', maxScore: 10 }
+                  ].map((param, index) => (
+                    <Box key={param.key} sx={{ 
+                      display: 'flex', 
+                      alignItems: 'flex-start',
+                      py: 2,
+                      borderBottom: '1px solid',
+                      borderColor: 'grey.200',
+                      backgroundColor: index % 2 === 0 ? 'white' : 'grey.50',
+                      '&:last-child': { borderBottom: 'none' }
+                    }}>
+                      {/* Parameter Name */}
+                      <Box sx={{ 
+                        flex: '0 0 200px', 
+                        pr: 2,
+                        minHeight: '40px',
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}>
+                        <Typography 
+                          variant="body2" 
+                          sx={{ 
+                            color: 'text.secondary',
+                            fontSize: '0.875rem',
+                            lineHeight: 1.4,
+                            wordBreak: 'break-word'
+                          }}
+                        >
+                          {param.name}
+                        </Typography>
                       </Box>
-                    </CardContent>
-                  </Card>
+                      
+                      {/* Score Input */}
+                      <Box sx={{ 
+                        flex: '0 0 60px', 
+                        px: 1,
+                        minHeight: '40px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start'
+                      }}>
+                        <TextField
+                          size="small"
+                          type="number"
+                          value={scoringCriteria[param.key] || 0}
+                          onChange={(e) => handleScoringChange(param.key, parseInt(e.target.value) || 0)}
+                          inputProps={{ 
+                            min: 0, 
+                            max: param.maxScore
+                          }}
+                          sx={{
+                            width: '50px',
+                            '& .MuiOutlinedInput-root': {
+                              height: '32px',
+                              width: '50px'
+                            },
+                            '& .MuiInputBase-input': {
+                              textAlign: 'left',
+                              padding: '4px 6px',
+                              fontSize: '0.875rem'
+                            }
+                          }}
+                        />
+                        <Typography variant="caption" sx={{ 
+                          display: 'block', 
+                          mt: 0.5, 
+                          color: 'text.secondary',
+                          fontSize: '0.75rem',
+                          textAlign: 'left'
+                        }}>
+                          /{param.maxScore}
+                        </Typography>
+                      </Box>
+                      
+                      {/* Reasons Input */}
+                      <Box sx={{ 
+                        flex: 1, 
+                        pl: 2,
+                        minHeight: '40px',
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}>
+                        <TextField
+                          size="small"
+                          placeholder="Enter reasons..."
+                          multiline
+                          rows={2}
+                          value={scoringReasons[param.key] || ''}
+                          onChange={(e) => handleReasonChange(param.key, e.target.value)}
+                          sx={{
+                            width: '100%',
+                            '& .MuiOutlinedInput-root': {
+                              fontSize: '0.875rem'
+                            },
+                            '& .MuiInputBase-input': {
+                              textAlign: 'left',
+                              padding: '4px 6px',
+                              verticalAlign: 'top'
+                            }
+                          }}
+                        />
+                      </Box>
+                    </Box>
+                  ))}
                 </Box>
-              )}
+              </Box>
+
+              {/* Total Score Display */}
+              <Box sx={{ 
+                mt: 3, 
+                p: 2, 
+                backgroundColor: 'grey.50', 
+                borderRadius: 1,
+                border: '1px solid',
+                borderColor: 'grey.200',
+                textAlign: 'center'
+              }}>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  Total Score: {Object.values(scoringCriteria).reduce((sum, score) => sum + (score || 0), 0)}/100 points
+                </Typography>
+              </Box>
             </CardContent>
           </Card>
-        </Container>
+          </Box>
 
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={4000}
-          onClose={handleSnackbarClose}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        >
-          <Alert
-            onClose={handleSnackbarClose}
-            severity={snackbarSeverity}
-            sx={{ width: "100%" }}
-          >
-            {snackbarMessage}
-          </Alert>
-        </Snackbar>
+          {/* Action Buttons */}
+          <Box sx={{ display: 'flex', gap: 2, mt: 3, flexShrink: 0 }}>
+            <Button
+              variant="outlined"
+              fullWidth
+              onClick={handleCloseSidedraw}
+              sx={{ 
+                py: 1.5,
+                textTransform: 'none'
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={handleSaveScores}
+              sx={{ 
+                py: 1.5,
+                textTransform: 'none'
+              }}
+            >
+              Save scores
+            </Button>
+          </Box>
       </Box>
+      </Drawer>
     </Box>
   );
 }
