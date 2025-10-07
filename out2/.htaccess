@@ -1,0 +1,7 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Redirect requests from /_next/static/* to actual folder location
+  RewriteRule ^_next/static/(.*)$ _next/static/$1 [L]
+</IfModule>+
