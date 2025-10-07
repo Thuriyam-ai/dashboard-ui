@@ -603,6 +603,7 @@ export default function AccessManagementPage() {
             transform: 'translate(-50%, -50%)',
             width: { xs: '95%', sm: '90%', md: '80%', lg: '70%' },
             maxWidth: '1200px',
+            height: '90vh',
             maxHeight: '90vh',
             bgcolor: 'background.paper',
             borderRadius: 2,
@@ -636,7 +637,9 @@ export default function AccessManagementPage() {
               p: 3,
               display: 'flex',
               flexDirection: 'column',
-              gap: 3
+              gap: 3,
+              minHeight: 0,
+              maxHeight: 'calc(90vh - 140px)' // Account for header and footer
             }}>
               {selectedTeam && (
                 <>
@@ -670,6 +673,12 @@ export default function AccessManagementPage() {
                         multiline
                         rows={3}
                         fullWidth
+                        sx={{
+                          '& .MuiInputBase-root': {
+                            overflow: 'auto',
+                            maxHeight: '120px'
+                          }
+                        }}
                       />
                     </CardContent>
                   </Card>
