@@ -1,6 +1,6 @@
 "use client";
 
-import { ConversationDetails } from "../team-leader-dashboard/test";
+import { ConversationDetails } from "./test";
 
 export default function TestPage() {
   const mockConversation = {
