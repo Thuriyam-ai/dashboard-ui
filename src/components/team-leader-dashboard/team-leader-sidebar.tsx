@@ -20,6 +20,7 @@ import {
   Flag,
   Campaign,
   Notifications,
+  Security,
 } from "@mui/icons-material";
 
 import { useRouter } from "next/navigation";
@@ -42,6 +43,12 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
       label: "Conversations",
       icon: <Message />,
       path: "/team-leader-dashboard/conversations",
+    },
+    {
+      id: "access-management",
+      label: "Access Management",
+      icon: <Security />,
+      path: "/team-leader-dashboard/access-management",
     },
   ];
 
