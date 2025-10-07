@@ -31,6 +31,12 @@ import {
   Tab,
   useTheme,
   useMediaQuery,
+  Drawer,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
 } from "@mui/material";
 import {
   Search,
@@ -47,6 +53,8 @@ import {
   Public,
   Add,
   Group,
+  Close,
+  Save,
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -158,6 +166,8 @@ export default function AccessManagementPage() {
   const [activeTab, setActiveTab] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+  const [teamManagementOpen, setTeamManagementOpen] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState<any>(null);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -181,6 +191,22 @@ export default function AccessManagementPage() {
         ? prev.filter(id => id !== userId)
         : [...prev, userId]
     );
+  };
+
+  const handleManageTeam = (team: any) => {
+    setSelectedTeam(team);
+    setTeamManagementOpen(true);
+  };
+
+  const handleCloseTeamManagement = () => {
+    setTeamManagementOpen(false);
+    setSelectedTeam(null);
+  };
+
+  const handleSaveTeam = () => {
+    // Handle team save logic here
+    console.log('Saving team:', selectedTeam);
+    handleCloseTeamManagement();
   };
 
   const getRoleColor = (role: string) => {
@@ -501,6 +527,7 @@ export default function AccessManagementPage() {
                                   variant="outlined"
                                   size="small"
                                   sx={{ textTransform: 'none' }}
+                                  onClick={() => handleManageTeam(team)}
                                 >
                                   Manage
                                 </Button>
@@ -533,6 +560,186 @@ export default function AccessManagementPage() {
           )}
         </Container>
       </Box>
+
+      {/* Team Management Drawer */}
+      <Drawer
+        anchor="right"
+        open={teamManagementOpen}
+        onClose={handleCloseTeamManagement}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: 500,
+            padding: 3,
+            height: '100vh',
+            overflow: 'hidden',
+          },
+        }}
+        ModalProps={{
+          keepMounted: true,
+        }}
+      >
+        <Box sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden'
+        }}>
+          {/* Header */}
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+            <Typography variant="h5" fontWeight={700}>
+              Manage Team
+            </Typography>
+            <IconButton onClick={handleCloseTeamManagement}>
+              <Close />
+            </IconButton>
+          </Box>
+
+          {/* Scrollable Content */}
+          <Box sx={{
+            flex: 1,
+            overflow: 'auto',
+            minHeight: 0,
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            {selectedTeam && (
+              <>
+                {/* Team Information */}
+                <Card sx={{ mb: 3 }}>
+                  <CardContent>
+                    <Typography variant="h6" fontWeight={600} gutterBottom>
+                      Team Information
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                      <Business sx={{ color: 'primary.main', fontSize: '2rem' }} />
+                      <Box>
+                        <Typography variant="h6" fontWeight={600} color="primary.main">
+                          {selectedTeam.name}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {selectedTeam.description}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                      <TextField
+                        label="Team Name"
+                        value={selectedTeam.name}
+                        size="small"
+                        sx={{ flex: 1 }}
+                      />
+                    </Box>
+                    <TextField
+                      label="Description"
+                      value={selectedTeam.description}
+                      multiline
+                      rows={2}
+                      fullWidth
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* Team Statistics */}
+                <Card sx={{ mb: 3 }}>
+                  <CardContent>
+                    <Typography variant="h6" fontWeight={600} gutterBottom>
+                      Team Statistics
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 3 }}>
+                      <Box>
+                        <Typography variant="h4" fontWeight={700} color="primary.main">
+                          {selectedTeam.members}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Total Members
+                        </Typography>
+                      </Box>
+                      <Box>
+                        <Typography variant="h4" fontWeight={700} color="success.main">
+                          {selectedTeam.members - 1}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Active Members
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </CardContent>
+                </Card>
+
+                {/* Team Members */}
+                <Card sx={{ mb: 3 }}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                      <Typography variant="h6" fontWeight={600}>
+                        Team Members
+                      </Typography>
+                      <Button
+                        variant="outlined"
+                        startIcon={<PersonAdd />}
+                        size="small"
+                        sx={{ textTransform: 'none' }}
+                      >
+                        Add Member
+                      </Button>
+                    </Box>
+                    <List>
+                      {mockUsers.filter(user => user.team === selectedTeam.name).map((member) => (
+                        <ListItem key={member.id} sx={{ px: 0 }}>
+                          <ListItemIcon>
+                            <Avatar sx={{ bgcolor: 'primary.main', fontSize: '0.875rem' }}>
+                              {member.avatar}
+                            </Avatar>
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={member.name}
+                            secondary={
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                                <Chip 
+                                  label={member.role} 
+                                  size="small" 
+                                  color={getRoleColor(member.role)}
+                                  variant="outlined"
+                                />
+                                <Typography variant="caption" color="text.secondary">
+                                  {member.email}
+                                </Typography>
+                              </Box>
+                            }
+                          />
+                          <IconButton size="small" color="error">
+                            <Delete fontSize="small" />
+                          </IconButton>
+                        </ListItem>
+                      ))}
+                    </List>
+                  </CardContent>
+                </Card>
+              </>
+            )}
+          </Box>
+
+          {/* Action Buttons */}
+          <Box sx={{ display: 'flex', gap: 2, mt: 3, flexShrink: 0 }}>
+            <Button
+              variant="outlined"
+              fullWidth
+              onClick={handleCloseTeamManagement}
+              sx={{ textTransform: 'none' }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={handleSaveTeam}
+              startIcon={<Save />}
+              sx={{ textTransform: 'none' }}
+            >
+              Save Changes
+            </Button>
+          </Box>
+        </Box>
+      </Drawer>
     </Box>
   );
 }
