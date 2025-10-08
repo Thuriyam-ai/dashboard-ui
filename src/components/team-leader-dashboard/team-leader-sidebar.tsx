@@ -20,6 +20,7 @@ import {
   Flag,
   Campaign,
   Notifications,
+  SmartToy,
 } from "@mui/icons-material";
 
 import { useRouter } from "next/navigation";
@@ -35,13 +36,13 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
       id: "call-quality",
       label: "Insights",
       icon: <Analytics />,
-      path: "/team-leader-dashboard/call-quality-analytics",
+      path: "/call-quality-analytics",
     },
     {
       id: "conversations",
       label: "Conversations",
       icon: <Message />,
-      path: "/team-leader-dashboard/conversations",
+      path: "/conversations",
     },
   ];
 
@@ -52,16 +53,22 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
       icon: <Settings />,
       children: [
         {
+          id: "agent-configurations",
+          label: "Agents",
+          icon: <SmartToy />,
+          path: "/team-leader-dashboard/agent-configurations",
+        },
+        {
           id: "goal-mgmt",
           label: "Goals",
           icon: <Flag />,
-          path: "/team-leader-dashboard/goal-mgmt",
+          path: "/goal-mgmt",
         },
         {
           id: "campaign-mgmt",
           label: "Campaigns",
           icon: <Campaign />,
-          path: "/team-leader-dashboard/campaign-mgmt",
+          path: "/campaign-mgmt",
         },
       ],
     },
