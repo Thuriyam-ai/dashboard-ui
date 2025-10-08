@@ -1373,7 +1373,7 @@ export default function AccessManagementPage() {
                   Google SSO Configuration
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
-                  Configure Google Workspace authentication settings
+                  Configure Google OAuth credentials and authentication settings
                 </Typography>
               </Box>
               <IconButton onClick={() => setShowGoogleSSOConfig(false)} size="small">
@@ -1453,91 +1453,6 @@ export default function AccessManagementPage() {
                 </Box>
               </Box>
 
-              {/* Domain Configuration */}
-              <Box>
-                <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ fontSize: '1rem' }}>
-                  Domain Configuration
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: '0.875rem' }}>
-                  Specify which domains can authenticate via Google SSO
-                </Typography>
-
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                  <TextField
-                    fullWidth
-                    label="Allowed Domain"
-                    placeholder="company.com"
-                    variant="outlined"
-                    size="small"
-                    sx={{
-                      '& .MuiInputLabel-root': {
-                        fontSize: '0.875rem',
-                      },
-                      '& .MuiInputBase-input': {
-                        fontSize: '0.875rem',
-                      },
-                    }}
-                  />
-                  <Button
-                    variant="contained"
-                    startIcon={<Add />}
-                    size="small"
-                    sx={{ 
-                      textTransform: 'none', 
-                      minWidth: 120, 
-                      fontSize: '0.875rem',
-                      backgroundColor: '#4285F4',
-                      color: 'white',
-                      borderRadius: '8px',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                      fontWeight: 500,
-                      px: 2,
-                      py: 1,
-                      '&:hover': {
-                        backgroundColor: '#3367D6',
-                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
-                      },
-                      '&:active': {
-                        backgroundColor: '#2E5BB5',
-                        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
-                      },
-                      '& .MuiButton-startIcon': {
-                        marginRight: '8px',
-                      }
-                    }}
-                  >
-                    Add Domain
-                  </Button>
-                </Box>
-
-                {/* Domain List */}
-                <TableContainer component={Paper} variant="outlined">
-                  <Table>
-                    <TableHead>
-                      <TableRow sx={{ bgcolor: 'grey.50' }}>
-                        <TableCell><Typography variant="subtitle2" fontWeight={600}>Domain</Typography></TableCell>
-                        <TableCell><Typography variant="subtitle2" fontWeight={600}>Status</Typography></TableCell>
-                        <TableCell><Typography variant="subtitle2" fontWeight={600}>Users</Typography></TableCell>
-                        <TableCell><Typography variant="subtitle2" fontWeight={600}>Actions</Typography></TableCell>
-                      </TableRow>
-                    </TableHead>
-                      <TableBody>
-                        <TableRow>
-                          <TableCell>company.com</TableCell>
-                          <TableCell>
-                            <Chip label="Active" color="success" size="small" />
-                          </TableCell>
-                          <TableCell>45</TableCell>
-                          <TableCell>
-                            <IconButton size="small" color="error">
-                              <Delete />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Box>
 
               {/* Advanced Settings */}
               <Box>
