@@ -1,8 +1,8 @@
 "use client";
 
-import { ConversationDetails } from "../../test-page/test";
+import { ConversationDetails } from "./test";
 
-export default function CallQualityAnalyticsPage() {
+export default function TestPage() {
   const mockConversation = {
     id: 1,
     agent: "Testbot",
