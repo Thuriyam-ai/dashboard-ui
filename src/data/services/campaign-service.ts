@@ -10,28 +10,40 @@ interface GetAllCampaignsParams {
 // Sample campaign data for development/demo purposes
 const SAMPLE_CAMPAIGNS: Campaign[] = [
   {
-    campaign_id: "camp_001",
-    campaign_name: "Customer Support Campaign",
-    description: "Handling customer support inquiries and issues",
+    id: "camp_001",
+    name: "Customer Support Campaign",
     status: "ACTIVE",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-15T00:00:00Z"
+    goal_name: "Customer Satisfaction",
+    team_name: "Support Team",
+    starts_at: "2024-01-01T00:00:00Z",
+    ends_at: "2024-12-31T23:59:59Z",
+    conversations: 1247,
+    avg_score: 87,
+    completion_rate: 92
   },
   {
-    campaign_id: "camp_002", 
-    campaign_name: "Sales Outreach Campaign",
-    description: "Proactive sales outreach to potential customers",
+    id: "camp_002", 
+    name: "Sales Outreach Campaign",
     status: "ACTIVE",
-    created_at: "2024-01-05T00:00:00Z",
-    updated_at: "2024-01-15T00:00:00Z"
+    goal_name: "Lead Generation",
+    team_name: "Sales Team",
+    starts_at: "2024-01-05T00:00:00Z",
+    ends_at: "2024-12-31T23:59:59Z",
+    conversations: 892,
+    avg_score: 78,
+    completion_rate: 85
   },
   {
-    campaign_id: "camp_003",
-    campaign_name: "Technical Support Campaign", 
-    description: "Technical support and troubleshooting assistance",
+    id: "camp_003",
+    name: "Technical Support Campaign", 
     status: "ACTIVE",
-    created_at: "2024-01-10T00:00:00Z",
-    updated_at: "2024-01-15T00:00:00Z"
+    goal_name: "Issue Resolution",
+    team_name: "Engineering",
+    starts_at: "2024-01-10T00:00:00Z",
+    ends_at: "2024-12-31T23:59:59Z",
+    conversations: 634,
+    avg_score: 91,
+    completion_rate: 88
   }
 ];
 
