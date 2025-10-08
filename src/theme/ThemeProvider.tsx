@@ -1,15 +1,45 @@
-"use client";
 
-import React from 'react';
-import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+'use client';
+
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { theme } from './theme';
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+const theme = createTheme({
+  palette: {
+    mode: 'light',
+    primary: {
+      main: '#1976d2',
+    },
+    secondary: {
+      main: '#dc004e',
+    },
+  },
+  typography: {
+    fontFamily: 'var(--font-inter), sans-serif',
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+        },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+        },
+      },
+    },
+  },
+});
+
+export default function MuiThemeProvider({ children }: { children: React.ReactNode }) {
   return (
-    <MuiThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       {children}
-    </MuiThemeProvider>
+    </ThemeProvider>
   );
 }
