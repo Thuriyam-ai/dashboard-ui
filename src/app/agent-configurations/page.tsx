@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
+import PageLayout from "@/components/layout/page-layout";
 import {
   Box,
   Container,
@@ -81,10 +81,6 @@ export default function AgentConfigurationsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const handleDrawerToggle = () => {
-    // Mobile drawer toggle logic
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active": return "success";
@@ -110,31 +106,20 @@ export default function AgentConfigurationsPage() {
   );
 
   const handleCreateConfiguration = () => {
-    router.push("/team-leader-dashboard/agent-configurations/new");
+    router.push("/agent-configurations/new");
   };
 
   const handleViewConfiguration = (id: number) => {
-    router.push(`/team-leader-dashboard/agent-configurations/${id}`);
+    router.push(`/agent-configurations/${id}`);
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
-      <TeamLeaderSidebar activeItem="agent-configurations" />
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginLeft: '280px', paddingLeft: '24px' }}>
+    <PageLayout activeItem="agent-configurations">
         <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
           <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ mr: 2, display: { md: 'none' } }}
-            >
-              <MoreVert />
-            </IconButton>
             <Box sx={{ flexGrow: 1 }}>
               <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
-                team-leader-dashboard-agent-configurations.localhost:3000
+                agent-configurations.localhost:3000
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -151,7 +136,7 @@ export default function AgentConfigurationsPage() {
           </Toolbar>
         </AppBar>
 
-        <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3 }}>
+        <Box sx={{ flexGrow: 1, py: 4, px: 4 }}>
           <Box sx={{ mb: 4 }}>
             <Typography variant="h3" component="h1" fontWeight={700} gutterBottom>
               Agent Configurations
@@ -264,8 +249,7 @@ export default function AgentConfigurationsPage() {
               </Box>
             </CardContent>
           </Card>
-        </Container>
-      </Box>
-    </Box>
+        </Box>
+    </PageLayout>
   );
 }

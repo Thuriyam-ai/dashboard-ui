@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
+import PageLayout from "@/components/layout/page-layout";
 import {
   Box,
   Container,
@@ -75,23 +75,18 @@ export default function AgentConfigurationDetailPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [activeTab, setActiveTab] = useState(0);
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   // Configuration state
   const [configName, setConfigName] = useState("Production Customer Support");
   const [status, setStatus] = useState("active");
   const [description, setDescription] = useState("Main customer support bot for production environment");
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
 
   const handleBack = () => {
-    router.push("/team-leader-dashboard/agent-configurations");
+    router.push("/agent-configurations");
   };
 
   const handleSave = () => {
@@ -100,27 +95,16 @@ export default function AgentConfigurationDetailPage() {
   };
 
   const handleCancel = () => {
-    router.push("/team-leader-dashboard/agent-configurations");
+    router.push("/agent-configurations");
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
-      <TeamLeaderSidebar activeItem="agent-configurations" />
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginLeft: '280px', paddingLeft: '24px' }}>
+    <PageLayout activeItem="agent-configurations">
         <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
           <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ mr: 2, display: { md: 'none' } }}
-            >
-              <MoreVert />
-            </IconButton>
             <Box sx={{ flexGrow: 1 }}>
               <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
-                team-leader-dashboard-agent-configurations.localhost:3000
+                agent-configurations.localhost:3000
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -137,7 +121,7 @@ export default function AgentConfigurationDetailPage() {
           </Toolbar>
         </AppBar>
 
-        <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3 }}>
+        <Box sx={{ flexGrow: 1, py: 4, px: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
             <IconButton onClick={handleBack} sx={{ color: 'text.secondary' }}>
               <ArrowBack />
@@ -417,8 +401,7 @@ export default function AgentConfigurationDetailPage() {
               </Button>
             </Box>
           </Card>
-        </Container>
-      </Box>
-    </Box>
+        </Box>
+    </PageLayout>
   );
 }

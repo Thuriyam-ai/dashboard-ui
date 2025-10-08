@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
+import PageLayout from "@/components/layout/page-layout";
 import {
   Box,
   Container,
@@ -59,7 +59,7 @@ function TabPanel(props: TabPanelProps) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: 4 }}>
           {children}
         </Box>
       )}
@@ -74,358 +74,754 @@ export default function NewAgentConfigurationPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [activeTab, setActiveTab] = useState(0);
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   // Configuration state
   const [configName, setConfigName] = useState("");
   const [status, setStatus] = useState("draft");
   const [description, setDescription] = useState("");
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
 
   const handleBack = () => {
-    router.push("/team-leader-dashboard/agent-configurations");
+    router.push("/agent-configurations");
   };
 
   const handleSave = () => {
     // Save new configuration logic
     console.log("Creating new configuration...");
-    router.push("/team-leader-dashboard/agent-configurations");
+    router.push("/agent-configurations");
   };
 
   const handleCancel = () => {
-    router.push("/team-leader-dashboard/agent-configurations");
+    router.push("/agent-configurations");
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
-      <TeamLeaderSidebar activeItem="agent-configurations" />
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginLeft: '280px', paddingLeft: '24px' }}>
-        <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ mr: 2, display: { md: 'none' } }}
-            >
-              <MoreVert />
-            </IconButton>
-            <Box sx={{ flexGrow: 1 }}>
-              <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
-                team-leader-dashboard-agent-configurations.localhost:3000
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <IconButton size="small" sx={{ color: 'text.secondary' }}><BookmarkBorder /></IconButton>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 2 }}>
-                <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '0.875rem' }}>W</Avatar>
-                <Typography variant="body2" fontWeight={500}>Work</Typography>
-              </Box>
-              <IconButton size="small" sx={{ color: 'text.secondary' }}><MoreVert /></IconButton>
-              <Button variant="contained" color="error" size="small" startIcon={<Lock />} sx={{ ml: 1 }} onClick={logout}>
-                Logout
-              </Button>
-            </Box>
-          </Toolbar>
-        </AppBar>
-
-        <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-            <IconButton onClick={handleBack} sx={{ color: 'text.secondary' }}>
+    <PageLayout activeItem="agent-configurations">
+        {/* Header Section */}
+        <Box sx={{ py: 4, px: 4 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+            <IconButton onClick={handleBack} sx={{ color: '#64748b', '&:hover': { backgroundColor: '#f1f5f9' } }}>
               <ArrowBack />
             </IconButton>
             <Box>
-              <Typography variant="h3" component="h1" fontWeight={700} gutterBottom>
+              <Typography variant="h4" component="h1" fontWeight={700} sx={{ color: '#1e293b', mb: 0.5 }}>
                 New Agent Configuration
               </Typography>
-              <Typography variant="h6" color="text.secondary">
+              <Typography variant="body1" sx={{ color: '#64748b' }}>
                 Create a new chatbot configuration
               </Typography>
             </Box>
           </Box>
 
-          <Card>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <Tabs value={activeTab} onChange={handleTabChange} aria-label="configuration tabs">
-                <Tab 
-                  icon={<Settings />} 
-                  label="General" 
-                  id="configuration-tab-0"
-                  aria-controls="configuration-tabpanel-0"
-                />
-                <Tab 
-                  icon={<Security />} 
-                  label="Guardrails" 
-                  id="configuration-tab-1"
-                  aria-controls="configuration-tabpanel-1"
-                />
-                <Tab 
-                  icon={<Psychology />} 
-                  label="Model Routing" 
-                  id="configuration-tab-2"
-                  aria-controls="configuration-tabpanel-2"
-                />
-                <Tab 
-                  icon={<Description />} 
-                  label="System Prompt" 
-                  id="configuration-tab-3"
-                  aria-controls="configuration-tabpanel-3"
-                />
-                <Tab 
-                  icon={<CheckCircle />} 
-                  label="Compliance" 
-                  id="configuration-tab-4"
-                  aria-controls="configuration-tabpanel-4"
-                />
-              </Tabs>
-            </Box>
+          {/* Tabs */}
+          <Box sx={{ borderBottom: 1, borderColor: '#e2e8f0', mb: 0 }}>
+            <Tabs 
+              value={activeTab} 
+              onChange={handleTabChange} 
+              sx={{
+                '& .MuiTab-root': {
+                  textTransform: 'none',
+                  fontWeight: 500,
+                  fontSize: '0.875rem',
+                  color: '#64748b',
+                  minHeight: '48px',
+                  '&.Mui-selected': {
+                    color: '#3b82f6',
+                  },
+                },
+                '& .MuiTabs-indicator': {
+                  backgroundColor: '#3b82f6',
+                  height: '2px',
+                },
+              }}
+            >
+              <Tab 
+                icon={<Settings sx={{ fontSize: '1.25rem', color: activeTab === 0 ? '#3b82f6' : '#64748b' }} />} 
+                label="General" 
+                iconPosition="start"
+              />
+              <Tab 
+                icon={<Security sx={{ fontSize: '1.25rem', color: activeTab === 1 ? '#3b82f6' : '#64748b' }} />} 
+                label="Guardrails" 
+                iconPosition="start"
+              />
+              <Tab 
+                icon={<Psychology sx={{ fontSize: '1.25rem', color: activeTab === 2 ? '#3b82f6' : '#64748b' }} />} 
+                label="Model Routing" 
+                iconPosition="start"
+              />
+              <Tab 
+                icon={<Description sx={{ fontSize: '1.25rem', color: activeTab === 3 ? '#3b82f6' : '#64748b' }} />} 
+                label="System Prompt" 
+                iconPosition="start"
+              />
+              <Tab 
+                icon={<CheckCircle sx={{ fontSize: '1.25rem', color: activeTab === 4 ? '#3b82f6' : '#64748b' }} />} 
+                label="Compliance" 
+                iconPosition="start"
+              />
+            </Tabs>
+          </Box>
+        </Box>
 
+        {/* Main Content */}
+        <Box sx={{ flexGrow: 1, px: 0 }}>
+          <Card sx={{ 
+            backgroundColor: 'white', 
+            borderRadius: '12px', 
+            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+            border: '1px solid #e2e8f0'
+          }}>
             <TabPanel value={activeTab} index={0}>
-              <Typography variant="h6" fontWeight={600} gutterBottom>
+              <Typography variant="h6" fontWeight={600} sx={{ color: '#1e293b', mb: 3 }}>
                 General Configuration
               </Typography>
               
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Configuration Name"
-                    value={configName}
-                    onChange={(e) => setConfigName(e.target.value)}
-                    variant="outlined"
-                    placeholder="Enter a name for your agent configuration"
-                  />
-                </Grid>
+              <Box sx={{ display: 'flex', gap: 3, mb: 4 }}>
+                <TextField
+                  label="Configuration Name"
+                  value={configName}
+                  onChange={(e) => setConfigName(e.target.value)}
+                  placeholder="Configuration Name"
+                  sx={{
+                    flex: 1.5,
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      '& fieldset': {
+                        borderColor: '#d1d5db',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#9ca3af',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#3b82f6',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#374151',
+                      fontWeight: 500,
+                    },
+                  }}
+                />
                 
-                <Grid item xs={12}>
-                  <FormControl fullWidth>
-                    <InputLabel>Status</InputLabel>
-                    <Select
-                      value={status}
-                      label="Status"
-                      onChange={(e) => setStatus(e.target.value)}
-                    >
-                      <MenuItem value="draft">Draft</MenuItem>
-                      <MenuItem value="active">Active</MenuItem>
-                      <MenuItem value="archived">Archived</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    multiline
-                    rows={4}
-                    variant="outlined"
-                    placeholder="Describe the purpose and functionality of this agent"
-                  />
-                </Grid>
-              </Grid>
+                <FormControl sx={{ flex: 0.5, minWidth: 100, maxWidth: 150 }}>
+                  <InputLabel sx={{ color: '#374151', fontWeight: 500 }}>Status</InputLabel>
+                  <Select
+                    value={status}
+                    label="Status"
+                    onChange={(e) => setStatus(e.target.value)}
+                    sx={{
+                      borderRadius: '8px',
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#d1d5db',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#9ca3af',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#3b82f6',
+                      },
+                    }}
+                  >
+                    <MenuItem value="draft">Draft</MenuItem>
+                    <MenuItem value="active">Active</MenuItem>
+                    <MenuItem value="archived">Archived</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+              
+              <TextField
+                fullWidth
+                label="Description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                multiline
+                rows={4}
+                placeholder="Description"
+                sx={{
+                  mb: 4,
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '8px',
+                    '& fieldset': {
+                      borderColor: '#d1d5db',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#9ca3af',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#3b82f6',
+                    },
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#374151',
+                    fontWeight: 500,
+                  },
+                }}
+              />
+
+              {/* Action Buttons */}
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, pt: 2 }}>
+                <Button
+                  variant="outlined"
+                  onClick={handleCancel}
+                  sx={{
+                    borderColor: '#d1d5db',
+                    color: '#374151',
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    px: 3,
+                    py: 1,
+                    borderRadius: '8px',
+                    '&:hover': {
+                      borderColor: '#9ca3af',
+                      backgroundColor: '#f9fafb',
+                    },
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleSave}
+                  startIcon={<Save />}
+                  sx={{
+                    backgroundColor: '#3b82f6',
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    px: 3,
+                    py: 1,
+                    borderRadius: '8px',
+                    '&:hover': {
+                      backgroundColor: '#2563eb',
+                    },
+                  }}
+                >
+                  Create Configuration
+                </Button>
+              </Box>
             </TabPanel>
 
             <TabPanel value={activeTab} index={1}>
-              <Typography variant="h6" fontWeight={600} gutterBottom>
+              <Typography variant="h6" fontWeight={600} sx={{ color: '#1e293b', mb: 3 }}>
                 Guardrails Configuration
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              <Typography variant="body2" sx={{ color: '#64748b', mb: 4 }}>
                 Define safety rules and boundaries for the agent's behavior
               </Typography>
               
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Prohibited Topics"
-                    placeholder="Enter topics the agent should never discuss (e.g., politics, personal information)"
-                    multiline
-                    rows={3}
-                    variant="outlined"
-                  />
-                </Grid>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mb: 4 }}>
+                <TextField
+                  fullWidth
+                  label="Prohibited Topics"
+                  placeholder="Enter topics the agent should never discuss (e.g., politics, personal information)"
+                  multiline
+                  rows={3}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      '& fieldset': {
+                        borderColor: '#d1d5db',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#9ca3af',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#3b82f6',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#374151',
+                      fontWeight: 500,
+                    },
+                  }}
+                />
                 
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Escalation Triggers"
-                    placeholder="Define keywords or conditions that trigger human handoff"
-                    multiline
-                    rows={3}
-                    variant="outlined"
-                  />
-                </Grid>
+                <TextField
+                  fullWidth
+                  label="Escalation Triggers"
+                  placeholder="Define keywords or conditions that trigger human handoff"
+                  multiline
+                  rows={3}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      '& fieldset': {
+                        borderColor: '#d1d5db',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#9ca3af',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#3b82f6',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#374151',
+                      fontWeight: 500,
+                    },
+                  }}
+                />
                 
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Response Filters"
-                    placeholder="Rules to prevent inappropriate language or responses"
-                    multiline
-                    rows={3}
-                    variant="outlined"
-                  />
-                </Grid>
-              </Grid>
+                <TextField
+                  fullWidth
+                  label="Response Filters"
+                  placeholder="Rules to prevent inappropriate language or responses"
+                  multiline
+                  rows={3}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      '& fieldset': {
+                        borderColor: '#d1d5db',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#9ca3af',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#3b82f6',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#374151',
+                      fontWeight: 500,
+                    },
+                  }}
+                />
+              </Box>
+
+              {/* Action Buttons */}
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, pt: 2 }}>
+                <Button
+                  variant="outlined"
+                  onClick={handleCancel}
+                  sx={{
+                    borderColor: '#d1d5db',
+                    color: '#374151',
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    px: 3,
+                    py: 1,
+                    borderRadius: '8px',
+                    '&:hover': {
+                      borderColor: '#9ca3af',
+                      backgroundColor: '#f9fafb',
+                    },
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleSave}
+                  startIcon={<Save />}
+                  sx={{
+                    backgroundColor: '#3b82f6',
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    px: 3,
+                    py: 1,
+                    borderRadius: '8px',
+                    '&:hover': {
+                      backgroundColor: '#2563eb',
+                    },
+                  }}
+                >
+                  Create Configuration
+                </Button>
+              </Box>
             </TabPanel>
 
             <TabPanel value={activeTab} index={2}>
-              <Typography variant="h6" fontWeight={600} gutterBottom>
+              <Typography variant="h6" fontWeight={600} sx={{ color: '#1e293b', mb: 3 }}>
                 Model Routing Configuration
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              <Typography variant="body2" sx={{ color: '#64748b', mb: 4 }}>
                 Configure how the agent processes and routes different types of requests
               </Typography>
               
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <FormControl fullWidth>
-                    <InputLabel>Primary Model</InputLabel>
-                    <Select
-                      value="gpt-4"
-                      label="Primary Model"
-                    >
-                      <MenuItem value="gpt-4">GPT-4</MenuItem>
-                      <MenuItem value="gpt-3.5-turbo">GPT-3.5 Turbo</MenuItem>
-                      <MenuItem value="claude-3">Claude-3</MenuItem>
-                      <MenuItem value="claude-2">Claude-2</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mb: 4 }}>
+                <FormControl fullWidth>
+                  <InputLabel sx={{ color: '#374151', fontWeight: 500 }}>Primary Model</InputLabel>
+                  <Select
+                    value="gpt-4"
+                    label="Primary Model"
+                    sx={{
+                      borderRadius: '8px',
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#d1d5db',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#9ca3af',
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#3b82f6',
+                      },
+                    }}
+                  >
+                    <MenuItem value="gpt-4">GPT-4</MenuItem>
+                    <MenuItem value="gpt-3.5-turbo">GPT-3.5 Turbo</MenuItem>
+                    <MenuItem value="claude-3">Claude-3</MenuItem>
+                    <MenuItem value="claude-2">Claude-2</MenuItem>
+                  </Select>
+                </FormControl>
                 
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Intent Recognition Model"
-                    placeholder="Configure NLP model for intent detection"
-                    variant="outlined"
-                  />
-                </Grid>
+                <TextField
+                  fullWidth
+                  label="Intent Recognition Model"
+                  placeholder="Configure NLP model for intent detection"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      '& fieldset': {
+                        borderColor: '#d1d5db',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#9ca3af',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#3b82f6',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#374151',
+                      fontWeight: 500,
+                    },
+                  }}
+                />
                 
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Fallback Strategy"
-                    placeholder="What to do when the agent doesn't understand user input"
-                    multiline
-                    rows={3}
-                    variant="outlined"
-                  />
-                </Grid>
-              </Grid>
+                <TextField
+                  fullWidth
+                  label="Fallback Strategy"
+                  placeholder="What to do when the agent doesn't understand user input"
+                  multiline
+                  rows={3}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      '& fieldset': {
+                        borderColor: '#d1d5db',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#9ca3af',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#3b82f6',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#374151',
+                      fontWeight: 500,
+                    },
+                  }}
+                />
+              </Box>
+
+              {/* Action Buttons */}
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, pt: 2 }}>
+                <Button
+                  variant="outlined"
+                  onClick={handleCancel}
+                  sx={{
+                    borderColor: '#d1d5db',
+                    color: '#374151',
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    px: 3,
+                    py: 1,
+                    borderRadius: '8px',
+                    '&:hover': {
+                      borderColor: '#9ca3af',
+                      backgroundColor: '#f9fafb',
+                    },
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleSave}
+                  startIcon={<Save />}
+                  sx={{
+                    backgroundColor: '#3b82f6',
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    px: 3,
+                    py: 1,
+                    borderRadius: '8px',
+                    '&:hover': {
+                      backgroundColor: '#2563eb',
+                    },
+                  }}
+                >
+                  Create Configuration
+                </Button>
+              </Box>
             </TabPanel>
 
             <TabPanel value={activeTab} index={3}>
-              <Typography variant="h6" fontWeight={600} gutterBottom>
+              <Typography variant="h6" fontWeight={600} sx={{ color: '#1e293b', mb: 3 }}>
                 System Prompt Configuration
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              <Typography variant="body2" sx={{ color: '#64748b', mb: 4 }}>
                 Define the core directive and behavior instructions for the agent
               </Typography>
               
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Core Directive"
-                    placeholder="You are a helpful and polite customer support assistant..."
-                    multiline
-                    rows={6}
-                    variant="outlined"
-                  />
-                </Grid>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mb: 4 }}>
+                <TextField
+                  fullWidth
+                  label="Core Directive"
+                  placeholder="You are a helpful and polite customer support assistant..."
+                  multiline
+                  rows={6}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      '& fieldset': {
+                        borderColor: '#d1d5db',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#9ca3af',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#3b82f6',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#374151',
+                      fontWeight: 500,
+                    },
+                  }}
+                />
                 
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Role Definition"
-                    placeholder="Define the agent's specific role and responsibilities"
-                    multiline
-                    rows={4}
-                    variant="outlined"
-                  />
-                </Grid>
+                <TextField
+                  fullWidth
+                  label="Role Definition"
+                  placeholder="Define the agent's specific role and responsibilities"
+                  multiline
+                  rows={4}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      '& fieldset': {
+                        borderColor: '#d1d5db',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#9ca3af',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#3b82f6',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#374151',
+                      fontWeight: 500,
+                    },
+                  }}
+                />
                 
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Contextual Information"
-                    placeholder="Provide initial context the agent should always be aware of"
-                    multiline
-                    rows={3}
-                    variant="outlined"
-                  />
-                </Grid>
-              </Grid>
+                <TextField
+                  fullWidth
+                  label="Contextual Information"
+                  placeholder="Provide initial context the agent should always be aware of"
+                  multiline
+                  rows={3}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      '& fieldset': {
+                        borderColor: '#d1d5db',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#9ca3af',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#3b82f6',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#374151',
+                      fontWeight: 500,
+                    },
+                  }}
+                />
+              </Box>
+
+              {/* Action Buttons */}
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, pt: 2 }}>
+                <Button
+                  variant="outlined"
+                  onClick={handleCancel}
+                  sx={{
+                    borderColor: '#d1d5db',
+                    color: '#374151',
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    px: 3,
+                    py: 1,
+                    borderRadius: '8px',
+                    '&:hover': {
+                      borderColor: '#9ca3af',
+                      backgroundColor: '#f9fafb',
+                    },
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleSave}
+                  startIcon={<Save />}
+                  sx={{
+                    backgroundColor: '#3b82f6',
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    px: 3,
+                    py: 1,
+                    borderRadius: '8px',
+                    '&:hover': {
+                      backgroundColor: '#2563eb',
+                    },
+                  }}
+                >
+                  Create Configuration
+                </Button>
+              </Box>
             </TabPanel>
 
             <TabPanel value={activeTab} index={4}>
-              <Typography variant="h6" fontWeight={600} gutterBottom>
+              <Typography variant="h6" fontWeight={600} sx={{ color: '#1e293b', mb: 3 }}>
                 Compliance Configuration
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              <Typography variant="body2" sx={{ color: '#64748b', mb: 4 }}>
                 Configure legal, regulatory, and policy compliance settings
               </Typography>
               
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Data Privacy Settings"
-                    placeholder="Configure GDPR, CCPA, HIPAA compliance settings"
-                    multiline
-                    rows={4}
-                    variant="outlined"
-                  />
-                </Grid>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mb: 4 }}>
+                <TextField
+                  fullWidth
+                  label="Data Privacy Settings"
+                  placeholder="Configure GDPR, CCPA, HIPAA compliance settings"
+                  multiline
+                  rows={4}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      '& fieldset': {
+                        borderColor: '#d1d5db',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#9ca3af',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#3b82f6',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#374151',
+                      fontWeight: 500,
+                    },
+                  }}
+                />
                 
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Audit Logging"
-                    placeholder="Configure conversation data and decision logging"
-                    multiline
-                    rows={3}
-                    variant="outlined"
-                  />
-                </Grid>
+                <TextField
+                  fullWidth
+                  label="Audit Logging"
+                  placeholder="Configure conversation data and decision logging"
+                  multiline
+                  rows={3}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      '& fieldset': {
+                        borderColor: '#d1d5db',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#9ca3af',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#3b82f6',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#374151',
+                      fontWeight: 500,
+                    },
+                  }}
+                />
                 
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Security Policies"
-                    placeholder="Define encryption, access controls, and security measures"
-                    multiline
-                    rows={3}
-                    variant="outlined"
-                  />
-                </Grid>
-              </Grid>
-            </TabPanel>
+                <TextField
+                  fullWidth
+                  label="Security Policies"
+                  placeholder="Define encryption, access controls, and security measures"
+                  multiline
+                  rows={3}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      '& fieldset': {
+                        borderColor: '#d1d5db',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#9ca3af',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#3b82f6',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#374151',
+                      fontWeight: 500,
+                    },
+                  }}
+                />
+              </Box>
 
-            <Divider />
-            
-            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', p: 3 }}>
-              <Button variant="outlined" onClick={handleCancel}>
-                Cancel
-              </Button>
-              <Button variant="contained" startIcon={<Save />} onClick={handleSave}>
-                Create Configuration
-              </Button>
-            </Box>
+              {/* Action Buttons */}
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, pt: 2 }}>
+                <Button
+                  variant="outlined"
+                  onClick={handleCancel}
+                  sx={{
+                    borderColor: '#d1d5db',
+                    color: '#374151',
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    px: 3,
+                    py: 1,
+                    borderRadius: '8px',
+                    '&:hover': {
+                      borderColor: '#9ca3af',
+                      backgroundColor: '#f9fafb',
+                    },
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleSave}
+                  startIcon={<Save />}
+                  sx={{
+                    backgroundColor: '#3b82f6',
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    px: 3,
+                    py: 1,
+                    borderRadius: '8px',
+                    '&:hover': {
+                      backgroundColor: '#2563eb',
+                    },
+                  }}
+                >
+                  Create Configuration
+                </Button>
+              </Box>
+            </TabPanel>
           </Card>
-        </Container>
-      </Box>
-    </Box>
+        </Box>
+    </PageLayout>
   );
 }

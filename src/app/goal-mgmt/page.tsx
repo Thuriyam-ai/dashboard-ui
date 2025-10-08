@@ -188,7 +188,7 @@ export default function GoalManagementPage() {
     <PageLayout activeItem="goal-mgmt">
       <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
           <Toolbar>
-            <Box sx={{ flexGrow: 1 }}><Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>team-leader-dashboard/goal-mgmt</Typography></Box>
+            <Box sx={{ flexGrow: 1 }}><Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>goal-mgmt.localhost:3000</Typography></Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <IconButton size="small" sx={{ color: 'text.secondary' }}><BookmarkBorder /></IconButton>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 2 }}><Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '0.875rem' }}>W</Avatar><Typography variant="body2" fontWeight={500}>Work</Typography></Box>

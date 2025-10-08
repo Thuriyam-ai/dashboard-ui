@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import PageLayout from '../../components/layout/page-layout';
+import PageLayout from '@/components/layout/page-layout';
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
   Box,
@@ -217,8 +217,8 @@ export default function CallQualityAnalyticsPage() {
 
   return (
     <PageLayout activeItem="call-quality">
-        {/* Top Bar */}
-        <AppBar 
+      {/* Top Bar */}
+      <AppBar 
           position="static" 
           elevation={1}
           sx={{ 

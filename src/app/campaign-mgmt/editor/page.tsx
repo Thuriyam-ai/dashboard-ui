@@ -1,10 +1,10 @@
-// src/app/team-leader-dashboard/campaign-mgmt/editor/page.tsx
+// src/app/campaign-mgmt/editor/page.tsx
 
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
+import PageLayout from "@/components/layout/page-layout";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
   Box, Container, Typography, AppBar, Toolbar, IconButton, Button, Avatar, Card,
@@ -146,9 +146,7 @@ function CampaignEditorContent() {
   };
   
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
-      <TeamLeaderSidebar activeItem="campaign-mgmt" />
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+    <PageLayout activeItem="campaign-mgmt">
         <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary' }}>
           <Toolbar>
             <IconButton onClick={() => router.push('/campaign-mgmt')}><ArrowBack /></IconButton>
@@ -219,8 +217,7 @@ function CampaignEditorContent() {
             </CardContent>
           </Card>
         </Container>
-      </Box>
-    </Box>
+    </PageLayout>
   );
 }
 

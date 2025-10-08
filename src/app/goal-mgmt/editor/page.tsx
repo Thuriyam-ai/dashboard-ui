@@ -1,4 +1,4 @@
-// src/app/team-leader-dashboard/goal-mgmt/editor/page.tsx
+// src/app/goal-mgmt/editor/page.tsx
 
 "use client";
 
