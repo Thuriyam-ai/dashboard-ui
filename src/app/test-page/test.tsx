@@ -67,6 +67,7 @@ import {
   ExpandMore,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import { TeamLeaderSidebar } from '@/components/team-leader-dashboard/team-leader-sidebar';
 
 interface ConversationDetailsProps {
   conversation: {
@@ -334,9 +335,11 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
   };
 
   return (
-    <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh' }}>
-      {/* Header */}
-      <Paper elevation={0} sx={{ borderBottom: 1, borderColor: 'divider', px: 6, py: 3 }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+      <TeamLeaderSidebar activeItem="conversations" />
+      <Box sx={{ flexGrow: 1, marginLeft: '280px', bgcolor: 'grey.50', minHeight: '100vh' }}>
+        {/* Header */}
+        <Paper elevation={0} sx={{ borderBottom: 1, borderColor: 'divider', px: 6, py: 3 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Stack direction="row" spacing={2} alignItems="center">
             <Button
@@ -882,6 +885,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
           </Box>
         </Fade>
       </Modal>
+      </Box>
     </Box>
   );
 }
