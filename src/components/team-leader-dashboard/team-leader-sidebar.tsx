@@ -57,7 +57,7 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
           id: "agent-configurations",
           label: "Agents",
           icon: <SmartToy />,
-          path: "/team-leader-dashboard/agent-configurations",
+          path: "/agent-configurations",
         },
         {
           id: "goal-mgmt",
