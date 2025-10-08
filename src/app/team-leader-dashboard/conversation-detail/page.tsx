@@ -405,11 +405,19 @@ export default function ConversationDetailPage() {
     detail.outcome
   ) as [string, OutcomeFieldAnalysis][];
 
-  const totalPossibleScore = scorecardEntries.reduce(
+  // First, filter out any parameters where the effective score is -1 (Not Applicable)
+  const validScorecardEntries = scorecardEntries.filter(([, paramData]) => {
+    const effectiveScore = paramData.review_score ?? paramData.score;
+    return effectiveScore !== -1;
+  });
+
+  // Now, calculate the totals using only the valid entries
+  const totalPossibleScore = validScorecardEntries.reduce(
     (sum, [, paramData]) => sum + paramData.max_score,
     0
   );
-  const totalAchievedScore = scorecardEntries.reduce(
+  
+  const totalAchievedScore = validScorecardEntries.reduce(
     (sum, [, paramData]) =>
       sum + (paramData.review_score ?? paramData.score),
     0

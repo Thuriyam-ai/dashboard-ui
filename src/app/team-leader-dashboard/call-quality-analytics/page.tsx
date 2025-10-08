@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
@@ -49,7 +48,7 @@ import {
   Phone,
   Person,
   Schedule,
-  Download, // Import the Download icon
+  Download,
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
 import { getAllCampaigns } from "@/data/services/campaign-service";
@@ -59,7 +58,7 @@ import {
 } from "@/data/services/analytics-service";
 import { Campaign } from "@/types/api/campaign";
 import { ParameterAnalysis, AgentPerformance } from "@/types/api/analytics";
-import * as XLSX from "xlsx"; // Import the xlsx library
+import * as XLSX from "xlsx";
 
 /**
  * Call Quality Analytics page component displaying comprehensive call quality metrics
@@ -73,17 +72,14 @@ export default function CallQualityAnalyticsPage() {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const { logout } = useAuth();
-
   // State for campaigns dropdown
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loadingCampaigns, setLoadingCampaigns] = useState<boolean>(true);
   const [campaignError, setCampaignError] = useState<string | null>(null);
-
   // State for parameters analysis data
   const [parameters, setParameters] = useState<ParameterAnalysis[]>([]);
   const [loadingParameters, setLoadingParameters] = useState<boolean>(false);
   const [parametersError, setParametersError] = useState<string | null>(null);
-
   // State for agent performance data
   const [agentPerformance, setAgentPerformance] = useState<AgentPerformance[]>([]);
   const [loadingAgents, setLoadingAgents] = useState<boolean>(false);
@@ -116,7 +112,6 @@ export default function CallQualityAnalyticsPage() {
       setAgentError(null);
       return;
     }
-
     const fetchCampaignData = async () => {
       // Fetch parameters analysis
       setLoadingParameters(true);
@@ -128,7 +123,6 @@ export default function CallQualityAnalyticsPage() {
           setParametersError("Failed to load campaign parameters analysis. Please try again.");
         })
         .finally(() => setLoadingParameters(false));
-
       // Fetch agent performance
       setLoadingAgents(true);
       setAgentError(null);
@@ -140,7 +134,6 @@ export default function CallQualityAnalyticsPage() {
         })
         .finally(() => setLoadingAgents(false));
     };
-
     fetchCampaignData();
   }, [selectedCampaign]);
 
@@ -155,13 +148,11 @@ export default function CallQualityAnalyticsPage() {
   const handleCampaignChange = (event: SelectChangeEvent<string>) => {
     const campaignId = event.target.value;
     setSelectedCampaign(campaignId);
-
     if (campaignId === "None") {
       setStartDate("");
       setEndDate("");
       return;
     }
-
     const selected = campaigns.find(c => c.id === campaignId);
     if (selected) {
       setStartDate(selected.starts_at ? selected.starts_at.substring(0, 10) : "");
@@ -182,7 +173,6 @@ export default function CallQualityAnalyticsPage() {
   // Handler for exporting parameters data to Excel
   const handleExportParameters = () => {
     if (parameters.length === 0) return;
-
     const fileName = `call_quality_parameters_analysis_${getTimestamp()}.xlsx`;
     const worksheet = XLSX.utils.json_to_sheet(parameters);
     const workbook = XLSX.utils.book_new();
@@ -193,7 +183,6 @@ export default function CallQualityAnalyticsPage() {
   // Handler for exporting agent performance data to Excel
   const handleExportAgents = () => {
     if (agentPerformance.length === 0) return;
-
     const fileName = `agent_performance_summary_${getTimestamp()}.xlsx`;
     const worksheet = XLSX.utils.json_to_sheet(agentPerformance);
     const workbook = XLSX.utils.book_new();
@@ -218,7 +207,6 @@ export default function CallQualityAnalyticsPage() {
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
       <TeamLeaderSidebar activeItem="call-quality" />
-
       <Box sx={{ 
         flexGrow: 1, 
         display: 'flex', 
@@ -484,26 +472,36 @@ export default function CallQualityAnalyticsPage() {
                             <Typography 
                               variant="body2" 
                               fontWeight={600}
-                              color={`${getScoreColor(item.current_score)}.main`}
+                              color={item.current_score === -1 ? 'text.secondary' : `${getScoreColor(item.current_score)}.main`}
                             >
-                              {item.current_score.toFixed(1)}
+                              {item.current_score === -1 ? 'NA' : item.current_score.toFixed(1)}
                             </Typography>
                           </TableCell>
                           <TableCell align="center">
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                              <LinearProgress 
-                                variant="determinate" 
-                                value={item.adherence_percentage} 
-                                sx={{ width: 60, height: 8, borderRadius: 4 }}
-                                color={getScoreColor(item.adherence_percentage)}
-                              />
-                              <Typography variant="body2" fontWeight={600}>
-                                {item.adherence_percentage}%
+                            {item.adherence_percentage === -1 ? (
+                              <Typography variant="body2" fontWeight={600} color="text.secondary">
+                                NA
                               </Typography>
-                            </Box>
+                            ) : (
+                              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                                <LinearProgress 
+                                  variant="determinate" 
+                                  value={item.adherence_percentage} 
+                                  sx={{ width: 60, height: 8, borderRadius: 4 }}
+                                  color={getScoreColor(item.adherence_percentage)}
+                                />
+                                <Typography variant="body2" fontWeight={600}>
+                                  {item.adherence_percentage}%
+                                </Typography>
+                              </Box>
+                            )}
                           </TableCell>
                           <TableCell align="center">
-                            {getTrendIcon(item.adherence_percentage)}
+                            {item.adherence_percentage === -1 ? (
+                              <Typography variant="body2" color="text.secondary">NA</Typography>
+                            ) : (
+                              getTrendIcon(item.adherence_percentage)
+                            )}
                           </TableCell>
                         </TableRow>
                       ))
