@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
+import PageLayout from '../../components/layout/page-layout';
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
   Box,
@@ -185,16 +185,7 @@ export default function CallQualityAnalyticsPage() {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
-      <TeamLeaderSidebar activeItem="call-quality" />
-
-      <Box sx={{ 
-        flexGrow: 1, 
-        display: 'flex', 
-        flexDirection: 'column',
-        marginLeft: '0px',
-        minHeight: '100vh'
-      }}>
+    <PageLayout activeItem="call-quality">
         {/* Top Bar */}
         <AppBar 
           position="static" 
@@ -576,7 +567,6 @@ export default function CallQualityAnalyticsPage() {
             </CardContent>
           </Card>
         </Container>
-      </Box>
-    </Box>
+    </PageLayout>
   );
 }

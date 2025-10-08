@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
+import PageLayout from '../../components/layout/page-layout';
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
   Box, Container, Typography, AppBar, Toolbar, IconButton, Button,
@@ -165,10 +165,8 @@ export default function GoalManagementPage() {
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
-      <TeamLeaderSidebar activeItem="goal-mgmt" />
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginLeft: '0px' }}>
-        <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
+    <PageLayout activeItem="goal-mgmt">
+      <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
           <Toolbar>
             <Box sx={{ flexGrow: 1 }}><Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>team-leader-dashboard/goal-mgmt</Typography></Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -207,7 +205,6 @@ export default function GoalManagementPage() {
             <Button onClick={confirmDelete} color="error" variant="contained">Archive Goal</Button>
           </DialogActions>
         </Dialog>
-      </Box>
-    </Box>
+    </PageLayout>
   );
 }

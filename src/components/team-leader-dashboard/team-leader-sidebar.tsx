@@ -99,12 +99,12 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
       }}
     >
       {/* Header */}
-      <Box sx={{ 
-        p: '1.5rem 1.25rem',
+      <Box sx={{
+        p: '1.5rem 1.5rem',
         borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
         background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)'
       }}>
-        <Box sx={{ 
+        <Box sx={{
           display: 'flex',
           alignItems: 'center',
           gap: '0.875rem'
@@ -129,7 +129,7 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
               fontWeight: 700,
               color: 'white',
               letterSpacing: '-0.01em',
-              lineHeight: 1.2,
+              lineHeight: 2.0,
               fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif',
             }}>
               Team Leader
@@ -155,15 +155,15 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
           color: 'rgba(255, 255, 255, 0.5)',
           textTransform: 'uppercase',
           letterSpacing: '0.125em',
-          px: '1.25rem',
+          px: '1.75rem',
           mb: '1rem',
           mt: '0.25rem',
           fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif',
         }}>
           {/* MANAGEMENT */}
-          ANALYTICS
+          Analytics
         </Typography>
-        
+
         <List sx={{ px: 0 }}>
           {navItems.map((item) => (
             <ListItem
@@ -208,9 +208,9 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
               />
             </ListItem>
           ))}
-          
+
           {/* Config Mgmt Section - Always Expanded */}
-          <Box sx={{ 
+          <Box sx={{
             ml: '1.25rem',
             mt: '0.25rem',
             mb: '0.5rem',
@@ -218,20 +218,22 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
             flexDirection: 'column',
             gap: '0.125rem',
             borderLeft: '1px solid rgba(255, 255, 255, 0.1)',
-            pl: '0.75rem',
+            pl: '1.5rem',
           }}>
-            <Typography 
-              variant="caption" 
-              sx={{ 
+            <Typography
+              variant="caption"
+              sx={{
                 color: 'rgba(255, 255, 255, 0.5)',
-                fontWeight: 600,
+                fontWeight: 800,
                 mb: '0.5rem',
-                textTransform: 'uppercase',
+                // textTransform: 'uppercase', //
                 letterSpacing: '0.05em',
                 fontSize: '0.6875rem',
+                px: '0.5rem',
+                display: 'block',
               }}
             >
-              CONFIGURATIONS
+              Configurations
             </Typography>
             {configurationItems[0].children.map((item) => (
               <ListItem
@@ -261,8 +263,8 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
                 <ListItemIcon>
                   {item.icon}
                 </ListItemIcon>
-                <ListItemText 
-                  primary={item.label} 
+                <ListItemText
+                  primary={item.label}
                   sx={{
                     '& .MuiListItemText-primary': {
                       fontSize: '0.8125rem',
@@ -278,7 +280,7 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
           </Box>
 
           {/* Users and Teams Section */}
-          <Box sx={{ 
+          <Box sx={{
             ml: '1.25rem',
             mt: '0.5rem',
             mb: '0.5rem',
@@ -286,20 +288,22 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
             flexDirection: 'column',
             gap: '0.125rem',
             borderLeft: '1px solid rgba(255, 255, 255, 0.1)',
-            pl: '0.75rem',
+            pl: '1.5rem',
           }}>
-            <Typography 
-              variant="caption" 
-              sx={{ 
+            <Typography
+              variant="caption"
+              sx={{
                 color: 'rgba(255, 255, 255, 0.5)',
                 fontWeight: 600,
                 mb: '0.5rem',
-                textTransform: 'uppercase',
+                textTransform: 'uppercase', //
                 letterSpacing: '0.05em',
                 fontSize: '0.6875rem',
+                px: '0.5rem',
+                display: 'block',
               }}
             >
-              USERS AND TEAMS
+              Users & Teams
             </Typography>
             {accessManagementItems.map((item) => (
               <ListItem
@@ -329,8 +333,8 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
                 <ListItemIcon>
                   {item.icon}
                 </ListItemIcon>
-                <ListItemText 
-                  primary={item.label} 
+                <ListItemText
+                  primary={item.label}
                   sx={{
                     '& .MuiListItemText-primary': {
                       fontSize: '0.8125rem',

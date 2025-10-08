@@ -157,6 +157,22 @@ export const theme = createTheme({
         },
       },
     },
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          padding: '0 !important',
+          margin: '0 !important',
+        },
+        html: {
+          padding: '0 !important',
+          margin: '0 !important',
+        },
+        '#__next': {
+          padding: '0 !important',
+          margin: '0 !important',
+        },
+      },
+    },
   },
 });
 

@@ -148,7 +148,7 @@ function CampaignEditorContent() {
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
       <TeamLeaderSidebar activeItem="campaign-mgmt" />
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginLeft: '0px' }}>
+      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary' }}>
           <Toolbar>
             <IconButton onClick={() => router.push('/campaign-mgmt')}><ArrowBack /></IconButton>

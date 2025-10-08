@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Shield, Mail, Lock, AlertCircle } from 'lucide-react';
 import './login-page.scss'; // You can reuse the styles

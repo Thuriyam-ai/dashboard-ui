@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
+import PageLayout from '../../components/layout/page-layout';
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
   Box, Container, Typography, AppBar, Toolbar, IconButton, Button, Avatar,
@@ -128,10 +128,7 @@ export default function CampaignManagementPage() {
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
-      <TeamLeaderSidebar activeItem="campaign-mgmt" />
-
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginLeft: '0px' }}>
+    <PageLayout activeItem="campaign-mgmt">
         {/* Top Bar */}
         <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
           <Toolbar>
@@ -233,7 +230,6 @@ export default function CampaignManagementPage() {
             <Button onClick={confirmDelete} color="error" variant="contained">Delete campaign</Button>
           </DialogActions>
         </Dialog>
-      </Box>
-    </Box>
+    </PageLayout>
   );
 }

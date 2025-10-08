@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from "next/navigation";
+import PageLayout from '../../components/layout/page-layout';
 import {
   Box,
   Container,
@@ -70,7 +71,6 @@ import {
   ExpandMore,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
 
 const GradientAvatar = styled(Avatar)(({ theme }) => ({
   background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
@@ -359,18 +359,7 @@ export default function ConversationDetailPage() {
     : mockTranscript.filter(entry => entry.speaker.toLowerCase() === selectedSentiment);
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <TeamLeaderSidebar activeItem="conversations" />
-      <Box 
-        component="main"
-        sx={{ 
-          flexGrow: 1, 
-          width: { xs: '100%', md: 'calc(100% - 280px)' },
-          marginLeft: { md: '0px' },
-          bgcolor: 'grey.50', 
-          minHeight: '100vh' 
-        }}
-      >
+    <PageLayout activeItem="conversations">
         {/* Header */}
         <Paper elevation={0} sx={{ borderBottom: 1, borderColor: 'divider', px: 6, py: 3 }}>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -919,7 +908,6 @@ export default function ConversationDetailPage() {
             </Box>
           </Fade>
         </Modal>
-      </Box>
-    </Box>
+    </PageLayout>
   );
 }

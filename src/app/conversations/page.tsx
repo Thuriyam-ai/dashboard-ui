@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
+import PageLayout from '../../components/layout/page-layout';
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
   Box,
@@ -202,24 +202,8 @@ export default function ConversationsPage() {
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
-      <TeamLeaderSidebar 
-        activeItem="conversations"
-        drawerWidth={DRAWER_WIDTH}
-        mobileOpen={mobileOpen}
-        onDrawerToggle={handleDrawerToggle}
-      />
-
-      <Box 
-        component="main"
-        sx={{ 
-          flexGrow: 1, 
-          display: 'flex', 
-          flexDirection: 'column',
-          width: { xs: '100%', md: `calc(100% - ${DRAWER_WIDTH}px)` }
-        }}
-      >
-        <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
+    <PageLayout activeItem="conversations">
+      <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
           <Toolbar>
             <IconButton
               color="inherit"
@@ -369,7 +353,6 @@ export default function ConversationsPage() {
             </CardContent>
           </Card>
         </Container>
-      </Box>
-    </Box>
+    </PageLayout>
   );
 }
