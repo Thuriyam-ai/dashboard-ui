@@ -416,14 +416,30 @@ export default function AccessManagementPage() {
                     placeholder="Search users..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    variant="standard"
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <Search />
+                          <Search sx={{ color: 'text.secondary' }} />
                         </InputAdornment>
                       ),
+                      disableUnderline: true,
                     }}
-                    sx={{ minWidth: 300, flexGrow: { xs: 1, md: 0 } }}
+                    sx={{ 
+                      minWidth: 300, 
+                      flexGrow: { xs: 1, md: 0 },
+                      bgcolor: 'grey.50',
+                      borderRadius: 2,
+                      px: 2,
+                      py: 1,
+                      '&:hover': {
+                        bgcolor: 'grey.100',
+                      },
+                      '&:focus-within': {
+                        bgcolor: 'white',
+                        boxShadow: '0 0 0 2px rgba(49, 130, 206, 0.1)',
+                      },
+                    }}
                   />
                   
                   <Button
