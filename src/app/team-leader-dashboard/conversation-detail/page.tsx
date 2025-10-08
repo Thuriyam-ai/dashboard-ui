@@ -1,8 +1,13 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { Box } from "@mui/material";
+import { TeamLeaderSidebar } from "@/components/team-leader-dashboard/team-leader-sidebar";
 import { ConversationDetails } from "../../test-page/test";
 
 export default function ConversationDetailPage() {
+  const router = useRouter();
+  
   const mockConversation = {
     id: 1,
     agent: "Testbot",
@@ -28,14 +33,18 @@ export default function ConversationDetailPage() {
   };
 
   const handleBack = () => {
-    // In a real app, this would navigate back
-    console.log("Navigate back to conversations");
+    router.push("/team-leader-dashboard/conversations");
   };
 
   return (
-    <ConversationDetails 
-      conversation={mockConversation} 
-      onBack={handleBack}
-    />
+    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+      <TeamLeaderSidebar activeItem="conversations" />
+      <Box sx={{ flexGrow: 1, marginLeft: '280px' }}>
+        <ConversationDetails 
+          conversation={mockConversation} 
+          onBack={handleBack}
+        />
+      </Box>
+    </Box>
   );
 }
