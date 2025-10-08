@@ -1416,7 +1416,8 @@ export default function AccessManagementPage() {
                         <TableCell><Typography variant="subtitle2" fontWeight={600}>Status</Typography></TableCell>
                         <TableCell><Typography variant="subtitle2" fontWeight={600}>Users</Typography></TableCell>
                         <TableCell><Typography variant="subtitle2" fontWeight={600}>Actions</Typography></TableCell>
-                      </TableHead>
+                      </TableRow>
+                    </TableHead>
                       <TableBody>
                         <TableRow>
                           <TableCell>company.com</TableCell>
