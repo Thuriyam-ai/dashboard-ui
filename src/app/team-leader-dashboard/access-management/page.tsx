@@ -243,6 +243,7 @@ export default function AccessManagementPage() {
   const [selectedTeam, setSelectedTeam] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const membersPerPage = 10;
+  const [showGoogleSSOConfig, setShowGoogleSSOConfig] = useState(false);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -714,6 +715,7 @@ export default function AccessManagementPage() {
                         size="small" 
                         startIcon={<Edit />}
                         fullWidth
+                        onClick={() => setShowGoogleSSOConfig(true)}
                         sx={{ textTransform: 'none' }}
                       >
                         Configure
@@ -1278,6 +1280,236 @@ export default function AccessManagementPage() {
                 sx={{ textTransform: 'none', py: 1 }}
               >
                 Save Changes
+              </Button>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
+
+      {/* Google SSO Configuration Modal */}
+      <Modal
+        open={showGoogleSSOConfig}
+        onClose={() => setShowGoogleSSOConfig(false)}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}
+      >
+        <Fade in={showGoogleSSOConfig}>
+          <Box sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: { xs: '95%', sm: '80%', md: '70%', lg: '60%' },
+            maxWidth: '800px',
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 0,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            maxHeight: '90vh',
+          }}>
+            {/* Modal Header */}
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              p: 3,
+              borderBottom: '1px solid',
+              borderColor: 'divider',
+              bgcolor: 'primary.50',
+            }}>
+              <Box>
+                <Typography variant="h5" fontWeight={700} color="primary.main">
+                  Google SSO Configuration
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Configure Google Workspace authentication settings
+                </Typography>
+              </Box>
+              <IconButton onClick={() => setShowGoogleSSOConfig(false)} size="large">
+                <Close />
+              </IconButton>
+            </Box>
+
+            {/* Modal Content */}
+            <Box sx={{
+              flex: 1,
+              overflow: 'auto',
+              p: 3,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 3
+            }}>
+              {/* Client Configuration */}
+              <Box>
+                <Typography variant="h6" fontWeight={600} gutterBottom>
+                  Client Configuration
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  Enter your Google OAuth 2.0 client credentials
+                </Typography>
+
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <TextField
+                    fullWidth
+                    label="Client ID"
+                    placeholder="Enter your Google OAuth Client ID"
+                    variant="outlined"
+                    size="small"
+                  />
+                  <TextField
+                    fullWidth
+                    label="Client Secret"
+                    placeholder="Enter your Google OAuth Client Secret"
+                    variant="outlined"
+                    size="small"
+                    type="password"
+                  />
+                  <TextField
+                    fullWidth
+                    label="Redirect URI"
+                    placeholder="https://yourdomain.com/auth/google/callback"
+                    variant="outlined"
+                    size="small"
+                    helperText="This must match the redirect URI configured in Google Console"
+                  />
+                </Box>
+              </Box>
+
+              {/* Domain Configuration */}
+              <Box>
+                <Typography variant="h6" fontWeight={600} gutterBottom>
+                  Domain Configuration
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  Specify which domains can authenticate via Google SSO
+                </Typography>
+
+                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                  <TextField
+                    fullWidth
+                    label="Allowed Domain"
+                    placeholder="company.com"
+                    variant="outlined"
+                    size="small"
+                  />
+                  <Button
+                    variant="contained"
+                    startIcon={<Add />}
+                    sx={{ textTransform: 'none', minWidth: 120 }}
+                  >
+                    Add Domain
+                  </Button>
+                </Box>
+
+                {/* Domain List */}
+                <TableContainer component={Paper} variant="outlined">
+                  <Table>
+                    <TableHead>
+                      <TableRow sx={{ bgcolor: 'grey.50' }}>
+                        <TableCell><Typography variant="subtitle2" fontWeight={600}>Domain</Typography></TableCell>
+                        <TableCell><Typography variant="subtitle2" fontWeight={600}>Status</Typography></TableCell>
+                        <TableCell><Typography variant="subtitle2" fontWeight={600}>Users</Typography></TableCell>
+                        <TableCell><Typography variant="subtitle2" fontWeight={600}>Actions</Typography></TableCell>
+                      </TableHead>
+                      <TableBody>
+                        <TableRow>
+                          <TableCell>company.com</TableCell>
+                          <TableCell>
+                            <Chip label="Active" color="success" size="small" />
+                          </TableCell>
+                          <TableCell>45</TableCell>
+                          <TableCell>
+                            <IconButton size="small" color="error">
+                              <Delete />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Box>
+
+              {/* Advanced Settings */}
+              <Box>
+                <Typography variant="h6" fontWeight={600} gutterBottom>
+                  Advanced Settings
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  Configure additional authentication options
+                </Typography>
+
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Checkbox defaultChecked />
+                    <Box>
+                      <Typography variant="body2" fontWeight={500}>
+                        Auto-provision users
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Automatically create user accounts for new Google users
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Checkbox defaultChecked />
+                    <Box>
+                      <Typography variant="body2" fontWeight={500}>
+                        Sync user groups
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Synchronize Google Groups with team assignments
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Checkbox />
+                    <Box>
+                      <Typography variant="body2" fontWeight={500}>
+                        Require domain verification
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Only allow users from verified domains
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+
+            {/* Modal Footer */}
+            <Box sx={{
+              display: 'flex',
+              gap: 2,
+              p: 3,
+              borderTop: '1px solid',
+              borderColor: 'divider',
+              bgcolor: 'grey.50',
+            }}>
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={() => setShowGoogleSSOConfig(false)}
+                sx={{ textTransform: 'none' }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={() => {
+                  console.log('Google SSO configuration saved');
+                  alert('Google SSO configuration saved successfully!');
+                  setShowGoogleSSOConfig(false);
+                }}
+                sx={{ textTransform: 'none' }}
+              >
+                Save Configuration
               </Button>
             </Box>
           </Box>
