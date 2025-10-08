@@ -90,6 +90,7 @@ export const theme = createTheme({
           textTransform: 'none',
           borderRadius: 8,
           fontWeight: 500,
+          fontSize: '0.875rem',
         },
       },
     },
@@ -97,6 +98,62 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 6,
+          fontWeight: 500,
+        },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          fontSize: '0.875rem',
+          fontWeight: 500,
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 8,
+          },
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
+        },
+        outlined: {
+          border: '1px solid #e2e8f0',
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          borderBottom: '1px solid #e2e8f0',
+        },
+        head: {
+          fontWeight: 600,
+          backgroundColor: '#f7fafc',
+        },
+      },
+    },
+    MuiModal: {
+      styleOverrides: {
+        root: {
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+      },
+    },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          backgroundImage: 'none',
         },
       },
     },
