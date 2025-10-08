@@ -411,7 +411,7 @@ export default function AccessManagementPage() {
                 </Typography>
 
                 {/* Search and Action Bar */}
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', mb: 3 }}>
+                <Box sx={{ display: 'flex', gap: 3, alignItems: 'center', flexWrap: 'wrap', mb: 3 }}>
                   <TextField
                     placeholder="Search users..."
                     value={searchTerm}
@@ -426,7 +426,7 @@ export default function AccessManagementPage() {
                       disableUnderline: true,
                     }}
                     sx={{ 
-                      minWidth: 300, 
+                      minWidth: 500, 
                       flexGrow: { xs: 1, md: 0 },
                       bgcolor: 'grey.50',
                       borderRadius: 2,
@@ -438,6 +438,9 @@ export default function AccessManagementPage() {
                       '&:focus-within': {
                         bgcolor: 'white',
                         boxShadow: '0 0 0 2px rgba(49, 130, 206, 0.1)',
+                      },
+                      '& .MuiInputBase-input': {
+                        fontSize: '0.875rem',
                       },
                     }}
                   />
