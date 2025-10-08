@@ -678,14 +678,14 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                 }
               }}>
             <Box>
-                <Typography variant="h5" fontWeight={700} color="primary.main">
+                <Typography variant="h6" fontWeight={600} color="primary.main">
                   Conversation Scoring
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
                   Review and score conversation parameters
               </Typography>
             </Box>
-              <IconButton onClick={() => setShowAuditorScoring(false)} size="large">
+              <IconButton onClick={() => setShowAuditorScoring(false)} size="small">
               <Close />
             </IconButton>
         </Box>
@@ -694,17 +694,17 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
             <Box sx={{
               flex: 1,
               overflow: 'auto',
-              p: 3,
+              p: 2,
               display: 'flex',
               flexDirection: 'column',
-              gap: 3
+              gap: 2
             }}>
               {/* Scoring Parameters - Single Accordion Layout */}
               <Box>
-                <Typography variant="h6" fontWeight={600} gutterBottom>
+                <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ fontSize: '1rem' }}>
                   Scoring Parameters
               </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: '0.875rem' }}>
                   Compare AI scores with your manual assessment
                   </Typography>
 
@@ -785,8 +785,8 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
               </Box>
 
               {/* Total Score Display - AI vs Human */}
-              <Box sx={{ p: 3, bgcolor: 'grey.50', borderRadius: 1 }}>
-                <Typography variant="h6" fontWeight={600} textAlign="center" gutterBottom>
+              <Box sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+                <Typography variant="subtitle1" fontWeight={600} textAlign="center" gutterBottom sx={{ fontSize: '1rem' }}>
                   Total Score Comparison
                 </Typography>
                 <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3, mt: 2 }}>
@@ -829,7 +829,7 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
             <Box sx={{
               display: 'flex',
               gap: 2,
-              p: 3,
+              p: 2,
               borderTop: '1px solid',
               borderColor: 'divider',
               bgcolor: 'grey.50',
@@ -838,14 +838,16 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
             <Button
               variant="outlined"
                 fullWidth
+                size="small"
               onClick={() => setShowAuditorScoring(false)}
-                sx={{ textTransform: 'none' }}
+                sx={{ textTransform: 'none', fontSize: '0.875rem' }}
             >
               Cancel
             </Button>
             <Button
               variant="contained"
                 fullWidth
+                size="small"
               onClick={() => {
                 const totalHumanScore = scoringTemplate.criteria.reduce((total, criterion) => {
                   const score = auditorScores[criterion.key as keyof typeof auditorScores];
@@ -856,9 +858,9 @@ export function ConversationDetails({ conversation, onBack }: ConversationDetail
                 alert('Scores saved successfully!');
                 setShowAuditorScoring(false);
               }}
-                sx={{ textTransform: 'none' }}
+                sx={{ textTransform: 'none', fontSize: '0.875rem' }}
             >
-                Save scores
+              Save scores
             </Button>
               
               {/* Resize Indicator */}
