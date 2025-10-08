@@ -244,6 +244,9 @@ export default function AccessManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const membersPerPage = 10;
   const [showGoogleSSOConfig, setShowGoogleSSOConfig] = useState(false);
+  const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -303,6 +306,41 @@ export default function AccessManagementPage() {
     console.log('Saving team:', selectedTeam);
     handleCloseTeamManagement();
   };
+
+  // Drag handlers for Google SSO modal
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({
+      x: e.clientX - modalPosition.x,
+      y: e.clientY - modalPosition.y,
+    });
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging) {
+      setModalPosition({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y,
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  // Add event listeners for drag functionality
+  React.useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, dragStart]);
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -1299,9 +1337,9 @@ export default function AccessManagementPage() {
         <Fade in={showGoogleSSOConfig}>
           <Box sx={{
             position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
+            top: modalPosition.y === 0 ? '50%' : 'auto',
+            left: modalPosition.x === 0 ? '50%' : 'auto',
+            transform: modalPosition.x === 0 && modalPosition.y === 0 ? 'translate(-50%, -50%)' : `translate(${modalPosition.x}px, ${modalPosition.y}px)`,
             width: { xs: '95%', sm: '80%', md: '70%', lg: '60%' },
             maxWidth: '800px',
             bgcolor: 'background.paper',
@@ -1312,26 +1350,33 @@ export default function AccessManagementPage() {
             display: 'flex',
             flexDirection: 'column',
             maxHeight: '90vh',
+            cursor: isDragging ? 'grabbing' : 'default'
           }}>
             {/* Modal Header */}
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              p: 3,
-              borderBottom: '1px solid',
-              borderColor: 'divider',
-              bgcolor: 'primary.50',
-            }}>
+            <Box
+              onMouseDown={handleMouseDown}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                p: 2,
+                borderBottom: '1px solid',
+                borderColor: 'divider',
+                bgcolor: 'primary.50',
+                cursor: 'grab',
+                '&:active': {
+                  cursor: 'grabbing'
+                }
+              }}>
               <Box>
-                <Typography variant="h5" fontWeight={700} color="primary.main">
+                <Typography variant="h6" fontWeight={600} color="primary.main">
                   Google SSO Configuration
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
                   Configure Google Workspace authentication settings
                 </Typography>
               </Box>
-              <IconButton onClick={() => setShowGoogleSSOConfig(false)} size="large">
+              <IconButton onClick={() => setShowGoogleSSOConfig(false)} size="small">
                 <Close />
               </IconButton>
             </Box>
@@ -1340,27 +1385,35 @@ export default function AccessManagementPage() {
             <Box sx={{
               flex: 1,
               overflow: 'auto',
-              p: 3,
+              p: 2,
               display: 'flex',
               flexDirection: 'column',
-              gap: 3
+              gap: 2
             }}>
               {/* Client Configuration */}
               <Box>
-                <Typography variant="h6" fontWeight={600} gutterBottom>
+                <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ fontSize: '1rem' }}>
                   Client Configuration
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: '0.875rem' }}>
                   Enter your Google OAuth 2.0 client credentials
                 </Typography>
 
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <TextField
                     fullWidth
                     label="Client ID"
                     placeholder="Enter your Google OAuth Client ID"
                     variant="outlined"
                     size="small"
+                    sx={{
+                      '& .MuiInputLabel-root': {
+                        fontSize: '0.875rem',
+                      },
+                      '& .MuiInputBase-input': {
+                        fontSize: '0.875rem',
+                      },
+                    }}
                   />
                   <TextField
                     fullWidth
@@ -1369,6 +1422,14 @@ export default function AccessManagementPage() {
                     variant="outlined"
                     size="small"
                     type="password"
+                    sx={{
+                      '& .MuiInputLabel-root': {
+                        fontSize: '0.875rem',
+                      },
+                      '& .MuiInputBase-input': {
+                        fontSize: '0.875rem',
+                      },
+                    }}
                   />
                   <TextField
                     fullWidth
@@ -1377,16 +1438,27 @@ export default function AccessManagementPage() {
                     variant="outlined"
                     size="small"
                     helperText="This must match the redirect URI configured in Google Console"
+                    sx={{
+                      '& .MuiInputLabel-root': {
+                        fontSize: '0.875rem',
+                      },
+                      '& .MuiInputBase-input': {
+                        fontSize: '0.875rem',
+                      },
+                      '& .MuiFormHelperText-root': {
+                        fontSize: '0.75rem',
+                      },
+                    }}
                   />
                 </Box>
               </Box>
 
               {/* Domain Configuration */}
               <Box>
-                <Typography variant="h6" fontWeight={600} gutterBottom>
+                <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ fontSize: '1rem' }}>
                   Domain Configuration
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: '0.875rem' }}>
                   Specify which domains can authenticate via Google SSO
                 </Typography>
 
@@ -1397,11 +1469,20 @@ export default function AccessManagementPage() {
                     placeholder="company.com"
                     variant="outlined"
                     size="small"
+                    sx={{
+                      '& .MuiInputLabel-root': {
+                        fontSize: '0.875rem',
+                      },
+                      '& .MuiInputBase-input': {
+                        fontSize: '0.875rem',
+                      },
+                    }}
                   />
                   <Button
                     variant="contained"
                     startIcon={<Add />}
-                    sx={{ textTransform: 'none', minWidth: 120 }}
+                    size="small"
+                    sx={{ textTransform: 'none', minWidth: 120, fontSize: '0.875rem' }}
                   >
                     Add Domain
                   </Button>
@@ -1438,43 +1519,43 @@ export default function AccessManagementPage() {
 
               {/* Advanced Settings */}
               <Box>
-                <Typography variant="h6" fontWeight={600} gutterBottom>
+                <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ fontSize: '1rem' }}>
                   Advanced Settings
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: '0.875rem' }}>
                   Configure additional authentication options
                 </Typography>
 
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Checkbox defaultChecked />
+                    <Checkbox defaultChecked size="small" />
                     <Box>
-                      <Typography variant="body2" fontWeight={500}>
+                      <Typography variant="body2" fontWeight={500} sx={{ fontSize: '0.875rem' }}>
                         Auto-provision users
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
                         Automatically create user accounts for new Google users
                       </Typography>
                     </Box>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Checkbox defaultChecked />
+                    <Checkbox defaultChecked size="small" />
                     <Box>
-                      <Typography variant="body2" fontWeight={500}>
+                      <Typography variant="body2" fontWeight={500} sx={{ fontSize: '0.875rem' }}>
                         Sync user groups
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
                         Synchronize Google Groups with team assignments
                       </Typography>
                     </Box>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Checkbox />
+                    <Checkbox size="small" />
                     <Box>
-                      <Typography variant="body2" fontWeight={500}>
+                      <Typography variant="body2" fontWeight={500} sx={{ fontSize: '0.875rem' }}>
                         Require domain verification
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
                         Only allow users from verified domains
                       </Typography>
                     </Box>
@@ -1487,7 +1568,7 @@ export default function AccessManagementPage() {
             <Box sx={{
               display: 'flex',
               gap: 2,
-              p: 3,
+              p: 2,
               borderTop: '1px solid',
               borderColor: 'divider',
               bgcolor: 'grey.50',
@@ -1495,20 +1576,22 @@ export default function AccessManagementPage() {
               <Button
                 variant="outlined"
                 fullWidth
+                size="small"
                 onClick={() => setShowGoogleSSOConfig(false)}
-                sx={{ textTransform: 'none' }}
+                sx={{ textTransform: 'none', fontSize: '0.875rem' }}
               >
                 Cancel
               </Button>
               <Button
                 variant="contained"
                 fullWidth
+                size="small"
                 onClick={() => {
                   console.log('Google SSO configuration saved');
                   alert('Google SSO configuration saved successfully!');
                   setShowGoogleSSOConfig(false);
                 }}
-                sx={{ textTransform: 'none' }}
+                sx={{ textTransform: 'none', fontSize: '0.875rem' }}
               >
                 Save Configuration
               </Button>
