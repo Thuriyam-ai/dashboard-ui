@@ -45,8 +45,8 @@ main {
 
 /* Override any MUI Container default padding */
 .MuiContainer-root {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
+  padding-left: 10 !important;
+  padding-right: 10 !important;
 }
 
 /* Override any MUI Box default styles */

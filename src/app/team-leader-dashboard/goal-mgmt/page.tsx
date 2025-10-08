@@ -167,7 +167,7 @@ export default function GoalManagementPage() {
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
       <TeamLeaderSidebar activeItem="goal-mgmt" />
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginLeft: '280px' }}>
+      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginLeft: '0px' }}>
         <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
           <Toolbar>
             <Box sx={{ flexGrow: 1 }}><Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>team-leader-dashboard/goal-mgmt</Typography></Box>

@@ -376,8 +376,7 @@ export default function AccessManagementPage() {
           flexGrow: 1, 
           display: 'flex', 
           flexDirection: 'column',
-          width: { xs: '100%', md: `calc(100% - ${DRAWER_WIDTH}px)` },
-          marginLeft: { md: `${DRAWER_WIDTH}px` }
+          width: { xs: '100%', md: `calc(100% - ${DRAWER_WIDTH}px)` }
         }}
       >
         <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>

@@ -366,7 +366,7 @@ export default function ConversationDetailPage() {
         sx={{ 
           flexGrow: 1, 
           width: { xs: '100%', md: 'calc(100% - 280px)' },
-          marginLeft: { md: '280px' },
+          marginLeft: { md: '0px' },
           bgcolor: 'grey.50', 
           minHeight: '100vh' 
         }}

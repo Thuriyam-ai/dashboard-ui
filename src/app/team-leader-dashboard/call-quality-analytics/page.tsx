@@ -192,7 +192,7 @@ export default function CallQualityAnalyticsPage() {
         flexGrow: 1, 
         display: 'flex', 
         flexDirection: 'column',
-        marginLeft: '280px',
+        marginLeft: '0px',
         minHeight: '100vh'
       }}>
         {/* Top Bar */}

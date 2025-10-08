@@ -180,7 +180,7 @@ function GoalEditorContent() {
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
       <TeamLeaderSidebar activeItem="goal-mgmt" />
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginLeft: '280px' }}>
+      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginLeft: '0px' }}>
         <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary' }}>
           <Toolbar>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1 }}>
