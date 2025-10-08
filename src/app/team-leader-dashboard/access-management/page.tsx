@@ -1482,7 +1482,29 @@ export default function AccessManagementPage() {
                     variant="contained"
                     startIcon={<Add />}
                     size="small"
-                    sx={{ textTransform: 'none', minWidth: 120, fontSize: '0.875rem' }}
+                    sx={{ 
+                      textTransform: 'none', 
+                      minWidth: 120, 
+                      fontSize: '0.875rem',
+                      backgroundColor: '#4285F4',
+                      color: 'white',
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                      fontWeight: 500,
+                      px: 2,
+                      py: 1,
+                      '&:hover': {
+                        backgroundColor: '#3367D6',
+                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
+                      },
+                      '&:active': {
+                        backgroundColor: '#2E5BB5',
+                        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                      },
+                      '& .MuiButton-startIcon': {
+                        marginRight: '8px',
+                      }
+                    }}
                   >
                     Add Domain
                   </Button>
