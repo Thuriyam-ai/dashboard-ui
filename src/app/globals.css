@@ -7,6 +7,8 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 body {
@@ -21,4 +23,40 @@ body {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+}
+
+/* Override any MUI global padding */
+.MuiCssBaseline-root {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Ensure no global padding on main containers */
+#__next {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Override any Next.js default styles */
+main {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Override any MUI Container default padding */
+.MuiContainer-root {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Override any MUI Box default styles */
+.MuiBox-root {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Ensure all pages start from the very left edge */
+body > div {
+  padding: 0 !important;
+  margin: 0 !important;
 }
