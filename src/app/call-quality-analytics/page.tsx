@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import PageLayout from '@/components/layout/page-layout';
-import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
   Box,
   Container,
@@ -265,8 +264,6 @@ export default function CallQualityAnalyticsPage() {
 
         {/* Main Content */}
         <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3, maxWidth: '100%', overflow: 'hidden' }}>
-          <Breadcrumbs />
-          
           <Box sx={{ mb: 4 }}>
             <Typography variant="h3" component="h1" fontWeight={700} gutterBottom>
               Call Quality Analytics

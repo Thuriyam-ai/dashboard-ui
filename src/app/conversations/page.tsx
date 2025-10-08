@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import PageLayout from "@/components/layout/page-layout";
-import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
   Box,
   Container,
@@ -253,7 +252,6 @@ export default function ConversationsPage() {
         </AppBar>
 
         <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3 }}>
-          <Breadcrumbs />
 
           <Box sx={{ mb: 4 }}>
             <Typography variant="h3" component="h1" fontWeight={700} gutterBottom>Conversations Management</Typography>

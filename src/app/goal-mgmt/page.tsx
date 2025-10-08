@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import PageLayout from '../../components/layout/page-layout';
-import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
   Box, Container, Typography, AppBar, Toolbar, IconButton, Button,
   Avatar, Card, CardContent, Chip, Grid, Dialog, DialogTitle,
@@ -198,7 +197,6 @@ export default function GoalManagementPage() {
           </Toolbar>
         </AppBar>
         <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3}}>
-          <Breadcrumbs />
           <Box sx={{ my: 4 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Box>

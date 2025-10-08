@@ -5,7 +5,6 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PageLayout from '../../../components/layout/page-layout';
-import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
   Box, Container, Typography, AppBar, Toolbar, IconButton, Button, Card, CardContent, Tabs, Tab,
   TextField, FormControl, InputLabel, Select, FormControlLabel, Checkbox, Grid, Paper, Table,
@@ -195,7 +194,6 @@ function GoalEditorContent() {
         </AppBar>
 
         <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3 }}>
-          <Breadcrumbs />
           <Card sx={{ mb: 3 }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
               <Tabs value={activeTab} onChange={handleTabChange}>

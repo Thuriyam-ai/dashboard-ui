@@ -5,7 +5,6 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PageLayout from "@/components/layout/page-layout";
-import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
   Box, Container, Typography, AppBar, Toolbar, IconButton, Button, Avatar, Card,
   CardContent, TextField, FormControl, InputLabel, Select, Grid, Alert,
@@ -158,7 +157,6 @@ function CampaignEditorContent() {
         </AppBar>
 
         <Container maxWidth="xl" sx={{ flexGrow: 1, py: 3 }}>
-          <Breadcrumbs />
           {apiError && <Alert severity="error" sx={{ mb: 2 }}>{apiError}</Alert>}
           
           <Card>
