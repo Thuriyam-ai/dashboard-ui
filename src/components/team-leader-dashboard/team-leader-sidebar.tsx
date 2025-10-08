@@ -21,6 +21,7 @@ import {
   Campaign,
   Notifications,
   SmartToy,
+  People,
 } from "@mui/icons-material";
 
 import { useRouter } from "next/navigation";
@@ -272,6 +273,71 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
                 />
               </ListItem>
             ))}
+          </Box>
+
+          {/* Access Management Section - Always Expanded */}
+          <Box sx={{ 
+            ml: '1.25rem',
+            mt: '0.5rem',
+            mb: '0.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.125rem',
+            borderLeft: '1px solid rgba(255, 255, 255, 0.1)',
+            pl: '0.75rem',
+          }}>
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                color: 'rgba(255, 255, 255, 0.5)',
+                fontWeight: 600,
+                mb: '0.5rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                fontSize: '0.6875rem',
+              }}
+            >
+              ACCESS MANAGEMENT
+            </Typography>
+            <ListItem
+              onClick={() => handleNavClick('/access-management')}
+              sx={{
+                borderRadius: '0.5rem',
+                backgroundColor: activeItem === 'access-management' ? 'rgba(102, 126, 234, 0.1)' : 'transparent',
+                color: activeItem === 'access-management' ? 'white' : 'rgba(255, 255, 255, 0.6)',
+                cursor: 'pointer',
+                transition: 'all 250ms cubic-bezier(0.4, 0, 0.2, 1)',
+                mb: '0.125rem',
+                border: activeItem === 'access-management' ? '1px solid rgba(102, 126, 234, 0.2)' : '1px solid transparent',
+                '&:hover': {
+                  backgroundColor: activeItem === 'access-management' ? 'rgba(102, 126, 234, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                  color: 'white',
+                  transform: 'translateX(2px)',
+                  border: '1px solid rgba(102, 126, 234, 0.15)',
+                },
+                '& .MuiListItemIcon-root': {
+                  color: 'inherit',
+                  minWidth: '1rem',
+                  mr: '0.625rem',
+                },
+              }}
+            >
+              <ListItemIcon>
+                <People />
+              </ListItemIcon>
+              <ListItemText 
+                primary="Access Management" 
+                sx={{
+                  '& .MuiListItemText-primary': {
+                    fontSize: '0.8125rem',
+                    fontWeight: 500,
+                    color: 'inherit',
+                    letterSpacing: '-0.01em',
+                    fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif',
+                  },
+                }}
+              />
+            </ListItem>
           </Box>
         </List>
       </Box>
