@@ -1,3 +1,5 @@
+'use client';
+
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 
 // Define the shape of the context data

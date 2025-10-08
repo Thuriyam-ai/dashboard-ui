@@ -1,8 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // This is the most important line. It tells Next.js to create
-  // a self-contained, static 'out' folder. This should be unconditional.
-  output: 'export',
+  // Disable static export for development
+  // output: 'export',
 
   // These are fine for managing your build process.
   typescript: {

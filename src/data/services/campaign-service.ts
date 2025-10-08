@@ -7,10 +7,63 @@ interface GetAllCampaignsParams {
   limit?: number;
 }
 
+// Sample campaign data for development/demo purposes
+const SAMPLE_CAMPAIGNS: Campaign[] = [
+  {
+    id: "camp_001",
+    name: "Customer Support Campaign",
+    status: "ACTIVE",
+    goal_name: "Customer Satisfaction",
+    team_name: "Support Team",
+    starts_at: "2024-01-01T00:00:00Z",
+    ends_at: "2024-12-31T23:59:59Z",
+    conversations: 1247,
+    avg_score: 87,
+    completion_rate: 92
+  },
+  {
+    id: "camp_002", 
+    name: "Sales Outreach Campaign",
+    status: "ACTIVE",
+    goal_name: "Lead Generation",
+    team_name: "Sales Team",
+    starts_at: "2024-01-05T00:00:00Z",
+    ends_at: "2024-12-31T23:59:59Z",
+    conversations: 892,
+    avg_score: 78,
+    completion_rate: 85
+  },
+  {
+    id: "camp_003",
+    name: "Technical Support Campaign", 
+    status: "ACTIVE",
+    goal_name: "Issue Resolution",
+    team_name: "Engineering",
+    starts_at: "2024-01-10T00:00:00Z",
+    ends_at: "2024-12-31T23:59:59Z",
+    conversations: 634,
+    avg_score: 91,
+    completion_rate: 88
+  }
+];
+
 /**
  * Fetches a paginated list of all campaigns.
  */
 export const getAllCampaigns = async ({ skip = 0, limit = 100 }: GetAllCampaignsParams = {}): Promise<Campaign[]> => {
+  // For development/demo purposes, return sample data
+  console.log('Using sample campaign data for development');
+  
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 300));
+  
+  // Apply pagination
+  const startIndex = skip;
+  const endIndex = startIndex + limit;
+  return SAMPLE_CAMPAIGNS.slice(startIndex, endIndex);
+
+  // Original API call code (commented out for development)
+  /*
   try {
     const response = await apiClient.get<Campaign[]>('/api/v1/campaigns/', {
       params: { skip, limit },
@@ -20,6 +73,7 @@ export const getAllCampaigns = async ({ skip = 0, limit = 100 }: GetAllCampaigns
     console.error('Failed to fetch campaigns:', error);
     throw new Error('Could not fetch campaigns.');
   }
+  */
 };
 
 /**

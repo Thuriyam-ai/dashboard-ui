@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { inter } from "./fonts";
 import "./globals.css";
 import { ContextWrapper } from "@/app/context-wrapper";
-import { ThemeProvider } from "@/theme/ThemeProvider";
+import MuiThemeProvider from "@/theme/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "Call Quality Analytics",
@@ -17,11 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ThemeProvider>
+        <MuiThemeProvider>
           <ContextWrapper>
             {children}
           </ContextWrapper>
-        </ThemeProvider>
+        </MuiThemeProvider>
       </body>
     </html>
   );
