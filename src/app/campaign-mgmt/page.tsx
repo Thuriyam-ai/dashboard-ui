@@ -76,9 +76,9 @@ export default function CampaignManagementPage() {
     fetchCampaigns();
   }, []);
 
-  const handleCreateCampaign = () => router.push('/team-leader-dashboard/campaign-mgmt/editor');
-  const handleEditCampaign = (campaignId: string) => router.push(`/team-leader-dashboard/campaign-mgmt/editor?id=${campaignId}`);
-  const handleCloneCampaign = (campaignId: string) => router.push(`/team-leader-dashboard/campaign-mgmt/editor?clone=${campaignId}`);
+  const handleCreateCampaign = () => router.push('/campaign-mgmt/editor');
+  const handleEditCampaign = (campaignId: string) => router.push(`/campaign-mgmt/editor?id=${campaignId}`);
+  const handleCloneCampaign = (campaignId: string) => router.push(`/campaign-mgmt/editor?clone=${campaignId}`);
 
   const handleDeleteCampaign = (campaign: CampaignType) => {
     setSelectedCampaign(campaign);

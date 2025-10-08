@@ -36,13 +36,13 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
       id: "call-quality",
       label: "Insights",
       icon: <Analytics />,
-      path: "/team-leader-dashboard/call-quality-analytics",
+      path: "/call-quality-analytics",
     },
     {
       id: "conversations",
       label: "Conversations",
       icon: <Message />,
-      path: "/team-leader-dashboard/conversations",
+      path: "/conversations",
     },
   ];
 
@@ -56,13 +56,13 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
           id: "goal-mgmt",
           label: "Goals",
           icon: <Flag />,
-          path: "/team-leader-dashboard/goal-mgmt",
+          path: "/goal-mgmt",
         },
         {
           id: "campaign-mgmt",
           label: "Campaigns",
           icon: <Campaign />,
-          path: "/team-leader-dashboard/campaign-mgmt",
+          path: "/campaign-mgmt",
         },
       ],
     },
@@ -73,7 +73,7 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
       id: "access-management",
       label: "Users and Teams",
       icon: <Security />,
-      path: "/team-leader-dashboard/access-management",
+      path: "/access-management",
     },
   ];
 

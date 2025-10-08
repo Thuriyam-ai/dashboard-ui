@@ -135,7 +135,7 @@ function CampaignEditorContent() {
         };
         await createCampaign(payload);
       }
-      router.push('/team-leader-dashboard/campaign-mgmt');
+      router.push('/campaign-mgmt');
     } catch (err: any) {
       // Display backend validation error
       const message = err.response?.data?.detail || "Failed to save the campaign. An unknown error occurred.";
@@ -151,7 +151,7 @@ function CampaignEditorContent() {
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginLeft: '0px' }}>
         <AppBar position="static" elevation={1} sx={{ backgroundColor: 'background.paper', color: 'text.primary' }}>
           <Toolbar>
-            <IconButton onClick={() => router.push('/team-leader-dashboard/campaign-mgmt')}><ArrowBack /></IconButton>
+            <IconButton onClick={() => router.push('/campaign-mgmt')}><ArrowBack /></IconButton>
             <Typography variant="h6" sx={{ ml: 2, flexGrow: 1 }}>{pageTitle}</Typography>
             <Button variant="contained" startIcon={isSaving ? <CircularProgress size={20} color="inherit" /> : <Save />} onClick={handleSave} disabled={isSaving}>
               {isSaving ? 'Saving...' : 'Save Campaign'}

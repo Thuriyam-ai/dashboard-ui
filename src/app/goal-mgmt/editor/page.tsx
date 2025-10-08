@@ -93,7 +93,7 @@ function GoalEditorContent() {
       } catch (error) {
         console.error("Initialization failed:", error);
         alert("Failed to load goal data for the editor.");
-        router.push('/team-leader-dashboard/goal-mgmt');
+        router.push('/goal-mgmt');
       } finally {
         setIsLoading(false);
       }
@@ -143,7 +143,7 @@ function GoalEditorContent() {
         await createGoal(payload);
         alert("Goal created successfully!");
       }
-      router.push('/team-leader-dashboard/goal-mgmt');
+      router.push('/goal-mgmt');
     } catch (error) {
       console.error("Failed to save goal:", error);
       alert("Error: Could not save the goal.");
@@ -153,7 +153,7 @@ function GoalEditorContent() {
   };
 
   // --- UI Handlers ---
-  const handleBack = () => router.push('/team-leader-dashboard/goal-mgmt');
+  const handleBack = () => router.push('/goal-mgmt');
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => setActiveTab(newValue);
   const totalScore = qualityParameters.reduce((sum, param) => sum + param.max_score, 0);
   

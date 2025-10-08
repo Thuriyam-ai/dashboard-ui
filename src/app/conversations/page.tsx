@@ -198,7 +198,7 @@ export default function ConversationsPage() {
   );
 
   const handleViewDetails = (conversationId: string) => {
-    router.push(`/team-leader-dashboard/conversation-detail?id=${conversationId}`);
+    router.push(`/conversation-detail?id=${conversationId}`);
   };
 
   return (

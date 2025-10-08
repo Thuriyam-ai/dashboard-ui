@@ -377,7 +377,7 @@ export default function ConversationDetailPage() {
             <Stack direction="row" spacing={2} alignItems="center">
               <Button
                 startIcon={<ArrowBack />}
-                onClick={() => router.push("/team-leader-dashboard/conversations")}
+                onClick={() => router.push("/conversations")}
                 sx={{ textTransform: 'none' }}
               >
                 Back to Conversations

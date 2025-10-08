@@ -71,9 +71,9 @@ export default function GoalManagementPage() {
     }
   };
   
-  const handleCreateGoal = () => router.push('/team-leader-dashboard/goal-mgmt/editor');
-  const handleEditGoal = (goalId: string) => router.push(`/team-leader-dashboard/goal-mgmt/editor?id=${goalId}`);
-  const handleCloneGoal = (goalId: string) => router.push(`/team-leader-dashboard/goal-mgmt/editor?clone=${goalId}`);
+  const handleCreateGoal = () => router.push('/goal-mgmt/editor');
+  const handleEditGoal = (goalId: string) => router.push(`/goal-mgmt/editor?id=${goalId}`);
+  const handleCloneGoal = (goalId: string) => router.push(`/goal-mgmt/editor?clone=${goalId}`);
   const handleDeleteGoal = (goal: GoalDetailResponse) => { setSelectedGoal(goal); setDeleteDialogOpen(true); };
 
   const renderContent = () => {
