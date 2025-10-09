@@ -131,7 +131,7 @@ function CampaignEditorContent() {
           ends_at, 
           business_objective: "TBD", 
           status: "UPCOMING", 
-          organization_id: "org-1" // This should be dynamic in a real app
+          organization_id: "default_org" // This should be dynamic in a real app
         };
         await createCampaign(payload);
       }

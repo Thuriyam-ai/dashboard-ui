@@ -1,81 +1,161 @@
-import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  ReactNode,
+} from "react";
+import apiClient from "@/data/services/api-client";
+import { AxiosError } from "axios";
+import { useRouter } from "next/navigation";
 
-// Define the shape of the context data
+interface User {
+  email: string;
+  role: string;
+  org_id: string | null;
+  user_id: string;
+}
+
 interface AuthContextType {
   isAuthenticated: boolean;
+  user: User | null;
   login: (email: string, password: string) => Promise<void>;
+  signup: (
+    username: string,
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string
+  ) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
   error: string;
+  clearError: () => void;
 }
 
-// Create the context with a default undefined value
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// The list of allowed users and password
-const allowedEmails = [
-  'admin@company.com',
-  'manager@company.com',
-  'support@company.com',
-  'dev@company.com',
-];
-const adminPassword = 'admin123';
-
-// Create the Provider component
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true); // Start true to check localStorage
-  const [error, setError] = useState<string>('');
+
+  const router = useRouter();
+
+  const clearError = () => setError("");
+
+  const checkAuthStatus = async () => {
+    setIsLoading(true);
+    try {
+      const response = await apiClient.get<User>("/api/v1/accounts_users/me");
+      setUser(response.data);
+      setIsAuthenticated(true);
+    } catch (err) {
+      setUser(null);
+      setIsAuthenticated(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Check for saved authentication state on initial load
-    const savedAuth = localStorage.getItem('botconfig_auth');
-    if (savedAuth) {
-      const authData = JSON.parse(savedAuth);
-      if (allowedEmails.includes(authData.email)) {
-        setIsAuthenticated(true);
-      }
-    }
-    setIsLoading(false); // Finished initial check
+    checkAuthStatus();
   }, []);
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
-    setError('');
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+    setError("");
+    try {
+      await apiClient.post("/api/v1/accounts_users/signin", {
+        email,
+        password,
+      });
 
-    if (!allowedEmails.includes(email.toLowerCase())) {
-      setError('Access denied. Your email is not authorized.');
+      // Fetch and set user data
+      const response = await apiClient.get<User>("/api/v1/accounts_users/me");
+      setUser(response.data);
+      setIsAuthenticated(true);
+    } catch (err) {
+      setIsAuthenticated(false);
+      const axiosError = err as AxiosError<any>;
+      const errorMessage =
+        axiosError.response?.data?.detail || "Invalid email or password.";
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
       setIsLoading(false);
-      throw new Error('Unauthorized email');
     }
-
-    if (password !== adminPassword) {
-      setError('Invalid password. Please try again.');
-      setIsLoading(false);
-      throw new Error('Invalid password');
-    }
-
-    localStorage.setItem('botconfig_auth', JSON.stringify({ email: email.toLowerCase() }));
-    setIsAuthenticated(true);
-    setIsLoading(false);
   };
 
-  const logout = () => {
-    localStorage.removeItem('botconfig_auth');
-    setIsAuthenticated(false);
+  const signup = async (
+    username: string,
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string
+  ) => {
+    setIsLoading(true);
+    setError("");
+    try {
+      await apiClient.post("/api/v1/accounts_users/", {
+        username,
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        password,
+      });
+
+      // Fetch and set user data
+      const response = await apiClient.get<User>("/api/v1/accounts_users/me");
+      setUser(response.data);
+      setIsAuthenticated(true);
+    } catch (err) {
+      setIsAuthenticated(false);
+      const axiosError = err as AxiosError<any>;
+      const errorMessage =
+        axiosError.response?.data?.detail || "Signup failed. Please try again.";
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const value = { isAuthenticated, login, logout, isLoading, error };
+  const logout = async () => {
+    try {
+      await apiClient.post("/api/v1/accounts_users/logout");
+    } catch (err) {
+      console.error(
+        "Logout API call failed, logging out on client-side anyway.",
+        err
+      );
+    } finally {
+      setUser(null);
+      setIsAuthenticated(false);
+    }
+  };
+
+  const value = {
+    isAuthenticated,
+    user,
+    login,
+    signup,
+    logout,
+    isLoading,
+    error,
+    clearError,
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Create a custom hook for easy consumption of the context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

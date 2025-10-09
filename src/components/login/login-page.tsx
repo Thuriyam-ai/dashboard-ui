@@ -1,20 +1,51 @@
-import React, { useState } from 'react';
-import { Shield, Mail, Lock, AlertCircle } from 'lucide-react';
-import './login-page.scss'; // You can reuse the styles
+import React, { useState, useEffect } from 'react';
+import { Shield, Mail, Lock, AlertCircle, User as UserIcon, CaseSensitive } from 'lucide-react';
+import './login-page.scss';
 import { useAuth } from '@/contexts/auth-context';
+import { useRouter } from 'next/navigation';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { login, isLoading, error } = useAuth(); // Use the context
+  const [isLoginView, setIsLoginView] = useState(true);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+
+  const router = useRouter();
+  const { login, signup, isLoading, error, clearError, isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/');
+    }
+  }, [isAuthenticated, router]);
+
+  useEffect(() => {
+    clearError();
+  }, [isLoginView, clearError]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login(email, password);
+      if (isLoginView) {
+        await login(email, password);
+      } else {
+        await signup(username, firstName, lastName, email, password);
+      }
     } catch (err) {
-      console.error(err); // The error is already handled in the context, but you can log it
+      console.error('Authentication failed:', err);
     }
+  };
+
+  const toggleView = () => {
+    setIsLoginView(!isLoginView);
+    setEmail('');
+    setUsername('');
+    setPassword('');
+    setFirstName('');
+    setLastName('');
   };
 
   return (
@@ -26,35 +57,116 @@ const LoginPage = () => {
               <Shield className="header-icon" />
             </div>
             <h1>BotConfig Admin</h1>
-            <p>Secure access required</p>
+            <p>{isLoginView ? 'Sign in to your account' : 'Create a new account'}</p>
           </div>
-          <form onSubmit={handleLogin} className="login-form">
+          <form onSubmit={handleSubmit} className="login-form">
+            {!isLoginView && (
+              <>
+                <div className="input-group">
+                  {/* ✨ CHANGE: Added asterisk to the label */}
+                  <label htmlFor="username">Username*</label>
+                  <div className="input-field-wrapper">
+                    <UserIcon className="input-icon" />
+                    <input
+                      id="username"
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className="text-input"
+                      placeholder="Choose a username"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* ✨ CHANGE: New container to hold First and Last Name in one row */}
+                <div className="form-row">
+                  <div className="input-group">
+                    <label htmlFor="first-name">First Name (optional)</label>
+                    <div className="input-field-wrapper">
+                      <CaseSensitive className="input-icon" /> {/* New Icon */}
+                      <input
+                        id="first-name"
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        className="text-input"
+                        placeholder="Your first name"
+                        // Removed 'required'
+                      />
+                    </div>
+                  </div>
+                  <div className="input-group">
+                    <label htmlFor="last-name">Last Name (optional)</label>
+                    <div className="input-field-wrapper">
+                      <CaseSensitive className="input-icon" /> {/* New Icon */}
+                      <input
+                        id="last-name"
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        className="text-input"
+                        placeholder="Your last name"
+                        // Removed 'required'
+                      />
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
             <div className="input-group">
-              <label htmlFor="email">Email Address</label>
+              {/* ✨ CHANGE: Added asterisk to the label */}
+              <label htmlFor="email">Email Address*</label>
               <div className="input-field-wrapper">
                 <Mail className="input-icon" />
-                <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="text-input" placeholder="Enter your email" required />
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="text-input"
+                  placeholder="Enter your email"
+                  required
+                />
               </div>
             </div>
+
             <div className="input-group">
-              <label htmlFor="password">Password</label>
+              {/* ✨ CHANGE: Added asterisk to the label */}
+              <label htmlFor="password">Password*</label>
               <div className="input-field-wrapper">
                 <Lock className="input-icon" />
-                <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="text-input" placeholder="Enter your password" required />
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="text-input"
+                  placeholder="Enter your password"
+                  required
+                />
               </div>
             </div>
+
             {error && (
               <div className="error-message">
                 <AlertCircle className="error-icon" />
                 <p className="error-text">{error}</p>
               </div>
             )}
+
             <button type="submit" disabled={isLoading} className="submit-button">
-              {isLoading ? 'Authenticating...' : 'Sign In'}
+              {isLoading ? 'Processing...' : (isLoginView ? 'Sign In' : 'Sign Up')}
             </button>
           </form>
           <div className="form-footer">
-            <p>Access is restricted to authorized personnel only.</p>
+            <p>
+              {isLoginView ? "Don't have an account? " : "Already have an account? "}
+              <span onClick={toggleView} className="toggle-button" style={{ cursor: 'pointer', color: '#1976d2' }}>
+                {isLoginView ? 'Sign Up' : 'Sign In'}
+              </span>
+            </p>
           </div>
         </div>
       </div>

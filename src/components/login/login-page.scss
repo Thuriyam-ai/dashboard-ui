@@ -35,6 +35,25 @@ body {
   }
 }
 
+// src/styles/login-page.scss
+
+.login-form {
+  // ... your existing styles for .login-form
+
+  // ✨ ADD THIS: New rule for the two-column row
+  .form-row {
+    display: flex;
+    align-items: flex-start; // Aligns items to the top
+    gap: 1rem; // Creates a space between the first and last name fields
+    width: 100%;
+
+    // Each input group within the row will take up equal space
+    .input-group {
+      flex: 1;
+    }
+  }
+}
+
 
 .auth-container {
   min-height: 100vh;
@@ -127,11 +146,11 @@ body {
     }
   }
 
-  .login-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
+  // .login-form {
+  //   display: flex;
+  //   flex-direction: column;
+  //   gap: 1.5rem;
+  // }
 
   .input-group {
     label {

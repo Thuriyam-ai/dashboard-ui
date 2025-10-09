@@ -122,7 +122,7 @@ function GoalEditorContent() {
     setIsSaving(true);
     
     const payload: GoalCreateRequest = {
-      organization_id: "org-1",
+      organization_id: "default_org",
       owner_id: ownerId,
       name: goalName,
       description: description,
