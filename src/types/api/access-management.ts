@@ -33,3 +33,8 @@ export interface UserUpdatePayload {
     last_name?: string;
     is_active?: boolean;
 }
+
+export interface TeamUpdatePayload {
+    name?: string;
+    slug?: string;
+}

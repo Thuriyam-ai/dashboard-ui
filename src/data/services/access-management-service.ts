@@ -1,5 +1,5 @@
 import apiClient from './api-client';
-import { User, Team, TeamCreatePayload, UserUpdatePayload } from '@/types/api/access-management';
+import { User, Team, TeamCreatePayload, UserUpdatePayload, TeamUpdatePayload } from '@/types/api/access-management';
 
 interface GetUsersParams {
   skip?: number;
@@ -8,7 +8,7 @@ interface GetUsersParams {
   username?: string;
   email?: string;
   role?: string;
-  is_active?: boolean;
+  is_active?: boolean; 
 }
 
 /**
@@ -16,8 +16,7 @@ interface GetUsersParams {
  */
 export const getUsers = async (params: GetUsersParams = {}): Promise<User[]> => {
   try {
-    // Filter out undefined values so they aren't sent as query params
-    const filteredParams = Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined));
+    const filteredParams = Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined && v !== ''));
     const response = await apiClient.get<User[]>('/api/v1/accounts_users/', { params: filteredParams });
     return response.data;
   } catch (error) {
@@ -69,9 +68,22 @@ export const createTeam = async (teamData: TeamCreatePayload): Promise<Team> => 
 };
 
 /**
+ * Updates a team.
+ * @param teamSlug The current slug of the team to update.
+ * @param teamData The data to update.
+ */
+export const updateTeam = async (teamSlug: string, teamData: TeamUpdatePayload): Promise<Team> => {
+    try {
+        const response = await apiClient.put<Team>(`/api/v1/accounts_teams/${teamSlug}`, teamData);
+        return response.data;
+    } catch (error) {
+        console.error(`Failed to update team ${teamSlug}:`, error);
+        throw new Error('Could not update team.');
+    }
+};
+
+/**
  * Updates a user.
- * @param userEmail The email of the user to update.
- * @param userData The partial data to update for the user.
  */
 export const updateUser = async (userEmail: string, userData: UserUpdatePayload): Promise<User> => {
     try {
@@ -83,10 +95,22 @@ export const updateUser = async (userEmail: string, userData: UserUpdatePayload)
     }
 };
 
+/**
+ * Adds a user to a team.
+ */
+export const addUserToTeam = async (teamSlug: string, userEmail: string): Promise<Team> => {
+    try {
+        const response = await apiClient.post<Team>(`/api/v1/accounts_teams/${teamSlug}/add_user/${userEmail}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Failed to add user ${userEmail} to team ${teamSlug}:`, error);
+        throw new Error('Could not add user to team.');
+    }
+};
+
 
 /**
  * Deletes a user.
- * @param userEmail The email of the user to delete.
  */
 export const deleteUser = async (userEmail: string): Promise<void> => {
     try {
@@ -99,7 +123,6 @@ export const deleteUser = async (userEmail: string): Promise<void> => {
 
 /**
  * Deletes a team.
- * @param teamSlug The slug of the team to delete.
  */
 export const deleteTeam = async (teamSlug: string): Promise<void> => {
     try {
@@ -113,8 +136,6 @@ export const deleteTeam = async (teamSlug: string): Promise<void> => {
 
 /**
  * Removes a user from a team.
- * @param teamSlug The slug of the team.
- * @param userEmail The email of the user to remove.
  */
 export const removeUserFromTeam = async (teamSlug: string, userEmail: string): Promise<Team> => {
     try {
