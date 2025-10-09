@@ -1,5 +1,5 @@
 import apiClient from './api-client';
-import { User, Team, TeamCreatePayload } from '@/types/api/access-management';
+import { User, Team, TeamCreatePayload, UserUpdatePayload } from '@/types/api/access-management';
 
 interface GetUsersParams {
   skip?: number;
@@ -8,6 +8,7 @@ interface GetUsersParams {
   username?: string;
   email?: string;
   role?: string;
+  is_active?: boolean;
 }
 
 /**
@@ -15,7 +16,9 @@ interface GetUsersParams {
  */
 export const getUsers = async (params: GetUsersParams = {}): Promise<User[]> => {
   try {
-    const response = await apiClient.get<User[]>('/api/v1/accounts_users/', { params });
+    // Filter out undefined values so they aren't sent as query params
+    const filteredParams = Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined));
+    const response = await apiClient.get<User[]>('/api/v1/accounts_users/', { params: filteredParams });
     return response.data;
   } catch (error) {
     console.error('Failed to fetch users:', error);
@@ -64,6 +67,22 @@ export const createTeam = async (teamData: TeamCreatePayload): Promise<Team> => 
         throw new Error('Could not create team.');
     }
 };
+
+/**
+ * Updates a user.
+ * @param userEmail The email of the user to update.
+ * @param userData The partial data to update for the user.
+ */
+export const updateUser = async (userEmail: string, userData: UserUpdatePayload): Promise<User> => {
+    try {
+        const response = await apiClient.put<User>(`/api/v1/accounts_users/${userEmail}`, userData);
+        return response.data;
+    } catch (error) {
+        console.error(`Failed to update user ${userEmail}:`, error);
+        throw new Error('Could not update user.');
+    }
+};
+
 
 /**
  * Deletes a user.

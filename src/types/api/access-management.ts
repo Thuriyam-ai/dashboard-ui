@@ -27,3 +27,9 @@ export interface TeamCreatePayload {
     slug: string;
     organization_id: string;
 }
+
+export interface UserUpdatePayload {
+    first_name?: string;
+    last_name?: string;
+    is_active?: boolean;
+}

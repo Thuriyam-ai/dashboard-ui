@@ -36,6 +36,18 @@ import {
   Pagination,
   CircularProgress,
   Alert,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Menu,
+  Switch,
+  Snackbar, // Added for toast notifications
 } from "@mui/material";
 import {
   Search,
@@ -55,13 +67,15 @@ import {
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
-import { User, Team } from "@/types/api/access-management";
+import { User, Team, UserUpdatePayload } from "@/types/api/access-management";
 import * as accessManagementService from "@/data/services/access-management-service";
 import { formatRelativeTime } from "@/utilities/date-util";
 import { useDebounce } from "@/hooks/use-debounce";
 
 // Define a constant for the sidebar width to reuse it
 const DRAWER_WIDTH = 280;
+
+type ToastSeverity = "success" | "error" | "info" | "warning";
 
 /**
  * Access Management page component for Team Leader Dashboard
@@ -82,6 +96,23 @@ export default function AccessManagementPage() {
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
+  // User Filter State
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [filters, setFilters] = useState<{ team: string; status: string }>({ team: "", status: "" });
+  const [tempFilters, setTempFilters] = useState(filters);
+
+  // User Edit Modal State
+  const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  
+  // Team Create Modal State
+  const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false);
+  const [newTeamName, setNewTeamName] = useState("");
+  
+  // Team Menu State
+  const [teamMenuAnchorEl, setTeamMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedMenuTeam, setSelectedMenuTeam] = useState<Team | null>(null);
+
   // Team Tab State & Modal State
   const [teamManagementOpen, setTeamManagementOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
@@ -89,25 +120,35 @@ export default function AccessManagementPage() {
   const [isLoadingTeamMembers, setIsLoadingTeamMembers] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const membersPerPage = 10;
+  
+  // Toast State
+  const [toast, setToast] = useState<{ open: boolean; message: string; severity: ToastSeverity }>({ open: false, message: "", severity: "success" });
+
+  // Confirmation Dialog State
+  const [confirmation, setConfirmation] = useState<{ open: boolean; title: string; content: string; onConfirm: () => void; }>({ open: false, title: "", content: "", onConfirm: () => {} });
 
   // Data fetching functions
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const fetchedUsers = await accessManagementService.getUsers({
-        // The API supports filtering by username or email.
-        // We can pass the search term to both.
-        username: debouncedSearchTerm,
-        email: debouncedSearchTerm,
-      });
-      setUsers(fetchedUsers);
+        const params: { [key: string]: any } = {
+            username: debouncedSearchTerm || undefined,
+            email: debouncedSearchTerm || undefined,
+            team_slug: filters.team || undefined,
+        };
+        if (filters.status) {
+            params.is_active = filters.status === 'active';
+        }
+
+        const fetchedUsers = await accessManagementService.getUsers(params);
+        setUsers(fetchedUsers);
     } catch (err) {
-      setError("Failed to load users. Please try again later.");
+        setError("Failed to load users. Please try again later.");
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  }, [debouncedSearchTerm]);
+  }, [debouncedSearchTerm, filters]);
 
   const fetchTeams = useCallback(async () => {
     setIsLoading(true);
@@ -129,7 +170,6 @@ export default function AccessManagementPage() {
           const members = await accessManagementService.getUsersInTeam(slug);
           setTeamMembers(members);
       } catch (err) {
-          // Handle specific error for modal
           console.error("Failed to load team members");
       } finally {
           setIsLoadingTeamMembers(false);
@@ -140,9 +180,8 @@ export default function AccessManagementPage() {
   useEffect(() => {
     if (activeTab === 0) {
       fetchUsers();
-    } else if (activeTab === 1) {
-      fetchTeams();
-    }
+    } 
+    fetchTeams();
   }, [activeTab, fetchUsers, fetchTeams]);
   
   useEffect(() => {
@@ -152,6 +191,22 @@ export default function AccessManagementPage() {
   }, [selectedTeam, fetchTeamMembers]);
 
   // Handlers
+  const showToast = (message: string, severity: ToastSeverity) => {
+    setToast({ open: true, message, severity });
+  };
+
+  const handleCloseToast = () => {
+    setToast({ ...toast, open: false });
+  };
+  
+  const openConfirmation = (title: string, content: string, onConfirm: () => void) => {
+    setConfirmation({ open: true, title, content, onConfirm });
+  };
+
+  const handleCloseConfirmation = () => {
+    setConfirmation({ ...confirmation, open: false });
+  };
+
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
     setSelectedUsers([]);
@@ -172,17 +227,127 @@ export default function AccessManagementPage() {
         : [...prev, userEmail]
     );
   };
+  
+  // User Action Handlers
+  const handleOpenEditUserModal = (user: User) => {
+    setEditingUser(user);
+    setIsEditUserModalOpen(true);
+  };
 
-  const handleDeleteUser = async (userEmail: string) => {
-      if (window.confirm(`Are you sure you want to delete user ${userEmail}?`)) {
-          try {
-              await accessManagementService.deleteUser(userEmail);
-              fetchUsers(); // Refresh user list
-          } catch (error) {
-              alert("Failed to delete user.");
-          }
+  const handleCloseEditUserModal = () => {
+    setIsEditUserModalOpen(false);
+    setEditingUser(null);
+  };
+
+  const handleUpdateUser = async (payload: UserUpdatePayload) => {
+    if (!editingUser) return;
+    try {
+      await accessManagementService.updateUser(editingUser.email, payload);
+      handleCloseEditUserModal();
+      showToast("User updated successfully", "success");
+      fetchUsers(); // Refresh users
+    } catch (error) {
+      showToast("Failed to update user.", "error");
+      console.error(error);
+    }
+  };
+
+  const handleDeleteUser = (userEmail: string, userName: string) => {
+    openConfirmation(
+      `Delete User?`,
+      `Are you sure you want to delete ${userName}? This action cannot be undone.`,
+      async () => {
+        try {
+          await accessManagementService.deleteUser(userEmail);
+          showToast("User deleted successfully.", "success");
+          fetchUsers(); // Refresh user list
+        } catch (error) {
+          showToast("Failed to delete user.", "error");
+        }
+        handleCloseConfirmation();
       }
-  }
+    );
+  };
+
+  // Filter Handlers
+  const handleOpenFilterModal = () => {
+    setTempFilters(filters);
+    setIsFilterModalOpen(true);
+  };
+
+  const handleCloseFilterModal = () => setIsFilterModalOpen(false);
+
+  const handleApplyFilters = () => {
+    setFilters(tempFilters);
+    handleCloseFilterModal();
+  };
+
+  const handleClearFilters = () => {
+    const clearedFilters = { team: "", status: "" };
+    setFilters(clearedFilters);
+    setTempFilters(clearedFilters);
+    handleCloseFilterModal();
+  };
+
+  // Team Action Handlers
+  const handleOpenCreateTeamModal = () => setIsCreateTeamModalOpen(true);
+  const handleCloseCreateTeamModal = () => {
+    setIsCreateTeamModalOpen(false);
+    setNewTeamName("");
+  };
+
+  const handleCreateTeam = async () => {
+    if (!newTeamName.trim()) {
+        showToast("Team name cannot be empty.", "warning");
+        return;
+    }
+    const slug = newTeamName.trim().toLowerCase().replace(/\s+/g, '-');
+    const organization_id = users[0]?.organization_id || "default-org-id"; 
+    
+    try {
+        await accessManagementService.createTeam({
+            name: newTeamName.trim(),
+            slug,
+            organization_id,
+        });
+        handleCloseCreateTeamModal();
+        showToast("Team created successfully!", "success");
+        fetchTeams(); 
+    } catch (error) {
+        showToast("Failed to create team. A team with this name may already exist.", "error");
+        console.error(error);
+    }
+  };
+  
+  const handleDeleteTeam = () => {
+    if (!selectedMenuTeam) return;
+    const teamToDelete = selectedMenuTeam; // Capture the team before closing the menu
+    handleTeamMenuClose(); // Close menu first
+    openConfirmation(
+      `Delete Team?`,
+      `Are you sure you want to delete "${teamToDelete.name}"? This action is permanent.`,
+      async () => {
+        try {
+          await accessManagementService.deleteTeam(teamToDelete.slug);
+          showToast("Team deleted successfully.", "success");
+          fetchTeams();
+        } catch (error) {
+          showToast("Failed to delete team.", "error");
+        }
+        handleCloseConfirmation();
+      }
+    );
+  };
+  
+  const handleTeamMenuOpen = (event: React.MouseEvent<HTMLElement>, team: Team) => {
+      setTeamMenuAnchorEl(event.currentTarget);
+      setSelectedMenuTeam(team);
+  };
+
+  const handleTeamMenuClose = () => {
+      setTeamMenuAnchorEl(null);
+      setSelectedMenuTeam(null);
+  };
 
   const handleManageTeam = (team: Team) => {
     setSelectedTeam(team);
@@ -196,15 +361,21 @@ export default function AccessManagementPage() {
     setCurrentPage(1);
   };
   
-  const handleRemoveMember = async (teamSlug: string, userEmail: string) => {
-      if (window.confirm(`Remove ${userEmail} from this team?`)) {
-          try {
-              await accessManagementService.removeUserFromTeam(teamSlug, userEmail);
-              fetchTeamMembers(teamSlug); // Refresh member list
-          } catch (error) {
-              alert("Failed to remove member.");
-          }
-      }
+  const handleRemoveMember = (teamSlug: string, userEmail: string, userName: string) => {
+    openConfirmation(
+        `Remove Member?`,
+        `Are you sure you want to remove ${userName} from this team?`,
+        async () => {
+            try {
+                await accessManagementService.removeUserFromTeam(teamSlug, userEmail);
+                showToast("Member removed successfully.", "success");
+                fetchTeamMembers(teamSlug); // Refresh member list
+            } catch (error) {
+                showToast("Failed to remove member.", "error");
+            }
+            handleCloseConfirmation();
+        }
+    );
   }
 
   const handlePageChange = (
@@ -237,7 +408,7 @@ export default function AccessManagementPage() {
   const getStatusColor = (status: boolean) => (status ? "success" : "default");
 
   const renderContent = () => {
-    if (isLoading) {
+    if (isLoading && activeTab === 0) { 
       return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
     }
     if (error) {
@@ -300,7 +471,6 @@ export default function AccessManagementPage() {
                         />
                       </TableCell>
                       <TableCell>
-                        {/* As per assumption, showing the first team */}
                         <Typography variant="body2">
                           {user.teams && user.teams.length > 0 ? user.teams[0].name : "N/A"}
                         </Typography>
@@ -318,8 +488,8 @@ export default function AccessManagementPage() {
                       </TableCell>
                       <TableCell>
                         <Box sx={{ display: "flex", gap: 1 }}>
-                          <IconButton size="small" color="primary"><Edit fontSize="small" /></IconButton>
-                          <IconButton size="small" color="error" onClick={() => handleDeleteUser(user.email)}><Delete fontSize="small" /></IconButton>
+                          <IconButton size="small" color="primary" onClick={() => handleOpenEditUserModal(user)}><Edit fontSize="small" /></IconButton>
+                          <IconButton size="small" color="error" onClick={() => handleDeleteUser(user.email, `${user.first_name} ${user.last_name}`)}><Delete fontSize="small" /></IconButton>
                           <IconButton size="small"><MoreVert fontSize="small" /></IconButton>
                         </Box>
                       </TableCell>
@@ -334,6 +504,9 @@ export default function AccessManagementPage() {
     }
     // Render Teams Tab
     if (activeTab === 1) {
+      if (isLoading) {
+        return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
+      }
       return (
         <Card>
           <CardContent sx={{ p: 0 }}>
@@ -376,7 +549,7 @@ export default function AccessManagementPage() {
                           <Button variant="outlined" size="small" sx={{ textTransform: "none" }} onClick={() => handleManageTeam(team)}>
                             Manage
                           </Button>
-                          <IconButton size="small"><MoreVert fontSize="small" /></IconButton>
+                          <IconButton size="small" onClick={(event) => handleTeamMenuOpen(event, team)}><MoreVert fontSize="small" /></IconButton>
                         </Box>
                       </TableCell>
                     </TableRow>
@@ -440,7 +613,7 @@ export default function AccessManagementPage() {
                   />
                   <Button variant="outlined" startIcon={<Upload />} sx={{ textTransform: "none" }}>Bulk Import</Button>
                   <Button variant="contained" startIcon={<PersonAdd />} sx={{ textTransform: "none" }}>Invite User</Button>
-                  <Button variant="outlined" startIcon={<FilterList />} sx={{ textTransform: "none", ml: "auto" }}>Filter</Button>
+                  <Button variant="outlined" startIcon={<FilterList />} sx={{ textTransform: "none", ml: "auto" }} onClick={handleOpenFilterModal}>Filter</Button>
                 </Box>
               </Box>
               {renderContent()}
@@ -453,7 +626,7 @@ export default function AccessManagementPage() {
                 <Typography variant="h4" component="h2" fontWeight={700} gutterBottom>Team Dashboard</Typography>
                 <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>Create and manage teams within your organization</Typography>
                 <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 3 }}>
-                  <Button variant="contained" startIcon={<Add />} sx={{ textTransform: "none" }}>Create Team</Button>
+                  <Button variant="contained" startIcon={<Add />} sx={{ textTransform: "none" }} onClick={handleOpenCreateTeamModal}>Create Team</Button>
                 </Box>
               </Box>
               {renderContent()}
@@ -502,7 +675,7 @@ export default function AccessManagementPage() {
                                         </Box>
                                     }
                                     />
-                                    <IconButton size="small" color="error" onClick={() => handleRemoveMember(selectedTeam.slug, member.email)}>
+                                    <IconButton size="small" color="error" onClick={() => handleRemoveMember(selectedTeam.slug, member.email, `${member.first_name} ${member.last_name}`)}>
                                         <Delete fontSize="small" />
                                     </IconButton>
                                 </ListItem>
@@ -521,13 +694,179 @@ export default function AccessManagementPage() {
                 </Card>
               )}
             </Box>
-            <Box sx={{ display: "flex", gap: 2, p: 2, borderTop: "1px solid", borderColor: "divider", flexShrink: 0 }}>
-              <Button variant="outlined" fullWidth onClick={handleCloseTeamManagement} sx={{ textTransform: "none", py: 1 }}>Cancel</Button>
-              <Button variant="contained" fullWidth startIcon={<Save />} sx={{ textTransform: "none", py: 1 }}>Save Changes</Button>
-            </Box>
           </Box>
         </Fade>
       </Modal>
+
+      {/* Edit User Modal */}
+      <Dialog open={isEditUserModalOpen} onClose={handleCloseEditUserModal} fullWidth maxWidth="sm">
+          <DialogTitle>Edit User: {editingUser?.first_name} {editingUser?.last_name}</DialogTitle>
+          <DialogContent>
+              <DialogContentText sx={{mb: 2}}>
+                  Update the user's details below.
+              </DialogContentText>
+              <TextField
+                  autoFocus
+                  margin="dense"
+                  id="first_name"
+                  label="First Name"
+                  type="text"
+                  fullWidth
+                  variant="outlined"
+                  defaultValue={editingUser?.first_name}
+                  onChange={(e) => setEditingUser(prev => prev ? {...prev, first_name: e.target.value} : null)}
+              />
+              <TextField
+                  margin="dense"
+                  id="last_name"
+                  label="Last Name"
+                  type="text"
+                  fullWidth
+                  variant="outlined"
+                  defaultValue={editingUser?.last_name}
+                  onChange={(e) => setEditingUser(prev => prev ? {...prev, last_name: e.target.value} : null)}
+              />
+              <FormControl component="fieldset" fullWidth margin="dense">
+                <Typography component="legend" variant="body2" color="text.secondary" sx={{ mt: 1 }}>Status</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Typography>Inactive</Typography>
+                    <Switch
+                        checked={editingUser?.is_active || false}
+                        onChange={(e) => setEditingUser(prev => prev ? { ...prev, is_active: e.target.checked } : null)}
+                        name="is_active"
+                    />
+                    <Typography>Active</Typography>
+                </Box>
+              </FormControl>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, pt: 1 }}>
+              <Button onClick={handleCloseEditUserModal}>Cancel</Button>
+              <Button onClick={() => handleUpdateUser({ 
+                  first_name: editingUser?.first_name || '', 
+                  last_name: editingUser?.last_name || '', 
+                  is_active: editingUser?.is_active 
+                })} 
+                variant="contained"
+              >
+                Save Changes
+              </Button>
+          </DialogActions>
+      </Dialog>
+      
+      {/* Create Team Modal */}
+      <Dialog open={isCreateTeamModalOpen} onClose={handleCloseCreateTeamModal} fullWidth maxWidth="sm">
+          <DialogTitle>Create New Team</DialogTitle>
+          <DialogContent>
+              <DialogContentText sx={{mb: 2}}>
+                  Enter a name for the new team. A unique slug will be generated automatically.
+              </DialogContentText>
+              <TextField
+                  autoFocus
+                  margin="dense"
+                  id="name"
+                  label="Team Name"
+                  type="text"
+                  fullWidth
+                  variant="outlined"
+                  value={newTeamName}
+                  onChange={(e) => setNewTeamName(e.target.value)}
+              />
+          </DialogContent>
+          <DialogActions sx={{ p: 3, pt: 0 }}>
+              <Button onClick={handleCloseCreateTeamModal}>Cancel</Button>
+              <Button onClick={handleCreateTeam} variant="contained">Create Team</Button>
+          </DialogActions>
+      </Dialog>
+      
+      {/* Team Actions Menu */}
+      <Menu
+        anchorEl={teamMenuAnchorEl}
+        open={Boolean(teamMenuAnchorEl)}
+        onClose={handleTeamMenuClose}
+      >
+        <MenuItem onClick={handleDeleteTeam} sx={{ color: 'error.main' }}>
+          <ListItemIcon>
+            <Delete fontSize="small" sx={{ color: 'error.main' }} />
+          </ListItemIcon>
+          Delete Team
+        </MenuItem>
+      </Menu>
+
+      {/* Filter Users Modal */}
+      <Dialog open={isFilterModalOpen} onClose={handleCloseFilterModal} fullWidth maxWidth="xs">
+        <DialogTitle>Filter Users</DialogTitle>
+        <DialogContent>
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="filter-team-label">Team</InputLabel>
+            <Select
+              labelId="filter-team-label"
+              value={tempFilters.team}
+              label="Team"
+              onChange={(e) => setTempFilters({ ...tempFilters, team: e.target.value })}
+            >
+              <MenuItem value=""><em>All Teams</em></MenuItem>
+              {teams.map((team) => (
+                  <MenuItem key={team.slug} value={team.slug}>{team.name}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="filter-status-label">Status</InputLabel>
+            <Select
+              labelId="filter-status-label"
+              value={tempFilters.status}
+              label="Status"
+              onChange={(e) => setTempFilters({ ...tempFilters, status: e.target.value })}
+            >
+              <MenuItem value=""><em>All Statuses</em></MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="inactive">Inactive</MenuItem>
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 0, justifyContent: 'space-between' }}>
+            <Button onClick={handleClearFilters} color="secondary">Clear Filters</Button>
+            <Box>
+                <Button onClick={handleCloseFilterModal}>Cancel</Button>
+                <Button onClick={handleApplyFilters} variant="contained">Apply</Button>
+            </Box>
+        </DialogActions>
+      </Dialog>
+      
+      {/* Confirmation Dialog */}
+      <Dialog
+        open={confirmation.open}
+        onClose={handleCloseConfirmation}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {confirmation.title}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {confirmation.content}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseConfirmation}>Cancel</Button>
+          <Button onClick={confirmation.onConfirm} color="error" autoFocus>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Toast Notification */}
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={6000}
+        onClose={handleCloseToast}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseToast} severity={toast.severity} sx={{ width: '100%' }}>
+          {toast.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
