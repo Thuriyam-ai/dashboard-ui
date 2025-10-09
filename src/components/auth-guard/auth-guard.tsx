@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { LoaderCircle } from 'lucide-react';
 import { Button } from '@mui/material';
 import { useAuth } from '@/contexts/auth-context';
@@ -26,10 +26,11 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     return <LoadingScreen />;
   }
 
-  if (!isAuthenticated) {
-    router.push('/login');
-    return <>{children}</>
-  }
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
 
   return (
     <>
