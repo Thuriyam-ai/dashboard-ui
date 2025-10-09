@@ -5,6 +5,8 @@ import { useAuth } from '@/contexts/auth-context';
 import LoginPage from '@/components/login/login-page';
 import './auth-guard.scss';
 import { Logout } from '@mui/icons-material';
+import { redirect } from 'next/dist/server/api-utils';
+import { useRouter } from 'next/navigation';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -18,13 +20,15 @@ const LoadingScreen = () => (
 
 const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth(); // Use the context
+  const router = useRouter();
 
   if (isLoading) {
     return <LoadingScreen />;
   }
 
   if (!isAuthenticated) {
-    return <LoginPage />;
+    router.push('/login');
+    return <>{children}</>
   }
 
   return (
