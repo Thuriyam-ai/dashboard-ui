@@ -13,13 +13,12 @@ import {
 import {
   BookmarkBorder, MoreVert, Logout, Add, Edit, ContentCopy, Delete, PlayArrow,
   Pause, CheckCircle, Schedule, Campaign, Group, CalendarToday,
-  FileCopy as FileCopyIcon, // <-- 1. Import the icon for copying
+  FileCopy as FileCopyIcon,
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
 import { getAllCampaigns, deleteCampaign } from "@/data/services/campaign-service";
 import { Campaign as CampaignType } from "@/types/api/campaign";
 
-// --- 2. UPDATED ActionsMenu to accept an `onCopy` handler ---
 const ActionsMenu = ({ campaign, onEdit, onClone, onDelete, onCopy }: any) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -39,7 +38,6 @@ const ActionsMenu = ({ campaign, onEdit, onClone, onDelete, onCopy }: any) => {
           <ListItemIcon><ContentCopy fontSize="small" /></ListItemIcon>
           <ListItemText>Clone</ListItemText>
         </MenuItem>
-        {/* --- ADDED "Copy ID" MenuItem --- */}
         <MenuItem onClick={() => { onCopy(campaign.id); handleClose(); }}>
           <ListItemIcon><FileCopyIcon fontSize="small" /></ListItemIcon>
           <ListItemText>Copy ID</ListItemText>
@@ -83,7 +81,6 @@ export default function CampaignManagementPage() {
   const handleEditCampaign = (campaignId: string) => router.push(`/team-leader-dashboard/campaign-mgmt/editor?id=${campaignId}`);
   const handleCloneCampaign = (campaignId: string) => router.push(`/team-leader-dashboard/campaign-mgmt/editor?clone=${campaignId}`);
 
-  // --- 3. ADDED: Handler function to copy the campaign ID ---
   const handleCopyId = (campaignId: string) => {
     navigator.clipboard.writeText(campaignId).then(() => {
       alert(`Campaign ID copied to clipboard: ${campaignId}`);
@@ -135,8 +132,8 @@ export default function CampaignManagementPage() {
   };
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return '–'; // Use an en-dash for missing dates
-    return new Date(dateString).toLocaleDateString('en-CA'); // 'en-CA' gives YYYY-MM-DD format
+    if (!dateString) return '–';
+    return new Date(dateString).toLocaleDateString('en-CA');
   };
 
   return (
@@ -210,7 +207,6 @@ export default function CampaignManagementPage() {
                         </Box>
                       </TableCell>
                       <TableCell align="right">
-                        {/* --- 4. Pass the `handleCopyId` function to the ActionsMenu --- */}
                         <ActionsMenu 
                           campaign={campaign} 
                           onEdit={handleEditCampaign} 

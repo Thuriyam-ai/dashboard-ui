@@ -21,7 +21,8 @@ import { CampaignCreate, CampaignUpdate } from "@/types/api/campaign";
 
 const formatDateForInput = (isoDate: string | null | undefined): string => {
   if (!isoDate) return "";
-  return isoDate.split('T')[0];
+  // Handles both UTC ('Z') and timezone offset ('+05:30') formats safely
+  return new Date(isoDate).toISOString().split('T')[0];
 };
 
 interface FormErrors {
@@ -55,16 +56,23 @@ function CampaignEditorContent() {
 
   useEffect(() => {
     const id = searchParams.get('id');
+    const cloneId = searchParams.get('clone');
+    const paramId = id || cloneId;
+
     const initialize = async () => {
       try {
         const [goalsData, teamsData] = await Promise.all([getActiveGoalsSummary(), getAllTeams()]);
         setAvailableGoals(goalsData);
         setAvailableTeams(teamsData);
-        if (id) {
-          setIsEditing(true);
-          setCampaignId(id);
-          setPageTitle("Edit Campaign");
-          await loadCampaignData(id);
+        if (paramId) {
+          if (id) { // Editing existing campaign
+            setIsEditing(true);
+            setCampaignId(id);
+            setPageTitle("Edit Campaign");
+          } else { // Cloning a campaign
+            setPageTitle("Create New Campaign (Cloned)");
+          }
+          await loadCampaignData(paramId);
         }
       } catch (err) {
         setApiError("Failed to load necessary data. Please try again.");
@@ -89,9 +97,11 @@ function CampaignEditorContent() {
     if (!campaignName.trim()) errors.campaignName = "Campaign name is required.";
     if (!selectedGoalId) errors.selectedGoalId = "A goal must be selected.";
     if (!selectedTeamId) errors.selectedTeamId = "A team must be assigned.";
+    if (!startDate) errors.startDate = "Start date is required.";
+    if (!endDate) errors.endDate = "End date is required.";
     
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Normalize to the start of today
+    today.setHours(0, 0, 0, 0);
     
     const start = startDate ? new Date(startDate) : null;
     const end = endDate ? new Date(endDate) : null;
@@ -100,7 +110,7 @@ function CampaignEditorContent() {
         errors.startDate = "Start date cannot be in the past.";
     }
 
-    if (start && end && end < start) {
+    if (start && end && !errors.startDate && !errors.endDate && end < start) {
         errors.endDate = "End date must be on or after the start date.";
     }
 
@@ -115,12 +125,15 @@ function CampaignEditorContent() {
     }
     
     setIsSaving(true);
-    const starts_at = startDate ? new Date(startDate).toISOString() : null;
-    const ends_at = endDate ? new Date(endDate).toISOString() : null;
+    
+    // **CRITICAL FIX**: Construct ISO string directly as UTC to avoid local timezone issues.
+    // This ensures "2025-10-09" is sent as midnight UTC, not midnight in the browser's timezone.
+    const starts_at = startDate ? `${startDate}T00:00:00.000Z` : null;
+    const ends_at = endDate ? `${endDate}T00:00:00.000Z` : null;
 
     try {
       if (isEditing && campaignId) {
-        const payload: CampaignUpdate = { starts_at, ends_at }; // Per API spec for update
+        const payload: CampaignUpdate = { starts_at, ends_at };
         await updateCampaign(campaignId, payload);
       } else {
         const payload: CampaignCreate = { 
@@ -137,7 +150,6 @@ function CampaignEditorContent() {
       }
       router.push('/team-leader-dashboard/campaign-mgmt');
     } catch (err: any) {
-      // Display backend validation error
       const message = err.response?.data?.detail || "Failed to save the campaign. An unknown error occurred.";
       setApiError(message);
     } finally {
@@ -153,7 +165,7 @@ function CampaignEditorContent() {
           <Toolbar>
             <IconButton onClick={() => router.push('/team-leader-dashboard/campaign-mgmt')}><ArrowBack /></IconButton>
             <Typography variant="h6" sx={{ ml: 2, flexGrow: 1 }}>{pageTitle}</Typography>
-            <Button variant="contained" startIcon={isSaving ? <CircularProgress size={20} color="inherit" /> : <Save />} onClick={handleSave} disabled={isSaving}>
+            <Button variant="contained" startIcon={isSaving ? <CircularProgress size={20} color="inherit" /> : <Save />} onClick={handleSave} disabled={isSaving || isLoading}>
               {isSaving ? 'Saving...' : 'Save Campaign'}
             </Button>
           </Toolbar>
@@ -166,56 +178,60 @@ function CampaignEditorContent() {
           <Card>
             <CardContent sx={{ p: 4 }}>
               <Typography variant="h5" fontWeight={600} gutterBottom>Campaign Configuration</Typography>
-              <Grid container spacing={4} sx={{ mt: 1 }}>
-                <Grid item xs={12} md={6}>
-                  <FormControl fullWidth sx={{ mb: 3 }}>
-                    <TextField 
-                      label="Campaign Name" 
-                      value={campaignName} 
-                      onChange={(e) => setCampaignName(e.target.value)} 
-                      required 
-                      disabled={isEditing} // Field disabled on edit
-                      error={!!formErrors.campaignName}
-                      helperText={formErrors.campaignName || "A unique, human-readable name for this campaign"}
-                    />
-                  </FormControl>
-                  <Box>
-                    <Typography variant="body1" color="text.secondary" gutterBottom>Campaign Duration</Typography>
-                    <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                         <TextField label="Start Date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} InputLabelProps={{ shrink: true }} fullWidth error={!!formErrors.startDate} helperText={formErrors.startDate}/>
+              {isLoading ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress /></Box>
+              ) : (
+                <Grid container spacing={4} sx={{ mt: 1 }}>
+                  <Grid item xs={12} md={6}>
+                    <FormControl fullWidth sx={{ mb: 3 }}>
+                      <TextField 
+                        label="Campaign Name" 
+                        value={campaignName} 
+                        onChange={(e) => setCampaignName(e.target.value)} 
+                        required 
+                        disabled={isEditing}
+                        error={!!formErrors.campaignName}
+                        helperText={formErrors.campaignName || "A unique, human-readable name for this campaign"}
+                      />
+                    </FormControl>
+                    <Box>
+                      <Typography variant="body1" color="text.secondary" gutterBottom>Campaign Duration</Typography>
+                      <Grid container spacing={2}>
+                        <Grid item xs={6}>
+                          <TextField label="Start Date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} InputLabelProps={{ shrink: true }} fullWidth required error={!!formErrors.startDate} helperText={formErrors.startDate}/>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField label="End Date" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} InputLabelProps={{ shrink: true }} fullWidth required error={!!formErrors.endDate} helperText={formErrors.endDate}/>
+                        </Grid>
                       </Grid>
-                      <Grid item xs={6}>
-                        <TextField label="End Date" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} InputLabelProps={{ shrink: true }} fullWidth error={!!formErrors.endDate} helperText={formErrors.endDate}/>
-                      </Grid>
-                    </Grid>
-                  </Box>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <FormControl fullWidth sx={{ mb: 3 }} required error={!!formErrors.selectedGoalId}>
+                      <InputLabel>Goal Selection</InputLabel>
+                      <Select value={selectedGoalId} onChange={(e) => setSelectedGoalId(e.target.value)} label="Goal Selection" disabled={isEditing}>
+                        {availableGoals.map((goal) => (
+                          <MenuItem key={goal.goal_id} value={goal.goal_id}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Psychology sx={{ fontSize: 16 }} />{goal.goal_name} (v{goal.active_version_no})</Box>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {formErrors.selectedGoalId && <FormHelperText>{formErrors.selectedGoalId}</FormHelperText>}
+                    </FormControl>
+                    <FormControl fullWidth required error={!!formErrors.selectedTeamId}>
+                      <InputLabel>Team Assignment</InputLabel>
+                      <Select value={selectedTeamId} onChange={(e) => setSelectedTeamId(e.target.value)} label="Team Assignment" disabled={isEditing}>
+                        {availableTeams.map((team) => (
+                          <MenuItem key={team.id} value={team.id}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Group sx={{ fontSize: 16 }} />{team.name}</Box>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {formErrors.selectedTeamId && <FormHelperText>{formErrors.selectedTeamId}</FormHelperText>}
+                    </FormControl>
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} md={6}>
-                  <FormControl fullWidth sx={{ mb: 3 }} required error={!!formErrors.selectedGoalId}>
-                    <InputLabel>Goal Selection</InputLabel>
-                    <Select value={selectedGoalId} onChange={(e) => setSelectedGoalId(e.target.value)} label="Goal Selection" disabled={isEditing}>
-                      {availableGoals.map((goal) => (
-                        <MenuItem key={goal.goal_id} value={goal.goal_id}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Psychology sx={{ fontSize: 16 }} />{goal.goal_name} (v{goal.active_version_no})</Box>
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {formErrors.selectedGoalId && <FormHelperText>{formErrors.selectedGoalId}</FormHelperText>}
-                  </FormControl>
-                  <FormControl fullWidth required error={!!formErrors.selectedTeamId}>
-                    <InputLabel>Team Assignment</InputLabel>
-                    <Select value={selectedTeamId} onChange={(e) => setSelectedTeamId(e.target.value)} label="Team Assignment" disabled={isEditing}>
-                      {availableTeams.map((team) => (
-                        <MenuItem key={team.id} value={team.id}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Group sx={{ fontSize: 16 }} />{team.name}</Box>
-                        </MenuItem>
-                      ))}
-                    </Select>
-                     {formErrors.selectedTeamId && <FormHelperText>{formErrors.selectedTeamId}</FormHelperText>}
-                  </FormControl>
-                </Grid>
-              </Grid>
+              )}
             </CardContent>
           </Card>
         </Container>

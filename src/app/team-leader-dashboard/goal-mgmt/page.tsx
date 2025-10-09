@@ -1,3 +1,5 @@
+// src/app/team-leader-dashboard/goal-mgmt/page.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -14,29 +16,52 @@ import {
   BookmarkBorder, MoreVert, Logout, Add, Edit, ContentCopy,
   Delete, PlayArrow, Pause, Assessment, Group, CheckCircle,
   FileCopy as FileCopyIcon,
-  Check as CheckIcon, // <-- 1. Import the Check icon for feedback
+  Check as CheckIcon,
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/auth-context";
-import { getAllGoals, publishDraftVersion, deleteGoal } from "@/data/services/goal-service";
+// --- MODIFIED: Import the new canEditGoal function ---
+import { getAllGoals, publishDraftVersion, deleteGoal, canEditGoal } from "@/data/services/goal-service";
 import { GoalDetailResponse } from "@/types/api/goal";
+
+// --- MODIFIED: Add a local type to include the editable status ---
+type GoalWithStatus = GoalDetailResponse & { is_editable: boolean };
 
 export default function GoalManagementPage() {
   const router = useRouter();
-  const [goals, setGoals] = useState<GoalDetailResponse[]>([]);
+  // --- MODIFIED: Use the new state type ---
+  const [goals, setGoals] = useState<GoalWithStatus[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedGoal, setSelectedGoal] = useState<GoalDetailResponse | null>(null);
+  const [selectedGoal, setSelectedGoal] = useState<GoalWithStatus | null>(null);
   const { logout } = useAuth();
   
-  // --- 2. ADDED: State to track which ID has been copied ---
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  // --- MODIFIED: The entire fetchGoals function is updated ---
   const fetchGoals = async () => {
     try {
       setIsLoading(true);
-      const data = await getAllGoals();
-      setGoals(data);
+      // 1. Fetch the initial list of goals
+      const initialGoals = await getAllGoals();
+      if (initialGoals.length === 0) {
+        setGoals([]);
+        return;
+      }
+
+      // 2. Create an array of promises to check the edit status for each goal concurrently
+      const editStatusPromises = initialGoals.map(goal => canEditGoal(goal.goal_id));
+      
+      // 3. Wait for all checks to complete
+      const editStatuses = await Promise.all(editStatusPromises);
+
+      // 4. Combine the initial goal data with its fetched edit status
+      const goalsWithStatus = initialGoals.map((goal, index) => ({
+        ...goal,
+        is_editable: editStatuses[index],
+      }));
+      
+      setGoals(goalsWithStatus);
       setError(null);
     } catch (err) {
       setError("Failed to fetch goals. Please try again later.");
@@ -66,7 +91,7 @@ export default function GoalManagementPage() {
     try {
         await deleteGoal(selectedGoal.goal_id);
         alert(`Goal "${selectedGoal.goal_name}" archived.`);
-        setGoals(goals.filter(g => g.goal_id !== selectedGoal.goal_id));
+        await fetchGoals(); // Refresh the list after deleting
     } catch (error) {
         console.error("Failed to delete goal:", error);
         alert("Error: Could not delete goal.");
@@ -79,13 +104,13 @@ export default function GoalManagementPage() {
   const handleCreateGoal = () => router.push('/team-leader-dashboard/goal-mgmt/editor');
   const handleEditGoal = (goalId: string) => router.push(`/team-leader-dashboard/goal-mgmt/editor?id=${goalId}`);
   const handleCloneGoal = (goalId: string) => router.push(`/team-leader-dashboard/goal-mgmt/editor?clone=${goalId}`);
-  const handleDeleteGoal = (goal: GoalDetailResponse) => { setSelectedGoal(goal); setDeleteDialogOpen(true); };
+  const handleDeleteGoal = (goal: GoalWithStatus) => { setSelectedGoal(goal); setDeleteDialogOpen(true); };
+  const handleViewGoal = (goalId: string) => router.push(`/team-leader-dashboard/goal-mgmt/view?id=${goalId}`);
 
-  // --- 3. UPDATED: Copy function now provides visual feedback ---
   const handleCopyId = (id: string) => {
     navigator.clipboard.writeText(id).then(() => {
-      setCopiedId(id); // Set the copied ID
-      setTimeout(() => setCopiedId(null), 2000); // Reset after 2 seconds
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
     }).catch(err => {
       console.error('Failed to copy ID: ', err);
     });
@@ -111,7 +136,15 @@ export default function GoalManagementPage() {
       <Grid container spacing={2}>
         {goals.map((goal) => (
           <Grid item xs={12} key={goal.goal_id}>
-            <Card sx={{ transition: 'all 0.2s ease-in-out', '&:hover': { transform: 'translateY(-4px)', boxShadow: 4},width:"75vw" }}>
+            <Card 
+              onClick={() => handleViewGoal(goal.goal_id)}
+              sx={{ 
+                cursor: 'pointer',
+                transition: 'all 0.2s ease-in-out', 
+                '&:hover': { transform: 'translateY(-4px)', boxShadow: 4},
+                width:"75vw" 
+              }}
+            >
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
                   <Box sx={{ flex: '1 1 50%', minWidth: 300 }}>
@@ -134,15 +167,22 @@ export default function GoalManagementPage() {
                     </Box>
                   </Box>
                   
-                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                    <Button 
-                      size="small" 
-                      startIcon={<Edit />} 
-                      onClick={() => handleEditGoal(goal.goal_id)} 
-                      disabled={!goal.draft_version_no && !goal.published_version_no}
-                    >
-                      Edit
-                    </Button>
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }} onClick={(e) => e.stopPropagation()}>
+                    <Tooltip title={!goal.is_editable ? "Cannot edit goal: dependent campaigns must be ended or deleted first." : "Edit goal draft"}>
+                      <span>
+                        <Button
+                          size="small"
+                          startIcon={<Edit />}
+                          onClick={() => handleEditGoal(goal.goal_id)}
+                          // --- CORRECTED LOGIC ---
+                          // This now correctly uses the is_editable flag fetched from the new API endpoint.
+                          disabled={!goal.is_editable}
+                        >
+                          Edit
+                        </Button>
+                      </span>
+                    </Tooltip>
+
                     <Button size="small" startIcon={<CheckCircle />} onClick={() => handlePublish(goal.goal_id)} disabled={!goal.draft_version_no}>
                       Publish Draft
                     </Button>
@@ -160,7 +200,6 @@ export default function GoalManagementPage() {
                       </span>
                     </Tooltip>
 
-                    {/* --- 4. ADDED: New button with conditional feedback --- */}
                     <Button
                       size="small"
                       variant="outlined"

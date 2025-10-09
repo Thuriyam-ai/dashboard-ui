@@ -2,8 +2,9 @@
 
 import apiClient from './api-client'; // Assuming you have a configured axios instance here
 import {
-  GoalDetailResponse, Owner, Team, GoalCreateRequest, GoalUpdateRequest,
-  SimpleSuccessResponse, ActiveGoalSummary, GoalVersionDetailResponse
+  GoalDetailResponse, ActiveGoalSummary, GoalVersionDetailResponse,
+  GoalCreateRequest, GoalUpdateRequest, SimpleSuccessResponse,
+  Owner, Team
 } from '@/types/api/goal';
 
 // --- Read Operations ---
@@ -55,4 +56,17 @@ export const getOwners = async (): Promise<Owner[]> => {
 export const getTeams = async (): Promise<Team[]> => {
   const response = await apiClient.get('/api/v1/goals/utils/teams');
   return response.data;
+};
+
+
+export const canEditGoal = async (goalId: string): Promise<boolean> => {
+  try {
+    // If the API returns a 200 OK response, it means the goal is editable.
+    await apiClient.get(`/api/v1/goals/${goalId}/can_edit`);
+    return true;
+  } catch (error) {
+    // If the API returns an error (like 400), it means the goal is NOT editable.
+    console.error(`Check for goal ${goalId} failed, assuming it's not editable.`);
+    return false;
+  }
 };

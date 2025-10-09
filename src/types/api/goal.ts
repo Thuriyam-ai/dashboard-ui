@@ -84,7 +84,7 @@ export interface GoalCreateRequest {
 // For updating a draft (same as create)
 export type GoalUpdateRequest = GoalCreateRequest;
 
-// For the main goal listing page (remains the same)
+// For the main goal listing page
 export interface GoalDetailResponse {
   goal_id: string;
   goal_name: string;
@@ -97,6 +97,7 @@ export interface GoalDetailResponse {
   completion_score: number;
   published_version_no: number | null;
   draft_version_no: number | null;
+  is_editable: boolean; // <-- ADDED: Determines if a goal can be edited (e.g., no active campaigns).
 }
 
 // For fetching a specific version to edit (flat structure)
