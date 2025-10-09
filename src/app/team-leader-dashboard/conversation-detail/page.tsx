@@ -672,6 +672,13 @@ export default function ConversationDetailPage() {
               <Typography variant="h6" gutterBottom>
                 Conversation Playback & Transcript
               </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 2 }}
+              >
+                Note: The transcript below is a sample for demonstration, this feature is coming soon. 
+              </Typography>
               <Box
                 sx={{
                   p: 2,
@@ -889,9 +896,7 @@ export default function ConversationDetailPage() {
                         color="text.secondary"
                         gutterBottom
                       >
-                        Total QC Score: {totalAchievedScore} /{" "}
-                        {totalPossibleScore} ({Math.round(scorecardPercentage)}
-                        % Adherence)
+                        Total Adherence: {Math.round(scorecardPercentage)}%
                       </Typography>
                       <LinearProgress
                         variant="determinate"
