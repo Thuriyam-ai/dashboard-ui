@@ -2,7 +2,6 @@
 
 import React from "react";
 import {
-  Drawer,
   List,
   ListItem,
   ListItemIcon,
@@ -11,15 +10,12 @@ import {
   Typography,
 } from "@mui/material";
 import {
-  Dashboard,
   Analytics,
   Message,
-  Support,
-  TrendingUp,
   Settings,
   Flag,
   Campaign,
-  Notifications,
+  People,
 } from "@mui/icons-material";
 
 import { useRouter } from "next/navigation";
@@ -62,6 +58,22 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
           label: "Campaigns",
           icon: <Campaign />,
           path: "/team-leader-dashboard/campaign-mgmt",
+        },
+      ],
+    },
+  ];
+
+  const accessManagementItems = [
+    {
+      id: "access-management",
+      label: "Access Management",
+      icon: <Settings />,
+      children: [
+        {
+          id: "access-management",
+          label: "Access Management",
+          icon: <People />,
+          path: "/team-leader-dashboard/access-management",
         },
       ],
     },
@@ -224,6 +236,74 @@ export function TeamLeaderSidebar({ activeItem = "overview" }: TeamLeaderSidebar
               CONFIGURATIONS
             </Typography>
             {configurationItems[0].children.map((item) => (
+              <ListItem
+                key={item.id}
+                onClick={() => handleNavClick(item.path)}
+                sx={{
+                  borderRadius: '0.5rem',
+                  backgroundColor: activeItem === item.id ? 'rgba(102, 126, 234, 0.1)' : 'transparent',
+                  color: activeItem === item.id ? 'white' : 'rgba(255, 255, 255, 0.6)',
+                  cursor: 'pointer',
+                  transition: 'all 250ms cubic-bezier(0.4, 0, 0.2, 1)',
+                  mb: '0.125rem',
+                  border: activeItem === item.id ? '1px solid rgba(102, 126, 234, 0.2)' : '1px solid transparent',
+                  '&:hover': {
+                    backgroundColor: activeItem === item.id ? 'rgba(102, 126, 234, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                    color: 'white',
+                    transform: 'translateX(2px)',
+                    border: '1px solid rgba(102, 126, 234, 0.15)',
+                  },
+                  '& .MuiListItemIcon-root': {
+                    color: 'inherit',
+                    minWidth: '1rem',
+                    mr: '0.625rem',
+                  },
+                }}
+              >
+                <ListItemIcon>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText 
+                  primary={item.label} 
+                  sx={{
+                    '& .MuiListItemText-primary': {
+                      fontSize: '0.8125rem',
+                      fontWeight: 500,
+                      color: 'inherit',
+                      letterSpacing: '-0.01em',
+                      fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif',
+                    },
+                  }}
+                />
+              </ListItem>
+            ))}
+          </Box>
+
+          {/* Access Management Section - Always Expanded */}
+          <Box sx={{ 
+            ml: '1.25rem',
+            mt: '0.25rem',
+            mb: '0.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.125rem',
+            borderLeft: '1px solid rgba(255, 255, 255, 0.1)',
+            pl: '0.75rem',
+          }}>
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                color: 'rgba(255, 255, 255, 0.5)',
+                fontWeight: 600,
+                mb: '0.5rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                fontSize: '0.6875rem',
+              }}
+            >
+              ACCESS MANAGEMENT
+            </Typography>
+            {accessManagementItems[0].children.map((item) => (
               <ListItem
                 key={item.id}
                 onClick={() => handleNavClick(item.path)}
