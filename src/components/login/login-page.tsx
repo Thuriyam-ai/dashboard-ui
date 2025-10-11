@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Mail, Lock, AlertCircle, User as UserIcon, CaseSensitive } from 'lucide-react';
+import { Shield, Mail, Lock, AlertCircle, User as UserIcon, CaseSensitive, Eye, EyeOff } from 'lucide-react';
 import './login-page.scss';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
@@ -12,6 +12,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
   const { login, signup, isLoading, error, clearError, isAuthenticated } = useAuth();
@@ -48,6 +49,10 @@ const LoginPage = () => {
     setLastName('');
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <div className="login-page">
       <div className="login-wrapper">
@@ -63,7 +68,6 @@ const LoginPage = () => {
             {!isLoginView && (
               <>
                 <div className="input-group">
-                  {/* ✨ CHANGE: Added asterisk to the label */}
                   <label htmlFor="username">Username*</label>
                   <div className="input-field-wrapper">
                     <UserIcon className="input-icon" />
@@ -79,12 +83,11 @@ const LoginPage = () => {
                   </div>
                 </div>
 
-                {/* ✨ CHANGE: New container to hold First and Last Name in one row */}
                 <div className="form-row">
                   <div className="input-group">
                     <label htmlFor="first-name">First Name (optional)</label>
                     <div className="input-field-wrapper">
-                      <CaseSensitive className="input-icon" /> {/* New Icon */}
+                      <CaseSensitive className="input-icon" />
                       <input
                         id="first-name"
                         type="text"
@@ -92,14 +95,13 @@ const LoginPage = () => {
                         onChange={(e) => setFirstName(e.target.value)}
                         className="text-input"
                         placeholder="Your first name"
-                        // Removed 'required'
                       />
                     </div>
                   </div>
                   <div className="input-group">
                     <label htmlFor="last-name">Last Name (optional)</label>
                     <div className="input-field-wrapper">
-                      <CaseSensitive className="input-icon" /> {/* New Icon */}
+                      <CaseSensitive className="input-icon" />
                       <input
                         id="last-name"
                         type="text"
@@ -107,7 +109,6 @@ const LoginPage = () => {
                         onChange={(e) => setLastName(e.target.value)}
                         className="text-input"
                         placeholder="Your last name"
-                        // Removed 'required'
                       />
                     </div>
                   </div>
@@ -116,7 +117,6 @@ const LoginPage = () => {
             )}
 
             <div className="input-group">
-              {/* ✨ CHANGE: Added asterisk to the label */}
               <label htmlFor="email">Email Address*</label>
               <div className="input-field-wrapper">
                 <Mail className="input-icon" />
@@ -133,19 +133,21 @@ const LoginPage = () => {
             </div>
 
             <div className="input-group">
-              {/* ✨ CHANGE: Added asterisk to the label */}
               <label htmlFor="password">Password*</label>
               <div className="input-field-wrapper">
                 <Lock className="input-icon" />
                 <input
                   id="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="text-input"
                   placeholder="Enter your password"
                   required
                 />
+                <button type="button" onClick={togglePasswordVisibility} className="password-toggle-button">
+                  {showPassword ? <EyeOff className="password-toggle-icon" /> : <Eye className="password-toggle-icon" />}
+                </button>
               </div>
             </div>
 

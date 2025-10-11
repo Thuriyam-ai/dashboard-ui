@@ -19,7 +19,6 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-
 .loading-screen {
   display: flex;
   align-items: center;
@@ -34,26 +33,6 @@ body {
     animation: spin 1s linear infinite;
   }
 }
-
-// src/styles/login-page.scss
-
-.login-form {
-  // ... your existing styles for .login-form
-
-  // ✨ ADD THIS: New rule for the two-column row
-  .form-row {
-    display: flex;
-    align-items: flex-start; // Aligns items to the top
-    gap: 1rem; // Creates a space between the first and last name fields
-    width: 100%;
-
-    // Each input group within the row will take up equal space
-    .input-group {
-      flex: 1;
-    }
-  }
-}
-
 
 .auth-container {
   min-height: 100vh;
@@ -90,7 +69,6 @@ body {
     }
   }
 }
-
 
 .login-page {
   min-height: 100vh;
@@ -146,11 +124,22 @@ body {
     }
   }
 
-  // .login-form {
-  //   display: flex;
-  //   flex-direction: column;
-  //   gap: 1.5rem;
-  // }
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  
+    .form-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      width: 100%;
+  
+      .input-group {
+        flex: 1;
+      }
+    }
+  }
 
   .input-group {
     label {
@@ -177,7 +166,8 @@ body {
 
     .text-input {
       width: 100%;
-      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      // ✨ CHANGE: Added padding-right to make space for the toggle icon
+      padding: 0.75rem 2.5rem;
       border: 1px solid $border-color;
       border-radius: 0.5rem;
       box-sizing: border-box;
@@ -187,6 +177,29 @@ body {
         outline: none;
         border-color: transparent;
         box-shadow: 0 0 0 2px $primary-blue;
+      }
+    }
+    
+    // ✨ ADDED: Styles for the new password visibility toggle button
+    .password-toggle-button {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      color: $text-extra-light;
+
+      &:hover {
+        color: $text-medium;
+      }
+      
+      .password-toggle-icon {
+        width: 1.25rem;
+        height: 1.25rem;
       }
     }
   }
