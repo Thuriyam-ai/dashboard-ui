@@ -121,9 +121,11 @@ export default function ConversationsPage() {
       setLoadingConversations(true);
       setConversationError(null);
       try {
+        // The API call in `listConversations` needs to be updated to handle "all"
+        // For now, we assume it fetches all if the ID is "all" or null/undefined
         const data = await listConversations({
-          campaignId: campaignFilter,
-          teamId: teamFilter,
+          campaign_id: campaignFilter === "all" ? undefined : campaignFilter,
+          team_id: teamFilter === "all" ? undefined : teamFilter,
         });
         setConversations(data);
       } catch (error) {
@@ -138,7 +140,56 @@ export default function ConversationsPage() {
 
   const teamMap = useMemo(() => new Map(teams.map(team => [team.id, team.name])), [teams]);
 
-  // --- UPDATED EXPORT HANDLER ---
+  const filteredConversations = useMemo(() => 
+    conversations.filter((conv) =>
+      conv.agent_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      conv.employer_user_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      conv.conversation_id.toLowerCase().includes(searchTerm.toLowerCase())
+    ),
+    [conversations, searchTerm]
+  );
+
+  // **Calculated Summary Statistics**
+  const summaryStats = useMemo(() => {
+    if (filteredConversations.length === 0) {
+      return {
+        total: 0,
+        completed: 0,
+        avgScore: 0,
+        avgDuration: 0,
+      };
+    }
+
+    const completedCount = filteredConversations.filter(
+      (conv) => conv.avyukta_status?.toUpperCase() === "COMPLETED"
+    ).length;
+
+    const conversationsWithScores = filteredConversations.filter(
+      (conv) => typeof conv.QC_score === 'number'
+    );
+    const totalScore = conversationsWithScores.reduce(
+      (acc, conv) => acc + (conv.QC_score || 0),
+      0
+    );
+    const avgScore = conversationsWithScores.length > 0
+      ? Math.round(totalScore / conversationsWithScores.length)
+      : 0;
+
+    const totalDuration = filteredConversations.reduce(
+      (acc, conv) => acc + (conv.length_in_sec || 0),
+      0
+    );
+    const avgDurationInSeconds = totalDuration / filteredConversations.length;
+    const avgDurationInMinutes = Math.round(avgDurationInSeconds / 60);
+
+    return {
+      total: filteredConversations.length,
+      completed: completedCount,
+      avgScore: avgScore,
+      avgDuration: avgDurationInMinutes,
+    };
+  }, [filteredConversations]);
+
   const handleExportData = () => {
     if (filteredConversations.length === 0) {
       alert("No data to export.");
@@ -146,32 +197,158 @@ export default function ConversationsPage() {
     }
     setIsExporting(true);
 
+    const flattenObject = (obj: any, parentKey = '', result: { [key: string]: any } = {}) => {
+      for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          const newKey = parentKey ? `${parentKey}.${key}` : key;
+          const value = obj[key];
+          if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+            flattenObject(value, newKey, result);
+          } else if (Array.isArray(value)) {
+            result[newKey] = JSON.stringify(value, null, 2);
+          } else {
+            result[newKey] = value;
+          }
+        }
+      }
+      return result;
+    };
+
     setTimeout(() => {
       try {
-        // 1. Process data: keep level-1 keys, stringify any nested objects/arrays
-        const exportData = filteredConversations.map(conv => {
-          const row: { [key: string]: any } = {};
-          for (const key in conv) {
-            if (Object.prototype.hasOwnProperty.call(conv, key)) {
-              const value = (conv as any)[key];
-              if (typeof value === 'object' && value !== null) {
-                // If the value is a nested object or an array, convert it to a JSON string
-                row[key] = JSON.stringify(value, null, 2); // Using null, 2 for pretty printing
-              } else {
-                // Otherwise, keep the primitive value as is
-                row[key] = value;
+        const transformedConversations = filteredConversations.map(conv => {
+            const newConv = JSON.parse(JSON.stringify(conv));
+            delete newConv.logging_comments;
+            if (newConv.analytics_data) {
+                if (newConv.analytics_data.outcome) {
+                    for (const key in newConv.analytics_data.outcome) {
+                        if (Object.prototype.hasOwnProperty.call(newConv.analytics_data.outcome, key)) {
+                            const item = newConv.analytics_data.outcome[key];
+                            newConv.analytics_data.outcome[key] = {
+                                extracted_value: item.extracted_value,
+                                reasoning: item.reasoning,
+                                reviewer_value: item.reviewer_value,
+                                reviewer_reason: item.reviewer_reason,
+                            };
+                        }
+                    }
+                }
+                if (newConv.analytics_data.scorecard) {
+                    for (const key in newConv.analytics_data.scorecard) {
+                        if (Object.prototype.hasOwnProperty.call(newConv.analytics_data.scorecard, key)) {
+                            const item = newConv.analytics_data.scorecard[key];
+                            newConv.analytics_data.scorecard[key] = {
+                                score: item.score,
+                                explanation: item.explanation,
+                                max_score: item.max_score,
+                                review_score: item.review_score,
+                                reason_for_update: item.reason_for_update,
+                            };
+                        }
+                    }
+                }
+                const { analytics_data, ...rest } = newConv;
+                return { ...rest, ...analytics_data };
+            }
+            return newConv;
+        });
+
+        const conversationsByCampaign = transformedConversations.reduce((acc, conv) => {
+          const campaignId = conv.campaign_id || 'Uncategorized';
+          if (!acc[campaignId]) acc[campaignId] = [];
+          acc[campaignId].push(conv as any);
+          return acc;
+        }, {} as Record<string, any[]>);
+
+        const workbook = XLSX.utils.book_new();
+
+        for (const campaignId in conversationsByCampaign) {
+          if (!Object.prototype.hasOwnProperty.call(conversationsByCampaign, campaignId)) continue;
+          
+          const campaignConversations = conversationsByCampaign[campaignId];
+          const flattenedData = campaignConversations.map(conv => flattenObject(conv));
+          if (flattenedData.length === 0) continue;
+
+          const allHeaders = Object.keys(flattenedData.reduce((res, row) => ({ ...res, ...row }), {}));
+          const headerParts = allHeaders.map(h => h.split('.'));
+          const maxDepth = Math.max(...headerParts.map(p => p.length));
+
+          const headerRows: string[][] = Array.from({ length: maxDepth }, () => []);
+          allHeaders.forEach(header => {
+            const parts = header.split('.');
+            for (let i = 0; i < maxDepth; i++) {
+              headerRows[i].push(parts[i] || '');
+            }
+          });
+
+          const dataRows = flattenedData.map(row => allHeaders.map(header => row[header] ?? ''));
+          const sheetData = [...headerRows, ...dataRows];
+          const worksheet = XLSX.utils.aoa_to_sheet(sheetData);
+
+          const merges = [];
+          for (let R = 0; R < maxDepth; ++R) {
+            for (let C = 0; C < headerRows[R].length; ++C) {
+              if (!headerRows[R][C] || merges.some(m => R >= m.s.r && R <= m.e.r && C >= m.s.c && C <= m.e.c)) continue;
+              let C_end = C;
+              while (C_end + 1 < headerRows[R].length && headerRows[R][C_end + 1] === headerRows[R][C]) {
+                let isSameParent = true;
+                for (let r_parent = 0; r_parent < R; r_parent++) {
+                  if (headerRows[r_parent][C] !== headerRows[r_parent][C_end + 1]) {
+                    isSameParent = false;
+                    break;
+                  }
+                }
+                if (!isSameParent) break;
+                C_end++;
+              }
+              let R_end = R;
+              while (R_end + 1 < maxDepth && !headerRows[R_end + 1][C]) R_end++;
+              if (R !== R_end || C !== C_end) merges.push({ s: { r: R, c: C }, e: { r: R_end, c: C_end } });
+            }
+          }
+          worksheet['!merges'] = merges;
+
+          const numCols = sheetData[0] ? sheetData[0].length : 0;
+          const cols = Array.from({ length: numCols }, () => ({ wch: 10 }));
+
+          for (let C = 0; C < numCols; ++C) {
+              let maxWidth = 0;
+              for (let R = 0; R < sheetData.length; ++R) {
+                  const cellContent = sheetData[R][C];
+                  const contentLength = cellContent ? String(cellContent).length : 0;
+                  if (contentLength > maxWidth) {
+                      maxWidth = contentLength;
+                  }
+              }
+              cols[C] = { wch: Math.min(Math.max(maxWidth + 2, 10), 60) };
+          }
+          worksheet['!cols'] = cols;
+
+          const range = XLSX.utils.decode_range(worksheet['!ref']!);
+          for (let R = range.s.r; R <= range.e.r; ++R) {
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+              const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+              const cell = worksheet[cellAddress];
+              if (!cell) continue;
+              if (!cell.s) cell.s = {};
+              if (!cell.s.alignment) cell.s.alignment = {};
+              cell.s.alignment.wrapText = true;
+              cell.s.alignment.vertical = "top";
+
+              if (R < maxDepth) {
+                if (!cell.s.fill) cell.s.fill = {};
+                cell.s.fill.fgColor = { rgb: "FFFF00" };
+                if (!cell.s.font) cell.s.font = {};
+                cell.s.font.bold = true;
               }
             }
           }
-          return row;
-        });
+          
+          const campaignInfo = campaigns.find(c => c.id === campaignId);
+          const sheetName = (campaignInfo?.name || campaignId).replace(/[\/\\?*[\]:]/g, '').substring(0, 31);
+          XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+        }
 
-        // 2. Create a single worksheet from the processed data
-        const worksheet = XLSX.utils.json_to_sheet(exportData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Conversations");
-        
-        // 3. Trigger the file download
         const today = new Date().toISOString().split('T')[0];
         XLSX.writeFile(workbook, `conversations_export_${today}.xlsx`);
 
@@ -184,7 +361,7 @@ export default function ConversationsPage() {
     }, 100);
   };
 
-  const getStatusColor = (status: string | null) => {
+  const getStatusColor = (status: string | null | undefined) => {
     switch (status?.toUpperCase()) {
       case "COMPLETED": return "success";
       case "IN-PROGRESS": return "info";
@@ -193,7 +370,7 @@ export default function ConversationsPage() {
     }
   };
 
-  const getStatusIcon = (status: string | null) => {
+  const getStatusIcon = (status: string | null | undefined) => {
     switch (status?.toUpperCase()) {
       case "COMPLETED": return <CheckCircle />;
       case "IN-PROGRESS": return <Schedule />;
@@ -208,17 +385,16 @@ export default function ConversationsPage() {
     return "error.main";
   };
 
-  const formatDate = (dateString: string) => {
-    let date;
-    try {
-        date = new Date(dateString.includes('$date') ? JSON.parse(dateString).$date : dateString);
-    } catch {
-        date = new Date(dateString);
-    }
-    if (isNaN(date.getTime())) return '-';
-    return date.toLocaleDateString("en-IN", {
-      day: "numeric", month: "short", year: "numeric",
-    });
+  const formatDate = (dateString: string | { $date: string }) => {
+      const dateVal = typeof dateString === 'string' ? dateString : dateString?.$date;
+      if (!dateVal) return '-';
+      
+      const date = new Date(dateVal);
+      if (isNaN(date.getTime())) return '-';
+
+      return date.toLocaleDateString("en-IN", {
+        day: "numeric", month: "short", year: "numeric",
+      });
   };
 
   const formatSeconds = (seconds: number) => {
@@ -227,12 +403,6 @@ export default function ConversationsPage() {
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-
-  const filteredConversations = conversations.filter((conv) =>
-    conv.agent_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    conv.employer_user_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    conv.conversation_id.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const handleViewDetails = (conversationId: string) => {
     router.push(`/team-leader-dashboard/conversation-detail?id=${conversationId}`);
@@ -331,16 +501,16 @@ export default function ConversationsPage() {
 
           <Grid container spacing={3} sx={{ mb: 4 }}>
             <Grid item xs={12} sm={6} md={3}>
-              <Card><CardContent><Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}><Box><Typography color="text.secondary" gutterBottom>Total Conversations</Typography><Typography variant="h4" fontWeight={700} color="primary">{conversations.length}</Typography></Box><Message sx={{ fontSize: 40, color: 'primary.main' }} /></Box></CardContent></Card>
+              <Card><CardContent><Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}><Box><Typography color="text.secondary" gutterBottom>Total Conversations</Typography><Typography variant="h4" fontWeight={700} color="primary">{summaryStats.total}</Typography></Box><Message sx={{ fontSize: 40, color: 'primary.main' }} /></Box></CardContent></Card>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-              <Card><CardContent><Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}><Box><Typography color="text.secondary" gutterBottom>Completed</Typography><Typography variant="h4" fontWeight={700} color="success.main">3</Typography></Box><CheckCircle sx={{ fontSize: 40, color: 'success.main' }} /></Box></CardContent></Card>
+              <Card><CardContent><Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}><Box><Typography color="text.secondary" gutterBottom>Completed</Typography><Typography variant="h4" fontWeight={700} color="success.main">{summaryStats.completed}</Typography></Box><CheckCircle sx={{ fontSize: 40, color: 'success.main' }} /></Box></CardContent></Card>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-              <Card><CardContent><Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}><Box><Typography color="text.secondary" gutterBottom>Avg Quality Score</Typography><Typography variant="h4" fontWeight={700} color="info.main">92</Typography></Box><TrendingUp sx={{ fontSize: 40, color: 'info.main' }} /></Box></CardContent></Card>
+              <Card><CardContent><Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}><Box><Typography color="text.secondary" gutterBottom>Avg Quality Score</Typography><Typography variant="h4" fontWeight={700} color="info.main">{summaryStats.avgScore}</Typography></Box><TrendingUp sx={{ fontSize: 40, color: 'info.main' }} /></Box></CardContent></Card>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-              <Card><CardContent><Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}><Box><Typography color="text.secondary" gutterBottom>Avg Duration</Typography><Typography variant="h4" fontWeight={700} color="warning.main">12m</Typography></Box><Schedule sx={{ fontSize: 40, color: 'warning.main' }} /></Box></CardContent></Card>
+              <Card><CardContent><Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}><Box><Typography color="text.secondary" gutterBottom>Avg Duration</Typography><Typography variant="h4" fontWeight={700} color="warning.main">{summaryStats.avgDuration}m</Typography></Box><Schedule sx={{ fontSize: 40, color: 'warning.main' }} /></Box></CardContent></Card>
             </Grid>
           </Grid>
           
@@ -373,7 +543,7 @@ export default function ConversationsPage() {
                     ) : (
                       filteredConversations.map((conv) => {
                         const qualityScore = conv.QC_score;
-                        const callDate = typeof conv.call_timestamp === 'string' ? conv.call_timestamp : conv.call_timestamp?.$date || new Date().toISOString();
+                        const callDate = conv.call_timestamp;
                         
                         return (
                           <TableRow key={conv.conversation_id}>
